@@ -24,25 +24,18 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// var rd []models.Device
-type deviceList struct {
-	rd []models.Device
+type deviceServiceList struct {
+	rd []models.DeviceProfile
 }
 
-// devicesCmd represents the devices command
-var devicesCmd = &cobra.Command{
-	Use:   "devices",
-	Short: "A list of all device services",
-	Long: `Return all device services sorted by id. 
-	Returns Internal Service Error (HTTP 500) for 
-	unknown or unanticipated issues. Returns 
-	LimitExceededException (HTTP 413) if the number 
-	returned exceeds the max limit.`,
+// deviceservicesCmd represents the deviceservices command
+var deviceservicesCmd = &cobra.Command{
+	Use:   "deviceservices",
+	Short: "Lists existing devices services",
+	Long:  `Return the list fo current device services.`,
 	Run: func(cmd *cobra.Command, args []string) {
-
-		resp, err := http.Get("http://localhost:48081/api/v1/device")
+		resp, err := http.Get("http://localhost:48081/api/v1/deviceservice")
 		if err != nil {
-			// handle error
 			fmt.Println("An error occured. Is EdgeX running?")
 			fmt.Println(err)
 		}
@@ -50,29 +43,28 @@ var devicesCmd = &cobra.Command{
 
 		data, _ := ioutil.ReadAll(resp.Body)
 
-		deviceList1 := deviceList{}
+		deviceServiceList1 := deviceServiceList{}
 
-		errjson := json.Unmarshal(data, &deviceList1.rd)
+		errjson := json.Unmarshal(data, &deviceServiceList1.rd)
 		if errjson != nil {
 			fmt.Println(errjson)
 		}
-		for i, device := range deviceList1.rd {
+		for i, device := range deviceServiceList1.rd {
 			fmt.Printf("%v\t%s\t%v\n", i, device.Name, device.Created)
 		}
-
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(devicesCmd)
+	rootCmd.AddCommand(deviceservicesCmd)
 
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	// devicesCmd.PersistentFlags().String("foo", "", "A help for foo")
+	// deviceservicesCmd.PersistentFlags().String("foo", "", "A help for foo")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// devicesCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// deviceservicesCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

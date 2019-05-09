@@ -15,23 +15,17 @@
 package cmd
 
 import (
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 
-	models "github.com/edgexfoundry/go-mod-core-contracts/models"
 	"github.com/spf13/cobra"
 )
 
-type deviceProfileList struct {
-	rd []models.DeviceProfile
-}
-
-// profilesCmd represents the profiles command
-var profilesCmd = &cobra.Command{
-	Use:   "profiles",
-	Short: "Returns a list of device profiles",
+// deletedeviceserviceCmd represents the deletedeviceservice command
+var deletedeviceserviceCmd = &cobra.Command{
+	Use:   "deletedeviceservice",
+	Short: "Delete device service by name",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
 
@@ -39,37 +33,48 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		resp, err := http.Get("http://localhost:48081/api/v1//deviceprofile")
+		fmt.Println(args[0])
+
+		client := &http.Client{}
+
+		// Create request
+		req, err := http.NewRequest("DELETE", "http://localhost:48081/api/v1/deviceservice/name/"+args[0], nil)
 		if err != nil {
-			fmt.Println("An error occured. Is EdgeX running?")
 			fmt.Println(err)
+			return
+		}
+
+		// Fetch Request
+		resp, err := client.Do(req)
+		if err != nil {
+			fmt.Println(err)
+			return
 		}
 		defer resp.Body.Close()
 
-		data, _ := ioutil.ReadAll(resp.Body)
-
-		deviceProfileList1 := deviceProfileList{}
-
-		errjson := json.Unmarshal(data, &deviceProfileList1.rd)
-		if errjson != nil {
-			fmt.Println(errjson)
+		respBody, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			fmt.Println(err)
+			return
 		}
-		for i, profile := range deviceProfileList1.rd {
-			fmt.Printf("%v\t%s\t%v\n", i, profile.Name, profile.Id)
-		}
+
+		// Display Results
+		fmt.Println("response Status : ", resp.Status)
+		fmt.Println("response Headers : ", resp.Header)
+		fmt.Println("response Body : ", string(respBody))
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(profilesCmd)
+	rootCmd.AddCommand(deletedeviceserviceCmd)
 
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	// profilesCmd.PersistentFlags().String("foo", "", "A help for foo")
+	// deletedeviceserviceCmd.PersistentFlags().String("foo", "", "A help for foo")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// profilesCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// deletedeviceserviceCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
