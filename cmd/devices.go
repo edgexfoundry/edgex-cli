@@ -20,7 +20,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/edgexfoundry/edgex-go/pkg/models"
+	models "github.com/edgexfoundry/go-mod-core-contracts/models"
 	"github.com/spf13/cobra"
 )
 
