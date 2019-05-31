@@ -33,11 +33,7 @@ type deviceList struct {
 var devicesCmd = &cobra.Command{
 	Use:   "devices",
 	Short: "A list of all device services",
-	Long: `Return all device services sorted by id. 
-	Returns Internal Service Error (HTTP 500) for 
-	unknown or unanticipated issues. Returns 
-	LimitExceededException (HTTP 413) if the number 
-	returned exceeds the max limit.`,
+	Long:  `Return all device services sorted by id.`,
 	Run: func(cmd *cobra.Command, args []string) {
 
 		resp, err := http.Get("http://localhost:48081/api/v1/device")
