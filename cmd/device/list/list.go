@@ -29,10 +29,10 @@ type deviceList struct {
 	rd []models.Device
 }
 
-// devicesCmd represents the devices command
+// NewCommand returns the list device command
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "devices",
+		Use:   "list",
 		Short: "A list of all device services",
 		Long:  `Return all device services sorted by id.`,
 		Run: func(cmd *cobra.Command, args []string) {
