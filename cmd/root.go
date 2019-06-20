@@ -21,13 +21,14 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/edgexfoundry/edgex-cli/cmd/device"
+	"github.com/edgexfoundry/edgex-cli/cmd/deviceservice"
 	"github.com/edgexfoundry/edgex-cli/cmd/event"
 	"github.com/edgexfoundry/edgex-cli/cmd/profile"
 )
 
 var cfgFile string
 
-// rootCmd represents the base command when called without any subcommands
+// NewCommand returns rootCmd which represents the base command when called without any subcommands
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "edgex-cli",
@@ -45,6 +46,7 @@ https://www.edgexfoundry.org/
 
 	// Add all subcommands below:
 	cmd.AddCommand(device.NewCommand())
+	cmd.AddCommand(deviceservice.NewCommand())
 	cmd.AddCommand(profile.NewCommand())
 	cmd.AddCommand(event.NewCommand())
 
