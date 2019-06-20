@@ -26,15 +26,22 @@ import (
 	"github.com/edgexfoundry/edgex-cli/cmd/profile"
 )
 
-var cfgFile string
+var (
+	cfgFile string
+)
 
 // NewCommand returns rootCmd which represents the base command when called without any subcommands
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "edgex-cli",
 		Short: "EdgeX command line interface",
-		Long: `
-EdgeX Command Line Interface
+		Long: " _____    _           __  __  _____                     _            \n" +
+			"| ____|__| | __ _  ___\\ \\/ / |  ___|__  _   _ _ __   __| |_ __ _   _ \n" +
+			"|  _| / _` |/ _` |/ _ \\\\  /  | |_ / _ \\| | | | '_ \\ / _` | '__| | | |\n" +
+			"| |__| (_| | (_| |  __//  \\  |  _| (_) | |_| | | | | (_| | |  | |_| |\n" +
+			"|_____\\__,_|\\__, |\\___/_/\\_\\ |_|  \\___/ \\__,_|_| |_|\\__,_|_|   \\__, |\n" +
+			"            |___/                                              |___/ \n" +
+			`
 
 https://www.edgexfoundry.org/
 	`,
@@ -61,46 +68,3 @@ func Execute() {
 		os.Exit(1)
 	}
 }
-
-func Main() {
-	Execute()
-}
-
-// func init() {
-// 	cobra.OnInitialize(initConfig)
-
-// 	// Here you will define your flags and configuration settings.
-// 	// Cobra supports persistent flags, which, if defined here,
-// 	// will be global for your application.
-// 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.edgex-cli.yaml)")
-
-// 	// Cobra also supports local flags, which will only run
-// 	// when this action is called directly.
-// 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-// }
-
-// // initConfig reads in config file and ENV variables if set.
-// func initConfig() {
-// 	if cfgFile != "" {
-// 		// Use config file from the flag.
-// 		viper.SetConfigFile(cfgFile)
-// 	} else {
-// 		// Find home directory.
-// 		home, err := homedir.Dir()
-// 		if err != nil {
-// 			fmt.Println(err)
-// 			os.Exit(1)
-// 		}
-
-// 		// Search config in home directory with name ".edgex-cli" (without extension).
-// 		viper.AddConfigPath(home)
-// 		viper.SetConfigName(".edgex-cli")
-// 	}
-
-// 	viper.AutomaticEnv() // read in environment variables that match
-
-// 	// If a config file is found, read it in.
-// 	if err := viper.ReadInConfig(); err == nil {
-// 		fmt.Println("Using config file:", viper.ConfigFileUsed())
-// 	}
-// }

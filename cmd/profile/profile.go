@@ -15,9 +15,9 @@
 package profile
 
 import (
+	addprofile "github.com/edgexfoundry/edgex-cli/cmd/profile/add"
 	listprofile "github.com/edgexfoundry/edgex-cli/cmd/profile/list"
 	rmprofile "github.com/edgexfoundry/edgex-cli/cmd/profile/rm"
-	addprofile "github.com/edgexfoundry/edgex-cli/cmd/profile/add"
 	"github.com/spf13/cobra"
 )
 
@@ -26,7 +26,14 @@ func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "profile [option]",
 		Short: "Device profile command.",
-		Long:  `Actions associated with device profiles`,
+		Long: `Device profile
+		
+Device profiles describe the attributes of a common class of devices 
+managed by a specific DS. A device profile is made up of one or more 
+device resources, optional resources, and optional commands. 
+Commands are added to Core Metadata, and are used to validate REST API 
+requests made to Core Command's command endpoint. 
+`,
 	}
 
 	cmd.AddCommand(rmprofile.NewCommand())
