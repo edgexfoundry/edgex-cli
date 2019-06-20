@@ -24,8 +24,27 @@ import (
 func NewCommand() *cobra.Command {
 	var cmd = &cobra.Command{
 		Use:   "deviceservice",
-		Short: "Event command",
-		Long:  `Actions related to device-generated events.`,
+		Short: "Device service command",
+		Long: `Device service
+
+Device Services (DS) are the edge connectors interacting with the devices 
+or IoT objects that include, but are not limited to: appliances 
+in your home, alarm systems, HVAC equipment, lighting, machines in any 
+industry, irrigation systems, drones, traffic signals, automated transportation, 
+and so forth.
+
+Device services may service one or a number of devices, including sensors, 
+actuators, and so forth, at one time. A “device” that a DS manages, 
+could be something other than a simple single physical device and 
+could be another gateway and all of that gateway’s devices, a device 
+manager, or a device aggregator that acts as a device, or collection 
+of devices, to EdgeX Foundry.
+
+The Device Services layer’s microservices communicate with the devices, 
+sensors, actuators, and other IoT objects through protocols native to the IoT object. 
+The DS Layer converts the data produced and communicated by the IoT object, into a 
+common EdgeX Foundry data structure, and sends that converted data into the Core Services 
+layer, and to other microservices in other layers of EdgeX Foundry.`,
 	}
 	cmd.AddCommand(rmdeviceservice.NewCommand())
 	cmd.AddCommand(listdeviceservice.NewCommand())
