@@ -17,6 +17,7 @@ package profile
 import (
 	listprofile "github.com/edgexfoundry/edgex-cli/cmd/profile/list"
 	rmprofile "github.com/edgexfoundry/edgex-cli/cmd/profile/rm"
+	addprofile "github.com/edgexfoundry/edgex-cli/cmd/profile/add"
 	"github.com/spf13/cobra"
 )
 
@@ -30,5 +31,6 @@ func NewCommand() *cobra.Command {
 
 	cmd.AddCommand(rmprofile.NewCommand())
 	cmd.AddCommand(listprofile.NewCommand())
+	cmd.AddCommand(addprofile.NewCommand())
 	return cmd
 }
