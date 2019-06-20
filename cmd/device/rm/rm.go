@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package cmd
+package rm
 
 import (
 	"fmt"
@@ -22,52 +22,55 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// deletedeviceCmd represents the deletedevice command
-var deletedeviceCmd = &cobra.Command{
-	Use:   "deletedevice",
-	Short: "Delete device by name",
-	Long: `A longer description that spans multiple lines and likely contains examples
+// NewCommand returns the rm command of type cobra.Command
+func NewCommand() *cobra.Command {
+	var cmd = &cobra.Command{
+		Use:   "rm",
+		Short: "Delete device by name",
+		Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
 
 Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Device name:")
-		fmt.Println(args[0])
+		Run: func(cmd *cobra.Command, args []string) {
+			fmt.Println("Device name:")
+			fmt.Println(args[0])
 
-		client := &http.Client{}
+			client := &http.Client{}
 
-		// Create request
-		req, err := http.NewRequest("DELETE", "http://localhost:48081/api/v1/device/name/"+args[0], nil)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
+			// Create request
+			req, err := http.NewRequest("DELETE", "http://localhost:48081/api/v1/device/name/"+args[0], nil)
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
 
-		// Fetch Request
-		resp, err := client.Do(req)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-		defer resp.Body.Close()
+			// Fetch Request
+			resp, err := client.Do(req)
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
+			defer resp.Body.Close()
 
-		respBody, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
+			respBody, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
 
-		// Display Results
-		fmt.Println("response Status : ", resp.Status)
-		fmt.Println("response Headers : ", resp.Header)
-		fmt.Println("response Body : ", string(respBody))
-	},
+			// Display Results
+			fmt.Println("response Status : ", resp.Status)
+			fmt.Println("response Headers : ", resp.Header)
+			fmt.Println("response Body : ", string(respBody))
+		},
+	}
+	return cmd
 }
 
 func init() {
-	rootCmd.AddCommand(deletedeviceCmd)
+	// rootCmd.AddCommand(deletedeviceCmd)
 
 	// Here you will define your flags and configuration settings.
 
