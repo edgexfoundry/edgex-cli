@@ -19,6 +19,9 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
+	"text/tabwriter"
+	"time"
 
 	models "github.com/edgexfoundry/go-mod-core-contracts/models"
 	"github.com/spf13/cobra"
@@ -50,10 +53,51 @@ func NewCommand() *cobra.Command {
 			if errjson != nil {
 				fmt.Println(errjson)
 			}
-			for i, profile := range deviceProfileList1.rd {
-				fmt.Printf("%v\t%s\t%v\n", i, profile.Name, profile.Id)
+
+			// TODO: Add commands and resources? They both are lists, so we need to think about how to display them
+			w := new(tabwriter.Writer)
+			w.Init(os.Stdout, 0, 8, 1, '\t', 0)
+			fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t%s\t\n", "ID", "Name", "Created", "Manufacturer", "Model", "Modified")
+			for _, device := range deviceProfileList1.rd {
+				tCreated := time.Unix(device.Created/1000, 0)
+				tModified := time.Unix(device.Modified/1000, 0)
+				fmt.Fprintf(w, "%s\t%s\t%v\t%v\t%v\t%v\t\n",
+					device.Id,
+					device.Name,
+					humanDuration(time.Since(tCreated)),
+					device.Manufacturer,
+					device.Model,
+					humanDuration(time.Since(tModified)),
+				)
 			}
+			w.Flush()
 		},
 	}
 	return cmd
+}
+
+// Taken from https://github.com/docker/go-units/blob/master/duration.go
+func humanDuration(d time.Duration) string {
+	if seconds := int(d.Seconds()); seconds < 1 {
+		return "Less than a second"
+	} else if seconds == 1 {
+		return "1 second"
+	} else if seconds < 60 {
+		return fmt.Sprintf("%d seconds", seconds)
+	} else if minutes := int(d.Minutes()); minutes == 1 {
+		return "About a minute"
+	} else if minutes < 60 {
+		return fmt.Sprintf("%d minutes", minutes)
+	} else if hours := int(d.Hours() + 0.5); hours == 1 {
+		return "About an hour"
+	} else if hours < 48 {
+		return fmt.Sprintf("%d hours", hours)
+	} else if hours < 24*7*2 {
+		return fmt.Sprintf("%d days", hours/24)
+	} else if hours < 24*30*2 {
+		return fmt.Sprintf("%d weeks", hours/24/7)
+	} else if hours < 24*365*2 {
+		return fmt.Sprintf("%d months", hours/24/30)
+	}
+	return fmt.Sprintf("%d years", int(d.Hours())/24/365)
 }
