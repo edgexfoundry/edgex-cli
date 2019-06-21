@@ -6,9 +6,9 @@ A command line interface to interact with EdgeX microservices. You can use this 
 
 ## Installation
 
-In order to run this tool, you will need a running EdgeX instance and Go 1.11 installed on your machine.
+In order to run this tool, you will need a running EdgeX instance and Go 1.11 or higher installed on your machine.
 
-* Download the repository in your go path:
+* Download the repository on your machine:
 
 ```
 $ git clone https://github.com/edgexfoundry-holding/edgex-cli
