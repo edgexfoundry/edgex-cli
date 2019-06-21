@@ -19,6 +19,9 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
+	"text/tabwriter"
+	"time"
 
 	models "github.com/edgexfoundry/go-mod-core-contracts/models"
 	"github.com/spf13/cobra"
@@ -50,10 +53,48 @@ func NewCommand() *cobra.Command {
 			if errjson != nil {
 				fmt.Println(errjson)
 			}
-			for i, device := range deviceServiceList1.rd {
-				fmt.Printf("%v\t%s\t%v\n", i, device.Name, device.Created)
+
+			w := new(tabwriter.Writer)
+			w.Init(os.Stdout, 0, 8, 1, '\t', 0)
+			fmt.Fprintf(w, "%s\t%s\t%s\t%s\t\n", "ID", "Name", "Last Connected", "Operating State")
+			for _, device := range deviceServiceList1.rd {
+				tCreated := time.Unix(0, device.LastConnected)
+				elapsed := time.Since(tCreated)
+				fmt.Fprintf(w, "%s\t%s\t%v\t%v\t\n",
+					device.Id,
+					device.Name,
+					humanDuration(elapsed),
+					device.OperatingState,
+				)
 			}
+			w.Flush()
 		},
 	}
 	return cmd
+}
+
+// Taken from https://github.com/docker/go-units/blob/master/duration.go
+func humanDuration(d time.Duration) string {
+	if seconds := int(d.Seconds()); seconds < 1 {
+		return "Less than a second"
+	} else if seconds == 1 {
+		return "1 second"
+	} else if seconds < 60 {
+		return fmt.Sprintf("%d seconds", seconds)
+	} else if minutes := int(d.Minutes()); minutes == 1 {
+		return "About a minute"
+	} else if minutes < 60 {
+		return fmt.Sprintf("%d minutes", minutes)
+	} else if hours := int(d.Hours() + 0.5); hours == 1 {
+		return "About an hour"
+	} else if hours < 48 {
+		return fmt.Sprintf("%d hours", hours)
+	} else if hours < 24*7*2 {
+		return fmt.Sprintf("%d days", hours/24)
+	} else if hours < 24*30*2 {
+		return fmt.Sprintf("%d weeks", hours/24/7)
+	} else if hours < 24*365*2 {
+		return fmt.Sprintf("%d months", hours/24/30)
+	}
+	return fmt.Sprintf("%d years", int(d.Hours())/24/365)
 }
