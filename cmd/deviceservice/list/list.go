@@ -56,14 +56,13 @@ func NewCommand() *cobra.Command {
 
 			w := new(tabwriter.Writer)
 			w.Init(os.Stdout, 0, 8, 1, '\t', 0)
-			fmt.Fprintf(w, "%s\t%s\t%s\t%s\t\n", "ID", "Name", "Last Connected", "Operating State")
+			fmt.Fprintf(w, "%s\t%s\t%s\t%s\t\n", "Service ID", "Service Name", "Created", "Operating State")
 			for _, device := range deviceServiceList1.rd {
-				tCreated := time.Unix(0, device.LastConnected)
-				elapsed := time.Since(tCreated)
+				tCreated := time.Unix(device.Created/1000, 0)
 				fmt.Fprintf(w, "%s\t%s\t%v\t%v\t\n",
 					device.Id,
 					device.Name,
-					humanDuration(elapsed),
+					humanDuration(time.Since(tCreated)),
 					device.OperatingState,
 				)
 			}

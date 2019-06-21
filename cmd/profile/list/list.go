@@ -57,7 +57,7 @@ func NewCommand() *cobra.Command {
 			// TODO: Add commands and resources? They both are lists, so we need to think about how to display them
 			w := new(tabwriter.Writer)
 			w.Init(os.Stdout, 0, 8, 1, '\t', 0)
-			fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t%s\t\n", "ID", "Name", "Created", "Manufacturer", "Model", "Modified")
+			fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t%s\t\n", "Profile ID", "Profile Name", "Created", "Modified", "Manufacturer", "Model")
 			for _, device := range deviceProfileList1.rd {
 				tCreated := time.Unix(device.Created/1000, 0)
 				tModified := time.Unix(device.Modified/1000, 0)
@@ -65,9 +65,9 @@ func NewCommand() *cobra.Command {
 					device.Id,
 					device.Name,
 					humanDuration(time.Since(tCreated)),
+					humanDuration(time.Since(tModified)),
 					device.Manufacturer,
 					device.Model,
-					humanDuration(time.Since(tModified)),
 				)
 			}
 			w.Flush()
