@@ -33,7 +33,7 @@ var (
 // NewCommand returns rootCmd which represents the base command when called without any subcommands
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "edgex-cli",
+		Use:   "edgex",
 		Short: "EdgeX command line interface",
 		Long: " _____    _           __  __  _____                     _            \n" +
 			"| ____|__| | __ _  ___\\ \\/ / |  ___|__  _   _ _ __   __| |_ __ _   _ \n" +
