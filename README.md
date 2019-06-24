@@ -15,7 +15,7 @@ $ cd ~/go/src/github.com/edgexfoundry/
 $ git clone https://github.com/edgexfoundry-holding/edgex-cli
 ```
 
-*A current bug prevents usage with go mod. The workaround is to download in go path and to build/install with GO111MODULE=off.*
+*A current bug prevents usage with go mod. The workaround is to download in go path and to build/install with GO111MODULE=off. This bug is described in [issue #26](https://github.com/edgexfoundry-holding/edgex-cli/issues/26).*
 
 * Install the CLI:
 
