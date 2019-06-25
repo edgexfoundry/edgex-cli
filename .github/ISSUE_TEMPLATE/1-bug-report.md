@@ -15,8 +15,8 @@ Existing issues often contain information about workarounds, resolution, or prog
 
 # 🐞 Bug Report
 
-### Affected Services
-<!-- Can you pin-point one or more EdgeX services (Data, Metadata, Command, etc...) as the source of the bug? -->
+### Affected Command
+<!-- Can you pin-point one or more EdgeX CLI commands (Device, Profile, etc...) as the source of the bug? -->
 <!-- ✍️edit: --> The issue is located in: 
 
 

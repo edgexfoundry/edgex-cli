@@ -15,11 +15,6 @@ Existing issues often contain information about workarounds, resolution, or prog
 
 # 🚀 Feature Request
 
-### Relevant Package
-<!-- Can you pin-point one or more EdgeX services the are relevant for this feature request? -->
-<!-- ✍️edit: --> This feature request is for...
-
-
 ### Description
 <!-- ✍️--> A clear and concise description of the problem or missing capability...
 
