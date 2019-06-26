@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-// Taken from https://github.com/docker/go-units/blob/master/duration.go
+// HumanDuration return the duration since date. Taken from https://github.com/docker/go-units/blob/master/duration.go
 func HumanDuration(d time.Duration) string {
 	if seconds := int(d.Seconds()); seconds < 1 {
 		return "Less than a second"

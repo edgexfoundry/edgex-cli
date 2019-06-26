@@ -5,18 +5,19 @@
 package add
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"io/ioutil"
+	"mime/multipart"
 	"net/http"
 	"os"
-	"bytes"
-	"mime/multipart"
 	"path/filepath"
 
 	"github.com/spf13/cobra"
 )
 
+// NewCommand return add profile command
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "add [FILE]...",
