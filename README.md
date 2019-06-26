@@ -23,7 +23,7 @@ $ git clone https://github.com/edgexfoundry-holding/edgex-cli
 $ make install
 ```
 
-You can now use the CLI by entering `edgex` anywhere on your machine.
+~~You can now use the CLI by entering `edgex` anywhere on your machine.~~ *BUG: `make install` currently installs the binary as `edgex-cli` globally, because of the directory structure.*
 
 ### Developers
 
