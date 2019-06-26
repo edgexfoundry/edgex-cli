@@ -44,7 +44,7 @@ func NewCommand() *cobra.Command {
 			resp, err := http.Get("http://localhost:48081/api/v1/device")
 			if err != nil {
 				// handle error
-				fmt.Println("An error occured. Is EdgeX running?")
+				fmt.Println("An error occurred. Is EdgeX running?")
 				fmt.Println(err)
 			}
 			defer resp.Body.Close()
