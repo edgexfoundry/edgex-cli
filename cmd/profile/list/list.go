@@ -39,7 +39,7 @@ func NewCommand() *cobra.Command {
 		Short: "Returns a list of device profiles",
 		Long:  `Returns the list of device profiles currently in the core-metadata database.`,
 		Run: func(cmd *cobra.Command, args []string) {
-			resp, err := http.Get("http://localhost:48081/api/v1//deviceprofile")
+			resp, err := http.Get("http://localhost:48081/api/v1/deviceprofile")
 			if err != nil {
 				fmt.Println("An error occured. Is EdgeX running?")
 				fmt.Println(err)

@@ -24,6 +24,7 @@ import (
 	"github.com/edgexfoundry/edgex-cli/cmd/deviceservice"
 	"github.com/edgexfoundry/edgex-cli/cmd/event"
 	"github.com/edgexfoundry/edgex-cli/cmd/profile"
+	"github.com/edgexfoundry/edgex-cli/cmd/status"
 )
 
 var (
@@ -56,6 +57,7 @@ https://www.edgexfoundry.org/
 	cmd.AddCommand(deviceservice.NewCommand())
 	cmd.AddCommand(profile.NewCommand())
 	cmd.AddCommand(event.NewCommand())
+	cmd.AddCommand(status.NewCommand())
 
 	return cmd
 }
