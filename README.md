@@ -1,3 +1,5 @@
+[![Go Report Card](https://goreportcard.com/badge/edgexfoundry-holding/edgex-cli)](https://goreportcard.com/report/edgexfoundry-holding/edgex-cli)
+
 # edgex-cli
 
 ## Introduction
