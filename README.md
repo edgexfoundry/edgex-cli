@@ -27,6 +27,15 @@ $ make install
 
 ~~You can now use the CLI by entering `edgex` anywhere on your machine.~~ *BUG: `make install` currently installs the binary as `edgex-cli` globally, because of the directory structure.*
 
+### Available Commands
+
+#### Readings
+```
+$ edgex reading list // All readings.
+$ edgex reading list A // All readings for device A, default limit is 50.
+$ edgex reading list A -l 5 // All readings for device A with limit 5.
+```
+
 ### Developers
 
 To test your changes, you can either build the binary or calling `go run`.
