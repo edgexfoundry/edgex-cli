@@ -20,6 +20,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"strconv"
 	"text/tabwriter"
 	"time"
 
@@ -33,15 +34,32 @@ type eventList struct {
 	rd []models.Event
 }
 
+var limit int32
+
 // NewCommand returns the list device command
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "list",
 		Short: "A list of all device services",
 		Long:  `Return all device services sorted by id.`,
+		Args:  cobra.MaximumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 
-			resp, err := http.Get("http://localhost:48080/api/v1/event")
+			var url string
+			if len(args) > 0 {
+				var limitUrl string
+				device := args[0]
+				if limit > 0 {
+					limitUrl = strconv.FormatInt(int64(limit), 10)
+				} else {
+					limitUrl = strconv.FormatInt(int64(50), 10)
+				}
+				url = "http://localhost:48080/api/v1/event/device/" + device + "/" + limitUrl
+			} else {
+				url = "http://localhost:48080/api/v1/event"
+			}
+			fmt.Println(url)
+			resp, err := http.Get(url)
 			if err != nil {
 				// handle error
 				fmt.Println("An error occurred. Is EdgeX running?")
@@ -55,7 +73,11 @@ func NewCommand() *cobra.Command {
 
 			errjson := json.Unmarshal(data, &eventList.rd)
 			if errjson != nil {
+				if string(data) == "Error, exceeded the max limit as defined in config" {
+					fmt.Println("The number of events to be returned exceeds the MaxResultCount limit defined in configuration.toml")
+				}
 				fmt.Println(errjson)
+				return
 			}
 			w := new(tabwriter.Writer)
 			w.Init(os.Stdout, 0, 8, 1, '\t', 0)
@@ -74,5 +96,6 @@ func NewCommand() *cobra.Command {
 			w.Flush()
 		},
 	}
+	cmd.Flags().Int32VarP(&limit, "limit", "l", 0, "Limit number of results")
 	return cmd
 }
