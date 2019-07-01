@@ -17,6 +17,7 @@ package device
 import (
 	listdevice "github.com/edgexfoundry/edgex-cli/cmd/device/list"
 	rmdevice "github.com/edgexfoundry/edgex-cli/cmd/device/rm"
+	adddevice "github.com/edgexfoundry/edgex-cli/cmd/device/add"
 	"github.com/spf13/cobra"
 )
 
@@ -29,5 +30,6 @@ func NewCommand() *cobra.Command {
 	}
 	cmd.AddCommand(rmdevice.NewCommand())
 	cmd.AddCommand(listdevice.NewCommand())
+	cmd.AddCommand(adddevice.NewCommand())
 	return cmd
 }
