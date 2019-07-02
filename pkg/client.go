@@ -24,11 +24,12 @@ func GetAllItems(itemType string) []byte {
 
 // DeleteItem deletes the given item
 func DeleteItem(id string, itemType string) {
+	fmt.Println("TEST")
 
 	// Create client
 	client := &http.Client{}
 	// call /Item/id/{id}
-	req, err := http.NewRequest("DELETE", "http://localhost:48081/api/v1/"+itemType+"/"+id, nil)
+	req, err := http.NewRequest("DELETE", "http://localhost:48081/api/v1/"+itemType+"/id/"+id, nil)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -42,5 +43,16 @@ func DeleteItem(id string, itemType string) {
 	}
 
 	defer resp.Body.Close()
+
+	respBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	// Display Results
+	fmt.Println("response Status : ", resp.Status)
+	fmt.Println("response Headers : ", resp.Header)
+	fmt.Println("response Body : ", string(respBody))
 
 }

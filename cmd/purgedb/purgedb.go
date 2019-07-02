@@ -40,26 +40,6 @@ always be possible using the CLI.
 `,
 		Run: func(cmd *cobra.Command, args []string) {
 
-			// ADDRESSABLES
-			type addressableList struct {
-				list []models.Addressable
-			}
-
-			data := client.GetAllItems("addressable")
-
-			list := addressableList{}
-			errjson := json.Unmarshal(data, &list.list)
-			if errjson != nil {
-				fmt.Println(errjson)
-			}
-
-			for _, addr := range list.list {
-				fmt.Println(addr.Id)
-				fmt.Println(addr.Name)
-				fmt.Println("ADDRESSABLES----------------------")
-				// call delete function here
-			}
-
 			//////////////////////////////////////////////////////
 			// COMMAND
 			//////////////////////////////////////////////////////
@@ -71,16 +51,20 @@ always be possible using the CLI.
 
 			commands := commandList{}
 			commanderrjson := json.Unmarshal(commandData, &commands.list)
-			if errjson != nil {
+			if commanderrjson != nil {
 				fmt.Println(commanderrjson)
 			}
 
+			fmt.Println("COMMAND--------------------------")
+			numberItems := len(commands.list)
 			for _, object := range commands.list {
 				fmt.Println(object.Id)
 				fmt.Println(object.Name)
-				fmt.Println("COMMAND--------------------------")
+
 				// call delete function here
+				client.DeleteItem(object.Id, "command")
 			}
+			fmt.Println("Removed ", numberItems, " commands.")
 
 			//////////////////////////////////////////////////////
 			// DEVICE
@@ -93,15 +77,14 @@ always be possible using the CLI.
 
 			devices := deviceList{}
 			deviceerrjson := json.Unmarshal(deviceData, &devices.list)
-			if errjson != nil {
+			if deviceerrjson != nil {
 				fmt.Println(deviceerrjson)
 			}
 
+			fmt.Println("DEVICE----------------")
 			for _, object := range devices.list {
-				fmt.Println("DEVICE----------------")
 				fmt.Println(object.Id)
 				fmt.Println(object.Name)
-				fmt.Println("------------------------------------------------")
 				// call delete function here
 			}
 
@@ -117,14 +100,15 @@ always be possible using the CLI.
 			deviceprofiles := deviceProfileList{}
 
 			deviceprofileerrjson := json.Unmarshal(DeviceProfileData, &deviceprofiles.list)
-			if errjson != nil {
+			if deviceprofileerrjson != nil {
 				fmt.Println(deviceprofileerrjson)
 			}
 
+			fmt.Println("-DP---------------------------")
 			for _, object := range deviceprofiles.list {
 				fmt.Println(object.Id)
 				fmt.Println(object.Name)
-				fmt.Println("-DP---------------------------")
+
 				// call delete function here
 			}
 
@@ -141,14 +125,15 @@ always be possible using the CLI.
 			devicereports := deviceReportList{}
 
 			devicereporterrjson := json.Unmarshal(deviceReportData, &devicereports.list)
-			if errjson != nil {
+			if devicereporterrjson != nil {
 				fmt.Println(devicereporterrjson)
 			}
 
+			fmt.Println("-----DR----------------------------------")
 			for _, object := range devicereports.list {
 				fmt.Println(object.Id)
 				fmt.Println(object.Name)
-				fmt.Println("-----DR----------------------------------")
+
 				// call delete function here
 			}
 
@@ -164,16 +149,49 @@ always be possible using the CLI.
 			deviceservices := deviceServiceList{}
 
 			deviceserviceerrjson := json.Unmarshal(deviceServiceData, &deviceservices.list)
-			if errjson != nil {
+			if deviceserviceerrjson != nil {
 				fmt.Println(deviceserviceerrjson)
 			}
 
+			fmt.Println("--DS---------------------------------------")
 			for _, object := range deviceservices.list {
 				fmt.Println(object.Id)
 				fmt.Println(object.Name)
-				fmt.Println("--DS---------------------------------------")
+
 				// call delete function here
 			}
+
+			//////////////////////////////////////////////////////
+			// ADDRESSABLES
+			//////////////////////////////////////////////////////
+
+			type addressableList struct {
+				list []models.Addressable
+			}
+
+			// Calling GetAllItems function, which
+			// makes API call to get all items of given typ
+			data := client.GetAllItems("addressable")
+
+			// unmarshalling the json response
+			list := addressableList{}
+			errjson := json.Unmarshal(data, &list.list)
+			if errjson != nil {
+				fmt.Println(errjson)
+			}
+
+			// Looping over the list of items and calling
+			// DeleteItem for each
+			fmt.Println("ADDRESSABLES----------------------")
+			// numberItems := len(list.list)
+			for _, addr := range list.list {
+				fmt.Println(addr.Id)
+				fmt.Println(addr.Name)
+
+				// call delete function here
+				// client.DeleteItem(addr.Id, "addressable")
+			}
+			fmt.Println(numberItems)
 
 			//////////////////////////////////////////////////////
 			// Provision watchers
@@ -188,14 +206,15 @@ always be possible using the CLI.
 			provisionwatchers := provisionWatcherList{}
 
 			provisionwatchererrjson := json.Unmarshal(provisionWatcherData, &provisionwatchers.list)
-			if errjson != nil {
+			if provisionwatchererrjson != nil {
 				fmt.Println(provisionwatchererrjson)
 			}
 
+			fmt.Println("-Provision watchers----------------------------")
 			for _, object := range provisionwatchers.list {
 				fmt.Println(object.Id)
 				fmt.Println(object.Name)
-				fmt.Println("-Provision watchers----------------------------")
+
 				// call delete function here
 			}
 
@@ -212,14 +231,15 @@ always be possible using the CLI.
 			schedules := scheduleList{}
 
 			schedulerjson := json.Unmarshal(scheduleData, &schedules.list)
-			if errjson != nil {
+			if schedulerjson != nil {
 				fmt.Println(schedulerjson)
 			}
 
+			fmt.Println("---Schedule--------------------------------")
 			for _, object := range schedules.list {
 				fmt.Println(object.Id)
 				fmt.Println(object.Name)
-				fmt.Println("---Schedule--------------------------------")
+
 				// call delete function here
 			}
 
