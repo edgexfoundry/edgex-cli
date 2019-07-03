@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// The purgedb command purges the entire Database. It performs the same action as the
+// clean_mongo.js developer script. Unlike the clean_mongo.js, this command purges the
+// database using API calls only. clean_mongo.js accesses the DB directly, which might
+// always be possible using the CLI.
 package purgedb
 
 import (
@@ -33,10 +37,16 @@ func NewCommand() *cobra.Command {
 
 USE WITH CAUTION. The effect of this command is irreversible.
 
-The purgedb command purges the entire Database. It performs the same action as the
-clean_mongo.js developer script. Unlike the clean_mongo.js, this command purges the 
-database using API calls only. clean_mongo.js accesses the DB directly, which might 
-always be possible using the CLI.
+TODO: clean other tables:
+-	coredata
+-	logging
+-	notifications
+-	exportclient
+
+The end goal for this command is to act like a clean_mongo.js script for any underlying 
+database. Currently, it only cleans up core-metadata.
+
+
 `,
 		Run: func(cmd *cobra.Command, args []string) {
 
