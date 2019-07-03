@@ -24,6 +24,7 @@ import (
 	"github.com/edgexfoundry/edgex-cli/cmd/deviceservice"
 	"github.com/edgexfoundry/edgex-cli/cmd/event"
 	"github.com/edgexfoundry/edgex-cli/cmd/profile"
+	"github.com/edgexfoundry/edgex-cli/cmd/purgedb"
 	"github.com/edgexfoundry/edgex-cli/cmd/reading"
 	"github.com/edgexfoundry/edgex-cli/cmd/status"
 )
@@ -60,6 +61,7 @@ https://www.edgexfoundry.org/
 	cmd.AddCommand(event.NewCommand())
 	cmd.AddCommand(reading.NewCommand())
 	cmd.AddCommand(status.NewCommand())
+	cmd.AddCommand(purgedb.NewCommand())
 
 	return cmd
 }
