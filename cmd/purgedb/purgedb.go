@@ -62,9 +62,9 @@ always be possible using the CLI.
 				fmt.Println(object.Name)
 
 				// call delete function here
-				client.DeleteItem(object.Id, "command")
+				// client.DeleteItem(object.Id, "command")
 			}
-			fmt.Println("Removed ", numberItems, " commands.")
+			// fmt.Println("Removed ", numberItems, " commands.")
 
 			//////////////////////////////////////////////////////
 			// DEVICE
@@ -218,37 +218,6 @@ always be possible using the CLI.
 				// call delete function here
 			}
 
-			//////////////////////////////////////////////////////
-			// Schedule
-			//////////////////////////////////////////////////////
-
-			type scheduleList struct {
-				list []models.ProvisionWatcher
-			}
-
-			scheduleData := client.GetAllItems("schedule")
-
-			schedules := scheduleList{}
-
-			schedulerjson := json.Unmarshal(scheduleData, &schedules.list)
-			if schedulerjson != nil {
-				fmt.Println(schedulerjson)
-			}
-
-			fmt.Println("---Schedule--------------------------------")
-			for _, object := range schedules.list {
-				fmt.Println(object.Id)
-				fmt.Println(object.Name)
-
-				// call delete function here
-			}
-
-			// TODO: check why not working:
-
-			// type scheduleEventList struct {
-			// 	addr []models
-			// }
-
 			// DONE:
 			// Meta data:
 			// addressable
@@ -258,8 +227,6 @@ always be possible using the CLI.
 			// deviceReport
 			// deviceService
 			// provisionWatcher
-			// schedule
-			// scheduleEvent
 
 			// TODO
 			// coredata:
