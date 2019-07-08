@@ -21,6 +21,8 @@ import (
 	"os"
 	"text/tabwriter"
 
+	"github.com/spf13/viper"
+
 	"github.com/spf13/cobra"
 )
 
@@ -35,6 +37,10 @@ This command pings each edgex microservice and prints their status.
 This command is not stable yet.
 `,
 		Run: func(cmd *cobra.Command, args []string) {
+
+			host := viper.GetString("Host")
+
+			fmt.Printf("Host: %s\n", viper.GetString("Host"))
 
 			// Maps of microservices pointing to their port numbers
 			microservices := make(map[string]string)
@@ -53,7 +59,7 @@ This command is not stable yet.
 			w.Init(os.Stdout, 0, 8, 1, '\t', 0)
 
 			for microservice, port := range microservices {
-				resp, err := http.Get("http://localhost:" + port + "/api/v1/ping")
+				resp, err := http.Get("http://" + host + ":" + port + "/api/v1/ping")
 				if err != nil {
 					fmt.Fprintf(w, "%s \t not connected\n", microservice)
 				} else {
