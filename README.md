@@ -36,6 +36,20 @@ $ edgex reading list A // All readings for device A, default limit is 50.
 $ edgex reading list A -l 5 // All readings for device A with limit 5.
 ```
 
+#### Notifications
+```
+$ edgex notification add /path/to/file.toml // Add notifications from toml file.
+$ edgex notification rm A // Remove a notification by slug.
+$ edgex notification rm --age 1561939200 // Remove a notification by age (timestamp).
+```
+
+#### Subscriptions
+```
+$ edgex subscription add /path/to/file.toml // Add subscriptions from toml file.
+$ edgex subscription rm A // Remove a notification by slug.
+$ edgex subscription rm --id SOMEID // Remove a notification by id.
+```
+
 ### Developers
 
 To test your changes, you can either build the binary or calling `go run`.
