@@ -28,10 +28,10 @@ import (
 	"github.com/edgexfoundry/go-mod-core-contracts/models"
 )
 
-// NewCommand returns the purgedb command
+// NewCommand returns the db command
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "purgedb",
+		Use:   "purge",
 		Short: "Purges entire EdgeX Database. [USE WITH CAUTION]",
 		Long: `Purge DB
 
