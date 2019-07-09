@@ -30,7 +30,7 @@ import (
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "status",
-		Short: "[BETA]Checks the current status of each microservice.",
+		Short: "Checks the current status of each microservice.",
 		Long: `Status
 		
 This command pings each edgex microservice and prints their status.
