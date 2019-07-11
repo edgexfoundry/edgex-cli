@@ -21,8 +21,13 @@ package purgedb
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"net/http"
+	"strconv"
+	"time"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 
 	client "github.com/edgexfoundry/edgex-cli/pkg"
 	"github.com/edgexfoundry/go-mod-core-contracts/models"
@@ -50,31 +55,7 @@ database. Currently, it only cleans up core-metadata.
 `,
 		Run: func(cmd *cobra.Command, args []string) {
 
-			//////////////////////////////////////////////////////
-			// COMMAND
-			//////////////////////////////////////////////////////
-			type commandList struct {
-				list []models.Command
-			}
-
-			commandData := client.GetAllItems("command")
-
-			commands := commandList{}
-			commanderrjson := json.Unmarshal(commandData, &commands.list)
-			if commanderrjson != nil {
-				fmt.Println(commanderrjson)
-			}
-
-			numberItems := len(commands.list)
-			for _, object := range commands.list {
-				fmt.Println(object.Id)
-				fmt.Println(object.Name)
-
-				// no delete API for command
-				// call delete function here
-				// client.DeleteItem(object.Id, "command")
-			}
-			// fmt.Println("Removed ", numberItems, " commands.")
+			fmt.Println("* core-metadata")
 
 			//////////////////////////////////////////////////////
 			// DEVICE
@@ -83,7 +64,7 @@ database. Currently, it only cleans up core-metadata.
 				list []models.Device
 			}
 
-			deviceData := client.GetAllItems("device")
+			deviceData := client.GetAllItems("device", "48081")
 
 			devices := deviceList{}
 			deviceerrjson := json.Unmarshal(deviceData, &devices.list)
@@ -94,10 +75,8 @@ database. Currently, it only cleans up core-metadata.
 			numberDevices := len(devices.list)
 
 			for _, object := range devices.list {
-				fmt.Println(object.Id)
-				fmt.Println(object.Name)
 				// call delete function here
-				client.DeleteItem(object.Id, "device")
+				client.DeleteItem(object.Id, "device", "48081")
 			}
 			fmt.Println("Removed ", numberDevices, " devices.")
 
@@ -108,7 +87,7 @@ database. Currently, it only cleans up core-metadata.
 				list []models.DeviceProfile
 			}
 
-			DeviceProfileData := client.GetAllItems("deviceprofile")
+			DeviceProfileData := client.GetAllItems("deviceprofile", "48081")
 
 			deviceprofiles := deviceProfileList{}
 
@@ -119,11 +98,8 @@ database. Currently, it only cleans up core-metadata.
 
 			numberProfiles := len(deviceprofiles.list)
 			for _, object := range deviceprofiles.list {
-				fmt.Println(object.Id)
-				fmt.Println(object.Name)
-
 				// call delete function here
-				client.DeleteItem(object.Id, "deviceprofile")
+				client.DeleteItem(object.Id, "deviceprofile", "48081")
 			}
 			fmt.Println("Removed ", numberProfiles, " device profiles.")
 
@@ -135,7 +111,7 @@ database. Currently, it only cleans up core-metadata.
 				list []models.DeviceReport
 			}
 
-			deviceReportData := client.GetAllItems("devicereport")
+			deviceReportData := client.GetAllItems("devicereport", "48081")
 
 			devicereports := deviceReportList{}
 
@@ -146,11 +122,8 @@ database. Currently, it only cleans up core-metadata.
 
 			numberDRs := len(devicereports.list)
 			for _, object := range devicereports.list {
-				fmt.Println(object.Id)
-				fmt.Println(object.Name)
-
 				// call delete function here
-				client.DeleteItem(object.Id, "deviceprofile")
+				client.DeleteItem(object.Id, "deviceprofile", "48081")
 			}
 			fmt.Println("Removed ", numberDRs, " device reports.")
 
@@ -161,7 +134,7 @@ database. Currently, it only cleans up core-metadata.
 				list []models.DeviceService
 			}
 
-			deviceServiceData := client.GetAllItems("deviceservice")
+			deviceServiceData := client.GetAllItems("deviceservice", "48081")
 
 			deviceservices := deviceServiceList{}
 
@@ -172,11 +145,8 @@ database. Currently, it only cleans up core-metadata.
 
 			numberDSs := len(deviceservices.list)
 			for _, object := range deviceservices.list {
-				fmt.Println(object.Id)
-				fmt.Println(object.Name)
-
 				// call delete function here
-				client.DeleteItem(object.Id, "deviceservice")
+				client.DeleteItem(object.Id, "deviceservice", "48081")
 			}
 
 			fmt.Println("Removed ", numberDSs, " device services.")
@@ -191,7 +161,7 @@ database. Currently, it only cleans up core-metadata.
 
 			// Calling GetAllItems function, which
 			// makes API call to get all items of given typ
-			data := client.GetAllItems("addressable")
+			data := client.GetAllItems("addressable", "48081")
 
 			// unmarshalling the json response
 			list := addressableList{}
@@ -203,13 +173,10 @@ database. Currently, it only cleans up core-metadata.
 			// Looping over the list of items and calling
 			// DeleteItem for each
 
-			// numberItems := len(list.list)
+			numberItems := len(list.list)
 			for _, addr := range list.list {
-				fmt.Println(addr.Id)
-				fmt.Println(addr.Name)
-
 				// call delete function here
-				client.DeleteItem(addr.Id, "addressable")
+				client.DeleteItem(addr.Id, "addressable", "48081")
 			}
 			fmt.Println("Removed ", numberItems, " device provision watchers.")
 
@@ -221,7 +188,7 @@ database. Currently, it only cleans up core-metadata.
 				list []models.ProvisionWatcher
 			}
 
-			provisionWatcherData := client.GetAllItems("provisionwatcher")
+			provisionWatcherData := client.GetAllItems("provisionwatcher", "48081")
 
 			provisionwatchers := provisionWatcherList{}
 
@@ -232,32 +199,255 @@ database. Currently, it only cleans up core-metadata.
 
 			numberPRs := len(provisionwatchers.list)
 			for _, object := range provisionwatchers.list {
-				fmt.Println(object.Id)
-				fmt.Println(object.Name)
-
 				// call delete function here
+				client.DeleteItem(object.Id, "provisionwatcher", "48081")
 			}
 
 			fmt.Println("Removed ", numberPRs, " device provision watchers.")
 
-			// TODO
-			// coredata:
-			// valueDescriptor
-			// reading: http://localhost:48080/api/v1/event/scrub Might have to delete one by one
-			// event: http://localhost:48080/api/v1/event/scrub
+			// CORE-DATA:
+			fmt.Println("* core-data")
+			//////////////////////////////////////////////////////
+			// Events and Readings
+			//////////////////////////////////////////////////////
 
-			// logging:
-			// logEntry /logs/{start}/{end}
+			removeEventsAndReadings()
 
-			// notifications:
-			// notification http://localhost:48060/api/v1/cleanup
-			// subscription might be affected by /cleanup
-			// transmission same
+			//////////////////////////////////////////////////////
+			// reading
+			//////////////////////////////////////////////////////
 
-			// exportclient:
-			// exportConfiguration one by one
+			type readingList struct {
+				list []models.Reading
+			}
+
+			readingData := client.GetAllItems("reading", "48080")
+
+			readings := readingList{}
+
+			readingerrjson := json.Unmarshal(readingData, &readings.list)
+			if readingerrjson != nil {
+				fmt.Println(readingerrjson)
+			}
+
+			numberRs := len(readings.list)
+			for _, object := range readings.list {
+
+				// call delete function here
+				client.DeleteItem(object.Id, "reading", "48080")
+			}
+
+			fmt.Println("Removed ", numberRs, " readings.")
+
+			//////////////////////////////////////////////////////
+			// value descriptors
+			//////////////////////////////////////////////////////
+
+			type valueDescriptorList struct {
+				list []models.ValueDescriptor
+			}
+
+			valueDescriptorData := client.GetAllItems("valuedescriptor", "48080")
+
+			valuedescriptors := valueDescriptorList{}
+
+			valuedescriptorerrjson := json.Unmarshal(valueDescriptorData, &valuedescriptors.list)
+			if valuedescriptorerrjson != nil {
+				fmt.Println(valuedescriptorerrjson)
+			}
+
+			numberVDs := len(valuedescriptors.list)
+			for _, object := range valuedescriptors.list {
+
+				// call delete function here
+				client.DeleteItem(object.Id, "valuedescriptor", "48080")
+			}
+
+			fmt.Println("Removed ", numberVDs, " value descriptors.")
+
+			//////////////////////////////////////////////////////
+			// Logs
+			//////////////////////////////////////////////////////
+
+			fmt.Println("* Logs")
+			removeLogs()
+
+			//////////////////////////////////////////////////////
+			// Scheduler
+			//////////////////////////////////////////////////////
+			fmt.Println("* Scheduler")
+
+			//////////////////////////////////////////////////////
+			// Interval
+			//////////////////////////////////////////////////////
+			type intervalList struct {
+				list []models.Interval
+			}
+
+			intervalData := client.GetAllItems("interval", "48085")
+
+			intervals := intervalList{}
+
+			intervalerrjson := json.Unmarshal(intervalData, &intervals.list)
+			if intervalerrjson != nil {
+				fmt.Println(intervalerrjson)
+			}
+
+			numberIs := len(intervals.list)
+			for _, object := range intervals.list {
+
+				// call delete function here
+				client.DeleteItemNoIDURL(object.ID, "interval", "48085")
+			}
+
+			fmt.Println("Removed ", numberIs, " interval.")
+
+			//////////////////////////////////////////////////////
+			// Interval Action
+			//////////////////////////////////////////////////////
+			type intervalactionList struct {
+				list []models.IntervalAction
+			}
+
+			intervalactionData := client.GetAllItems("intervalaction", "48085")
+
+			intervalactions := intervalactionList{}
+
+			intervalactionerrjson := json.Unmarshal(intervalactionData, &intervalactions.list)
+			if intervalactionerrjson != nil {
+				fmt.Println(intervalactionerrjson)
+			}
+
+			numberIAs := len(intervalactions.list)
+			for _, object := range intervalactions.list {
+
+				// call delete function here
+				client.DeleteItemNoIDURL(object.ID, "intervalaction", "48085")
+			}
+
+			fmt.Println("Removed ", numberIAs, " interval action.")
+
+			//////////////////////////////////////////////////////
+			// notifications
+			//////////////////////////////////////////////////////
+			fmt.Println("* Notifications")
+			removeNotifications()
+
+			//////////////////////////////////////////////////////
+			// exportclient
+			//////////////////////////////////////////////////////
+
+			type registrationList struct {
+				list []models.Registration
+			}
+
+			registrationData := client.GetAllItems("registration", "48071")
+
+			registrations := registrationList{}
+
+			registrationerrjson := json.Unmarshal(registrationData, &registrations.list)
+			if registrationerrjson != nil {
+				fmt.Println(registrationerrjson)
+			}
+
+			numberRegs := len(registrations.list)
+			for _, object := range registrations.list {
+
+				// call delete function here
+				client.DeleteItem(object.ID, "registration", "48071")
+			}
+
+			fmt.Println("Removed ", numberRegs, " registrations.")
 
 		},
 	}
 	return cmd
+}
+
+func removeEventsAndReadings() {
+	host := viper.GetString("Host")
+
+	// Create client
+	client := &http.Client{}
+	req, err := http.NewRequest("DELETE", "http://"+host+":48080/api/v1/event/scrub", nil)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	// Fetch Request
+	resp, errResp := client.Do(req)
+	if errResp != nil {
+		fmt.Println(errResp)
+		return
+	}
+
+	defer resp.Body.Close()
+
+	respBody, errBody := ioutil.ReadAll(resp.Body)
+	if errBody != nil {
+		fmt.Println(errBody)
+		return
+	}
+	fmt.Printf("Removed %v events\n", string(respBody))
+}
+
+func removeLogs() {
+	host := viper.GetString("Host")
+
+	ts := time.Now().Unix() * 1000
+
+	// Create client
+	client := &http.Client{}
+	req, err := http.NewRequest("DELETE", "http://"+host+":48061/api/v1/logs/0/"+strconv.FormatInt(ts, 10), nil)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	// Fetch Request
+	resp, errResp := client.Do(req)
+	if errResp != nil {
+		fmt.Println(errResp)
+		return
+	}
+
+	respBody, errBody := ioutil.ReadAll(resp.Body)
+	if errBody != nil {
+		fmt.Println(errBody)
+		return
+	}
+
+	defer resp.Body.Close()
+
+	fmt.Printf("Removed %v logs\n", string(respBody))
+}
+
+func removeNotifications() {
+	host := viper.GetString("Host")
+
+	// Create client
+	client := &http.Client{}
+	req, err := http.NewRequest("DELETE", "http://"+host+":48060/api/v1/cleanup", nil)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	// Fetch Request
+	resp, errResp := client.Do(req)
+	if errResp != nil {
+		fmt.Println(errResp)
+		return
+	}
+
+	respBody, errBody := ioutil.ReadAll(resp.Body)
+	if errBody != nil {
+		fmt.Println(errBody)
+		return
+	}
+
+	defer resp.Body.Close()
+
+	fmt.Printf("Removed notifications %v\n", string(respBody))
 }

@@ -29,8 +29,6 @@ func NewCommand() *cobra.Command {
 		Short: "Removes device by name",
 		Long:  `Removes a device given its name.`,
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Println("Device name:")
-			fmt.Println(args[0])
 
 			client := &http.Client{}
 
@@ -42,23 +40,26 @@ func NewCommand() *cobra.Command {
 			}
 
 			// Fetch Request
-			resp, err := client.Do(req)
-			if err != nil {
-				fmt.Println(err)
+			resp, errReq := client.Do(req)
+			if errReq != nil {
+				fmt.Println(errReq)
 				return
 			}
 			defer resp.Body.Close()
 
-			respBody, err := ioutil.ReadAll(resp.Body)
-			if err != nil {
-				fmt.Println(err)
+			respBody, errrespBody := ioutil.ReadAll(resp.Body)
+			if errrespBody != nil {
+				fmt.Println(errrespBody)
 				return
 			}
 
 			// Display Results
-			fmt.Println("response Status : ", resp.Status)
-			fmt.Println("response Headers : ", resp.Header)
-			fmt.Println("response Body : ", string(respBody))
+
+			if string(respBody) == "true" {
+				fmt.Printf("Removed: %s\n", args[0])
+			} else {
+				fmt.Printf("Remove Unsuccessful!\n")
+			}
 		},
 	}
 	return cmd
