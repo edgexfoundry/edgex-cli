@@ -9,11 +9,11 @@ import (
 )
 
 // GetAllItems returns a list of all Items in the DB
-func GetAllItems(itemType string) []byte {
+func GetAllItems(itemType string, port string) []byte {
 
 	host := viper.GetString("Host")
 
-	resp, err := http.Get("http://" + host + ":48081/api/v1/" + itemType)
+	resp, err := http.Get("http://" + host + ":" + port + "/api/v1/" + itemType)
 	if err != nil {
 		// handle error
 		fmt.Println("An error occurred")
@@ -27,14 +27,14 @@ func GetAllItems(itemType string) []byte {
 }
 
 // DeleteItem deletes the given item
-func DeleteItem(id string, itemType string) {
+func DeleteItem(id string, itemType string, port string) {
 
 	host := viper.GetString("Host")
 
 	// Create client
 	client := &http.Client{}
 	// call /Item/id/{id}
-	req, err := http.NewRequest("DELETE", "http://"+host+":48081/api/v1/"+itemType+"/id/"+id, nil)
+	req, err := http.NewRequest("DELETE", "http://"+host+":"+port+"/api/v1/"+itemType+"/id/"+id, nil)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -55,9 +55,35 @@ func DeleteItem(id string, itemType string) {
 		return
 	}
 
-	// Display Results
-	// fmt.Println("response Status : ", resp.Status)
-	// fmt.Println("response Headers : ", resp.Header)
-	// fmt.Println("response Body : ", string(respBody))
+}
+
+// DeleteItemNoIDURL deletes the given item
+func DeleteItemNoIDURL(id string, itemType string, port string) {
+
+	host := viper.GetString("Host")
+
+	// Create client
+	client := &http.Client{}
+	// call /Item/id/{id}
+	req, err := http.NewRequest("DELETE", "http://"+host+":"+port+"/api/v1/"+itemType+"/"+id, nil)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	// Fetch Request
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	defer resp.Body.Close()
+
+	// respBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
 }
