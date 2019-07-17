@@ -78,7 +78,7 @@ database. Currently, it only cleans up core-metadata.
 
 			for _, object := range devices.list {
 				// call delete function here
-				client.DeleteItem(object.Id, "device", "48081", verbose)
+				_ = client.DeleteItem(object.Id, "device", "48081", verbose)
 			}
 			fmt.Println("Removed ", numberDevices, " devices.")
 
@@ -101,7 +101,7 @@ database. Currently, it only cleans up core-metadata.
 			numberProfiles := len(deviceprofiles.list)
 			for _, object := range deviceprofiles.list {
 				// call delete function here
-				client.DeleteItem(object.Id, "deviceprofile", "48081", verbose)
+				_ = client.DeleteItem(object.Id, "deviceprofile", "48081", verbose)
 			}
 			fmt.Println("Removed ", numberProfiles, " device profiles.")
 
@@ -125,7 +125,7 @@ database. Currently, it only cleans up core-metadata.
 			numberDRs := len(devicereports.list)
 			for _, object := range devicereports.list {
 				// call delete function here
-				client.DeleteItem(object.Id, "deviceprofile", "48081", verbose)
+				_ = client.DeleteItem(object.Id, "deviceprofile", "48081", verbose)
 			}
 			fmt.Println("Removed ", numberDRs, " device reports.")
 
@@ -148,7 +148,7 @@ database. Currently, it only cleans up core-metadata.
 			numberDSs := len(deviceservices.list)
 			for _, object := range deviceservices.list {
 				// call delete function here
-				client.DeleteItem(object.Id, "deviceservice", "48081", verbose)
+				_ = client.DeleteItem(object.Id, "deviceservice", "48081", verbose)
 			}
 
 			fmt.Println("Removed ", numberDSs, " device services.")
@@ -178,7 +178,7 @@ database. Currently, it only cleans up core-metadata.
 			numberItems := len(list.list)
 			for _, addr := range list.list {
 				// call delete function here
-				client.DeleteItem(addr.Id, "addressable", "48081", verbose)
+				_ = client.DeleteItem(addr.Id, "addressable", "48081", verbose)
 			}
 			fmt.Println("Removed ", numberItems, " device provision watchers.")
 
@@ -202,7 +202,7 @@ database. Currently, it only cleans up core-metadata.
 			numberPRs := len(provisionwatchers.list)
 			for _, object := range provisionwatchers.list {
 				// call delete function here
-				client.DeleteItem(object.Id, "provisionwatcher", "48081", verbose)
+				_ = client.DeleteItem(object.Id, "provisionwatcher", "48081", verbose)
 			}
 
 			fmt.Println("Removed ", numberPRs, " device provision watchers.")
@@ -236,7 +236,7 @@ database. Currently, it only cleans up core-metadata.
 			for _, object := range readings.list {
 
 				// call delete function here
-				client.DeleteItem(object.Id, "reading", "48080", verbose)
+				_ = client.DeleteItem(object.Id, "reading", "48080", verbose)
 			}
 
 			fmt.Println("Removed ", numberRs, " readings.")
@@ -262,7 +262,7 @@ database. Currently, it only cleans up core-metadata.
 			for _, object := range valuedescriptors.list {
 
 				// call delete function here
-				client.DeleteItem(object.Id, "valuedescriptor", "48080", verbose)
+				_ = client.DeleteItem(object.Id, "valuedescriptor", "48080", verbose)
 			}
 
 			fmt.Println("Removed ", numberVDs, " value descriptors.")
@@ -299,7 +299,7 @@ database. Currently, it only cleans up core-metadata.
 			for _, object := range intervals.list {
 
 				// call delete function here
-				client.DeleteItemNoIDURL(object.ID, "interval", "48085", verbose)
+				_ = client.DeleteItemNoIDURL(object.ID, "interval", "48085", verbose)
 			}
 
 			fmt.Println("Removed ", numberIs, " interval.")
@@ -324,7 +324,7 @@ database. Currently, it only cleans up core-metadata.
 			for _, object := range intervalactions.list {
 
 				// call delete function here
-				client.DeleteItemNoIDURL(object.ID, "intervalaction", "48085", verbose)
+				_ = client.DeleteItemNoIDURL(object.ID, "intervalaction", "48085", verbose)
 			}
 
 			fmt.Println("Removed ", numberIAs, " interval action.")
@@ -356,7 +356,7 @@ database. Currently, it only cleans up core-metadata.
 			for _, object := range registrations.list {
 
 				// call delete function here
-				client.DeleteItem(object.ID, "registration", "48071", verbose)
+				_ = client.DeleteItem(object.ID, "registration", "48071", verbose)
 			}
 
 			fmt.Println("Removed ", numberRegs, " registrations.")

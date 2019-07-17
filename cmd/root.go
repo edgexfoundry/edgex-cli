@@ -63,7 +63,7 @@ https://www.edgexfoundry.org/
 
 	// global flags
 	Verbose := false
-	cmd.PersistentFlags().BoolVarP(&Verbose, "verbose", "v", true, "Print URL(s) used by the entered command.")
+	cmd.PersistentFlags().BoolVarP(&Verbose, "verbose", "v", false, "Print URL(s) used by the entered command.")
 
 	return cmd
 }

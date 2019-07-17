@@ -33,7 +33,7 @@ func GetAllItems(itemType string, port string, verbose bool) []byte {
 }
 
 // DeleteItem deletes the given item
-func DeleteItem(id string, itemType string, port string, verbose bool) {
+func DeleteItem(id string, itemType string, port string, verbose bool) []byte {
 
 	host := viper.GetString("Host")
 
@@ -50,28 +50,27 @@ func DeleteItem(id string, itemType string, port string, verbose bool) {
 	req, err := http.NewRequest("DELETE", url, nil)
 	if err != nil {
 		fmt.Println(err)
-		return
 	}
 
 	// Fetch Request
 	resp, err := client.Do(req)
 	if err != nil {
 		fmt.Println(err)
-		return
 	}
 
 	defer resp.Body.Close()
 
-	// respBody, err := ioutil.ReadAll(resp.Body)
+	respBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		fmt.Println(err)
-		return
 	}
+
+	return respBody
 
 }
 
 // DeleteItemNoIDURL deletes the given item
-func DeleteItemNoIDURL(id string, itemType string, port string, verbose bool) {
+func DeleteItemNoIDURL(id string, itemType string, port string, verbose bool) []byte {
 
 	host := viper.GetString("Host")
 
@@ -87,22 +86,20 @@ func DeleteItemNoIDURL(id string, itemType string, port string, verbose bool) {
 	req, err := http.NewRequest("DELETE", url, nil)
 	if err != nil {
 		fmt.Println(err)
-		return
 	}
 
 	// Fetch Request
 	resp, err := client.Do(req)
 	if err != nil {
 		fmt.Println(err)
-		return
 	}
 
 	defer resp.Body.Close()
 
-	// respBody, err := ioutil.ReadAll(resp.Body)
+	respBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		fmt.Println(err)
-		return
 	}
 
+	return respBody
 }
