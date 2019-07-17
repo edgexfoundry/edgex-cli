@@ -17,12 +17,11 @@ package list
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"net/http"
 	"os"
 	"text/tabwriter"
 	"time"
 
+	client "github.com/edgexfoundry/edgex-cli/pkg"
 	"github.com/edgexfoundry/edgex-cli/pkg/utils"
 	models "github.com/edgexfoundry/go-mod-core-contracts/models"
 	"github.com/spf13/cobra"
@@ -39,14 +38,10 @@ func NewCommand() *cobra.Command {
 		Short: "Lists existing devices services",
 		Long:  `Return the list fo current device services.`,
 		Run: func(cmd *cobra.Command, args []string) {
-			resp, err := http.Get("http://localhost:48081/api/v1/deviceservice")
-			if err != nil {
-				fmt.Println("An error occurred. Is EdgeX running?")
-				fmt.Println(err)
-			}
-			defer resp.Body.Close()
 
-			data, _ := ioutil.ReadAll(resp.Body)
+			verbose, _ := cmd.Flags().GetBool("verbose")
+
+			data := client.GetAllItems("deviceservice", "48081", verbose)
 
 			deviceServiceList1 := deviceServiceList{}
 

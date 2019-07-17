@@ -16,9 +16,8 @@ package rm
 
 import (
 	"fmt"
-	"io/ioutil"
-	"net/http"
 
+	client "github.com/edgexfoundry/edgex-cli/pkg"
 	"github.com/spf13/cobra"
 )
 
@@ -26,38 +25,21 @@ import (
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "rm [device service name]",
-		Short: "Removes device service by name",
+		Short: "Removes device service by ID",
 		Long:  `Removes a device service from the core-metadata DB.`,
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Println(args[0])
 
-			client := &http.Client{}
+			verbose, _ := cmd.Flags().GetBool("verbose")
 
-			// Create request
-			req, err := http.NewRequest("DELETE", "http://localhost:48081/api/v1/deviceservice/name/"+args[0], nil)
-			if err != nil {
-				fmt.Println(err)
-				return
-			}
-
-			// Fetch Request
-			resp, err := client.Do(req)
-			if err != nil {
-				fmt.Println(err)
-				return
-			}
-			defer resp.Body.Close()
-
-			respBody, err := ioutil.ReadAll(resp.Body)
-			if err != nil {
-				fmt.Println(err)
-				return
-			}
+			deviceID := args[0]
+			respBody := client.DeleteItem(deviceID, "deviceservice", "48081", verbose)
 
 			// Display Results
-			fmt.Println("response Status : ", resp.Status)
-			fmt.Println("response Headers : ", resp.Header)
-			fmt.Println("response Body : ", string(respBody))
+			if string(respBody) == "true" {
+				fmt.Printf("Removed: %s\n", deviceID)
+			} else {
+				fmt.Printf("Remove Unsuccessful!\n")
+			}
 		},
 	}
 	return cmd
