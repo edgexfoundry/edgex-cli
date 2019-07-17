@@ -61,6 +61,10 @@ https://www.edgexfoundry.org/
 	cmd.AddCommand(notification.NewCommand())
 	cmd.AddCommand(subscription.NewCommand())
 
+	// global flags
+	Verbose := false
+	cmd.PersistentFlags().BoolVarP(&Verbose, "verbose", "v", true, "Print URL(s) used by the entered command.")
+
 	return cmd
 }
 

@@ -55,6 +55,8 @@ database. Currently, it only cleans up core-metadata.
 `,
 		Run: func(cmd *cobra.Command, args []string) {
 
+			verbose, _ := cmd.Flags().GetBool("verbose")
+
 			fmt.Println("* core-metadata")
 
 			//////////////////////////////////////////////////////
@@ -64,7 +66,7 @@ database. Currently, it only cleans up core-metadata.
 				list []models.Device
 			}
 
-			deviceData := client.GetAllItems("device", "48081")
+			deviceData := client.GetAllItems("device", "48081", verbose)
 
 			devices := deviceList{}
 			deviceerrjson := json.Unmarshal(deviceData, &devices.list)
@@ -76,7 +78,7 @@ database. Currently, it only cleans up core-metadata.
 
 			for _, object := range devices.list {
 				// call delete function here
-				client.DeleteItem(object.Id, "device", "48081")
+				client.DeleteItem(object.Id, "device", "48081", verbose)
 			}
 			fmt.Println("Removed ", numberDevices, " devices.")
 
@@ -87,7 +89,7 @@ database. Currently, it only cleans up core-metadata.
 				list []models.DeviceProfile
 			}
 
-			DeviceProfileData := client.GetAllItems("deviceprofile", "48081")
+			DeviceProfileData := client.GetAllItems("deviceprofile", "48081", verbose)
 
 			deviceprofiles := deviceProfileList{}
 
@@ -99,7 +101,7 @@ database. Currently, it only cleans up core-metadata.
 			numberProfiles := len(deviceprofiles.list)
 			for _, object := range deviceprofiles.list {
 				// call delete function here
-				client.DeleteItem(object.Id, "deviceprofile", "48081")
+				client.DeleteItem(object.Id, "deviceprofile", "48081", verbose)
 			}
 			fmt.Println("Removed ", numberProfiles, " device profiles.")
 
@@ -111,7 +113,7 @@ database. Currently, it only cleans up core-metadata.
 				list []models.DeviceReport
 			}
 
-			deviceReportData := client.GetAllItems("devicereport", "48081")
+			deviceReportData := client.GetAllItems("devicereport", "48081", verbose)
 
 			devicereports := deviceReportList{}
 
@@ -123,7 +125,7 @@ database. Currently, it only cleans up core-metadata.
 			numberDRs := len(devicereports.list)
 			for _, object := range devicereports.list {
 				// call delete function here
-				client.DeleteItem(object.Id, "deviceprofile", "48081")
+				client.DeleteItem(object.Id, "deviceprofile", "48081", verbose)
 			}
 			fmt.Println("Removed ", numberDRs, " device reports.")
 
@@ -134,7 +136,7 @@ database. Currently, it only cleans up core-metadata.
 				list []models.DeviceService
 			}
 
-			deviceServiceData := client.GetAllItems("deviceservice", "48081")
+			deviceServiceData := client.GetAllItems("deviceservice", "48081", verbose)
 
 			deviceservices := deviceServiceList{}
 
@@ -146,7 +148,7 @@ database. Currently, it only cleans up core-metadata.
 			numberDSs := len(deviceservices.list)
 			for _, object := range deviceservices.list {
 				// call delete function here
-				client.DeleteItem(object.Id, "deviceservice", "48081")
+				client.DeleteItem(object.Id, "deviceservice", "48081", verbose)
 			}
 
 			fmt.Println("Removed ", numberDSs, " device services.")
@@ -161,7 +163,7 @@ database. Currently, it only cleans up core-metadata.
 
 			// Calling GetAllItems function, which
 			// makes API call to get all items of given typ
-			data := client.GetAllItems("addressable", "48081")
+			data := client.GetAllItems("addressable", "48081", verbose)
 
 			// unmarshalling the json response
 			list := addressableList{}
@@ -176,7 +178,7 @@ database. Currently, it only cleans up core-metadata.
 			numberItems := len(list.list)
 			for _, addr := range list.list {
 				// call delete function here
-				client.DeleteItem(addr.Id, "addressable", "48081")
+				client.DeleteItem(addr.Id, "addressable", "48081", verbose)
 			}
 			fmt.Println("Removed ", numberItems, " device provision watchers.")
 
@@ -188,7 +190,7 @@ database. Currently, it only cleans up core-metadata.
 				list []models.ProvisionWatcher
 			}
 
-			provisionWatcherData := client.GetAllItems("provisionwatcher", "48081")
+			provisionWatcherData := client.GetAllItems("provisionwatcher", "48081", verbose)
 
 			provisionwatchers := provisionWatcherList{}
 
@@ -200,7 +202,7 @@ database. Currently, it only cleans up core-metadata.
 			numberPRs := len(provisionwatchers.list)
 			for _, object := range provisionwatchers.list {
 				// call delete function here
-				client.DeleteItem(object.Id, "provisionwatcher", "48081")
+				client.DeleteItem(object.Id, "provisionwatcher", "48081", verbose)
 			}
 
 			fmt.Println("Removed ", numberPRs, " device provision watchers.")
@@ -221,7 +223,7 @@ database. Currently, it only cleans up core-metadata.
 				list []models.Reading
 			}
 
-			readingData := client.GetAllItems("reading", "48080")
+			readingData := client.GetAllItems("reading", "48080", verbose)
 
 			readings := readingList{}
 
@@ -234,7 +236,7 @@ database. Currently, it only cleans up core-metadata.
 			for _, object := range readings.list {
 
 				// call delete function here
-				client.DeleteItem(object.Id, "reading", "48080")
+				client.DeleteItem(object.Id, "reading", "48080", verbose)
 			}
 
 			fmt.Println("Removed ", numberRs, " readings.")
@@ -247,7 +249,7 @@ database. Currently, it only cleans up core-metadata.
 				list []models.ValueDescriptor
 			}
 
-			valueDescriptorData := client.GetAllItems("valuedescriptor", "48080")
+			valueDescriptorData := client.GetAllItems("valuedescriptor", "48080", verbose)
 
 			valuedescriptors := valueDescriptorList{}
 
@@ -260,7 +262,7 @@ database. Currently, it only cleans up core-metadata.
 			for _, object := range valuedescriptors.list {
 
 				// call delete function here
-				client.DeleteItem(object.Id, "valuedescriptor", "48080")
+				client.DeleteItem(object.Id, "valuedescriptor", "48080", verbose)
 			}
 
 			fmt.Println("Removed ", numberVDs, " value descriptors.")
@@ -284,7 +286,7 @@ database. Currently, it only cleans up core-metadata.
 				list []models.Interval
 			}
 
-			intervalData := client.GetAllItems("interval", "48085")
+			intervalData := client.GetAllItems("interval", "48085", verbose)
 
 			intervals := intervalList{}
 
@@ -297,7 +299,7 @@ database. Currently, it only cleans up core-metadata.
 			for _, object := range intervals.list {
 
 				// call delete function here
-				client.DeleteItemNoIDURL(object.ID, "interval", "48085")
+				client.DeleteItemNoIDURL(object.ID, "interval", "48085", verbose)
 			}
 
 			fmt.Println("Removed ", numberIs, " interval.")
@@ -309,7 +311,7 @@ database. Currently, it only cleans up core-metadata.
 				list []models.IntervalAction
 			}
 
-			intervalactionData := client.GetAllItems("intervalaction", "48085")
+			intervalactionData := client.GetAllItems("intervalaction", "48085", verbose)
 
 			intervalactions := intervalactionList{}
 
@@ -322,7 +324,7 @@ database. Currently, it only cleans up core-metadata.
 			for _, object := range intervalactions.list {
 
 				// call delete function here
-				client.DeleteItemNoIDURL(object.ID, "intervalaction", "48085")
+				client.DeleteItemNoIDURL(object.ID, "intervalaction", "48085", verbose)
 			}
 
 			fmt.Println("Removed ", numberIAs, " interval action.")
@@ -341,7 +343,7 @@ database. Currently, it only cleans up core-metadata.
 				list []models.Registration
 			}
 
-			registrationData := client.GetAllItems("registration", "48071")
+			registrationData := client.GetAllItems("registration", "48071", verbose)
 
 			registrations := registrationList{}
 
@@ -354,7 +356,7 @@ database. Currently, it only cleans up core-metadata.
 			for _, object := range registrations.list {
 
 				// call delete function here
-				client.DeleteItem(object.ID, "registration", "48071")
+				client.DeleteItem(object.ID, "registration", "48071", verbose)
 			}
 
 			fmt.Println("Removed ", numberRegs, " registrations.")
