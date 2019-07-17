@@ -13,10 +13,10 @@ func GetAllItems(itemType string, port string, verbose bool) []byte {
 
 	host := viper.GetString("Host")
 
-	url := "GET: http://" + host + ":" + port + "/api/v1/" + itemType
+	url := "http://" + host + ":" + port + "/api/v1/" + itemType
 
 	if verbose {
-		fmt.Println(url)
+		fmt.Println("GET: " + url)
 	}
 
 	resp, err := http.Get(url)
@@ -40,10 +40,10 @@ func DeleteItem(id string, itemType string, port string, verbose bool) {
 	// Create client
 	client := &http.Client{}
 
-	url := "DELETE: http://" + host + ":" + port + "/api/v1/" + itemType + "/id/" + id
+	url := "http://" + host + ":" + port + "/api/v1/" + itemType + "/id/" + id
 
 	if verbose {
-		fmt.Println(url)
+		fmt.Println("DELETE: " + url)
 	}
 
 	// call /Item/id/{id}
@@ -75,10 +75,10 @@ func DeleteItemNoIDURL(id string, itemType string, port string, verbose bool) {
 
 	host := viper.GetString("Host")
 
-	url := "DELETE: http://" + host + ":" + port + "/api/v1/" + itemType + "/" + id
+	url := "http://" + host + ":" + port + "/api/v1/" + itemType + "/" + id
 
 	if verbose {
-		fmt.Println(url)
+		fmt.Println("DELETE: " + url)
 	}
 
 	// Create client
