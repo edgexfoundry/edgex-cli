@@ -17,11 +17,11 @@ package list
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"net/http"
 	"os"
 	"text/tabwriter"
 	"time"
+
+	client "github.com/edgexfoundry/edgex-cli/pkg"
 
 	"github.com/edgexfoundry/edgex-cli/pkg/utils"
 	models "github.com/edgexfoundry/go-mod-core-contracts/models"
@@ -41,15 +41,9 @@ func NewCommand() *cobra.Command {
 		Long:  `Return all device services sorted by id.`,
 		Run: func(cmd *cobra.Command, args []string) {
 
-			resp, err := http.Get("http://localhost:48081/api/v1/device")
-			if err != nil {
-				// handle error
-				fmt.Println("An error occurred. Is EdgeX running?")
-				fmt.Println(err)
-			}
-			defer resp.Body.Close()
+			verbose, _ := cmd.Flags().GetBool("verbose")
 
-			data, _ := ioutil.ReadAll(resp.Body)
+			data := client.GetAllItems("device", "48081", verbose)
 
 			deviceList1 := deviceList{}
 

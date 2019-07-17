@@ -16,9 +16,8 @@ package rm
 
 import (
 	"fmt"
-	"io/ioutil"
-	"net/http"
 
+	client "github.com/edgexfoundry/edgex-cli/pkg"
 	"github.com/spf13/cobra"
 )
 
@@ -26,37 +25,19 @@ import (
 func NewCommand() *cobra.Command {
 	var cmd = &cobra.Command{
 		Use:   "rm [device name]",
-		Short: "Removes device by name",
-		Long:  `Removes a device given its name.`,
+		Short: "Removes device by ID",
+		Long: `Removes a device given its ID. 
+You can use: '$ edgex device list' to find a device's ID.`,
 		Run: func(cmd *cobra.Command, args []string) {
 
-			client := &http.Client{}
+			verbose, _ := cmd.Flags().GetBool("verbose")
 
-			// Create request
-			req, err := http.NewRequest("DELETE", "http://localhost:48081/api/v1/device/name/"+args[0], nil)
-			if err != nil {
-				fmt.Println(err)
-				return
-			}
-
-			// Fetch Request
-			resp, errReq := client.Do(req)
-			if errReq != nil {
-				fmt.Println(errReq)
-				return
-			}
-			defer resp.Body.Close()
-
-			respBody, errrespBody := ioutil.ReadAll(resp.Body)
-			if errrespBody != nil {
-				fmt.Println(errrespBody)
-				return
-			}
+			deviceID := args[0]
+			respBody := client.DeleteItem(deviceID, "device", "48081", verbose)
 
 			// Display Results
-
 			if string(respBody) == "true" {
-				fmt.Printf("Removed: %s\n", args[0])
+				fmt.Printf("Removed: %s\n", deviceID)
 			} else {
 				fmt.Printf("Remove Unsuccessful!\n")
 			}
