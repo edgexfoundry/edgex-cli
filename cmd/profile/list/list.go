@@ -17,12 +17,11 @@ package list
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"net/http"
 	"os"
 	"text/tabwriter"
 	"time"
 
+	client "github.com/edgexfoundry/edgex-cli/pkg"
 	"github.com/edgexfoundry/edgex-cli/pkg/utils"
 	models "github.com/edgexfoundry/go-mod-core-contracts/models"
 	"github.com/spf13/cobra"
@@ -39,14 +38,10 @@ func NewCommand() *cobra.Command {
 		Short: "Returns a list of device profiles",
 		Long:  `Returns the list of device profiles currently in the core-metadata database.`,
 		Run: func(cmd *cobra.Command, args []string) {
-			resp, err := http.Get("http://localhost:48081/api/v1/deviceprofile")
-			if err != nil {
-				fmt.Println("An error occurred. Is EdgeX running?")
-				fmt.Println(err)
-			}
-			defer resp.Body.Close()
 
-			data, _ := ioutil.ReadAll(resp.Body)
+			verbose, _ := cmd.Flags().GetBool("verbose")
+
+			data := client.GetAllItems("deviceprofile", "48081", verbose)
 
 			deviceProfileList1 := deviceProfileList{}
 
