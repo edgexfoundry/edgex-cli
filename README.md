@@ -30,24 +30,63 @@ $ make install
 ### Available Commands
 
 #### Readings
+
+All readings:
+
 ```
-$ edgex reading list // All readings.
-$ edgex reading list A // All readings for device A, default limit is 50.
-$ edgex reading list A -l 5 // All readings for device A with limit 5.
+$ edgex reading list
+```
+
+All readings for device, default limit is 50:
+
+```
+$ edgex reading list <device>
+```
+
+All readings for device with limit:
+
+```
+$ edgex reading list <device> -l <limit>
 ```
 
 #### Notifications
+
+Add notifications from toml file:
+
 ```
-$ edgex notification add /path/to/file.toml // Add notifications from toml file.
-$ edgex notification rm A // Remove a notification by slug.
-$ edgex notification rm --age 1561939200 // Remove a notification by age (timestamp).
+$ edgex notification add </path/to/file.toml>
+```
+
+Remove a notification by slug:
+
+```
+$ edgex notification rm <slug>
+```
+
+Remove a notification by age (timestamp):
+
+```
+$ edgex notification rm --age 1561939200
 ```
 
 #### Subscriptions
+
+Add subscriptions from toml file:
+
 ```
-$ edgex subscription add /path/to/file.toml // Add subscriptions from toml file.
-$ edgex subscription rm A // Remove a notification by slug.
-$ edgex subscription rm --id SOMEID // Remove a notification by id.
+$ edgex subscription add </path/to/file.toml>
+```
+
+Remove a subscription by slug:
+
+```
+$ edgex subscription rm A
+```
+
+Remove a subscription by id:
+
+```
+$ edgex subscription rm --id <SOMEID>
 ```
 
 ### Developers
