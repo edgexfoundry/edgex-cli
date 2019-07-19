@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// The purgedb command purges the entire Database. It performs the same action as the
+// Package purgedb command purges the entire Database. It performs the same action as the
 // clean_mongo.js developer script. Unlike the clean_mongo.js, this command purges the
 // database using API calls only. clean_mongo.js accesses the DB directly, which might
 // always be possible using the CLI.

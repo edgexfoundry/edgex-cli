@@ -24,10 +24,10 @@ import (
 // NewCommand returns the rm command of type cobra.Command
 func NewCommand() *cobra.Command {
 	var cmd = &cobra.Command{
-		Use:   "rm [device name]",
-		Short: "Removes device by ID",
-		Long: `Removes a device given its ID. 
-You can use: '$ edgex device list' to find a device's ID.`,
+		Use:   "rm [device name|ID]",
+		Short: "Removes device by name or ID",
+		Long: `Removes a device given its name or ID. 
+You can use: '$ edgex device list' to find a device's name and ID.`,
 		Run: func(cmd *cobra.Command, args []string) {
 
 			verbose, _ := cmd.Flags().GetBool("verbose")

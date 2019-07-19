@@ -24,9 +24,9 @@ import (
 // NewCommand return the rm profile command
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "rm [profile id]",
-		Short: "Remove profile by ID",
-		Long:  `Removes the device profile given a device profile ID.`,
+		Use:   "rm [profile name|ID]",
+		Short: "Remove profile by name or ID",
+		Long:  `Removes the device profile given a device profile name or ID.`,
 		Run: func(cmd *cobra.Command, args []string) {
 
 			verbose, _ := cmd.Flags().GetBool("verbose")
