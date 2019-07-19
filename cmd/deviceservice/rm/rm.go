@@ -24,8 +24,8 @@ import (
 // NewCommand returns the rm device service command
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "rm [device service name]",
-		Short: "Removes device service by ID",
+		Use:   "rm [device service name|ID]",
+		Short: "Removes device service by name or ID",
 		Long:  `Removes a device service from the core-metadata DB.`,
 		Run: func(cmd *cobra.Command, args []string) {
 
