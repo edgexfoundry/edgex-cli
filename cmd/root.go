@@ -26,6 +26,7 @@ import (
 	"github.com/edgexfoundry/edgex-cli/cmd/device"
 	"github.com/edgexfoundry/edgex-cli/cmd/deviceservice"
 	"github.com/edgexfoundry/edgex-cli/cmd/event"
+	"github.com/edgexfoundry/edgex-cli/cmd/interval"
 	"github.com/edgexfoundry/edgex-cli/cmd/notification"
 	"github.com/edgexfoundry/edgex-cli/cmd/profile"
 	"github.com/edgexfoundry/edgex-cli/cmd/reading"
@@ -58,8 +59,10 @@ https://www.edgexfoundry.org/
 	cmd.AddCommand(reading.NewCommand())
 	cmd.AddCommand(status.NewCommand())
 	cmd.AddCommand(db.NewCommand())
+	// --- Support Services Commands ---
 	cmd.AddCommand(notification.NewCommand())
 	cmd.AddCommand(subscription.NewCommand())
+	cmd.AddCommand(interval.NewCommand())
 
 	// global flags
 	Verbose := false

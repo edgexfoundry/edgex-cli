@@ -72,7 +72,7 @@ func DeleteItem(id string, itemType string, port string, verbose bool) []byte {
 		}
 		return respBody
 	}
-	// deleting with IF failed. trying wiht name
+	// deleting with IF failed. trying with name/slug
 	url = "http://" + host + ":" + port + "/api/v1/" + itemType + "/name/" + id
 
 	req, err = http.NewRequest("DELETE", url, nil)
@@ -125,6 +125,33 @@ func DeleteItemNoIDURL(id string, itemType string, port string, verbose bool) []
 	defer resp.Body.Close()
 
 	respBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	if string(respBody) == "true" {
+		// deleting with ID worked
+		if verbose {
+			fmt.Println("DELETE: " + url)
+		}
+		return respBody
+	}
+	// deleting with IF failed. trying with name/slug
+	url = "http://" + host + ":" + port + "/api/v1/" + itemType + "/name/" + id
+
+	req, err = http.NewRequest("DELETE", url, nil)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	// Fetch Request
+	resp, err = client.Do(req)
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer resp.Body.Close()
+
+	respBody, err = ioutil.ReadAll(resp.Body)
 	if err != nil {
 		fmt.Println(err)
 	}
