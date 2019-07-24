@@ -16,6 +16,7 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/spf13/viper"
@@ -31,6 +32,7 @@ import (
 	"github.com/edgexfoundry/edgex-cli/cmd/reading"
 	"github.com/edgexfoundry/edgex-cli/cmd/status"
 	"github.com/edgexfoundry/edgex-cli/cmd/subscription"
+	"github.com/edgexfoundry/edgex-cli/config"
 )
 
 // NewCommand returns rootCmd which represents the base command when called without any subcommands
@@ -81,9 +83,23 @@ func Execute() {
 }
 
 func setConfig() {
-	viper.SetDefault("Host", "localhost")
+	// viper.SetDefault("Host", "localhost")
 	viper.SetConfigName("config")
 	viper.AddConfigPath("$HOME/.edgex-cli")
-	viper.WriteConfig()
-	viper.SafeWriteConfig()
+
+	var configuration config.Configuration
+
+	if err := viper.ReadInConfig(); err != nil {
+		log.Fatalf("Error reading config file, %s", err)
+	}
+
+	err := viper.Unmarshal(&configuration)
+	if err != nil {
+		log.Fatalf("unable to decode into struct, %v", err)
+	}
+
+	log.Printf("host: %s", configuration.Host)
+
+	// viper.WriteConfig()
+	// viper.SafeWriteConfig()
 }
