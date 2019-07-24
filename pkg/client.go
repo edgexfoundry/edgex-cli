@@ -11,7 +11,7 @@ import (
 // GetAllItems returns a list of all Items in the DB
 func GetAllItems(itemType string, port string, verbose bool) []byte {
 
-	host := viper.GetString("Host")
+	host := viper.GetString("host")
 
 	url := "http://" + host + ":" + port + "/api/v1/" + itemType
 
@@ -39,7 +39,7 @@ func DeleteItem(id string, itemType string, port string, verbose bool) []byte {
 	// enter either the name or the ID of an object to delete.
 	// First, we try ID. If successful, stop. If unsuccessful, try name.
 
-	host := viper.GetString("Host")
+	host := viper.GetString("host")
 
 	// Create client
 	client := &http.Client{}
@@ -100,7 +100,7 @@ func DeleteItem(id string, itemType string, port string, verbose bool) []byte {
 // DeleteItemNoIDURL deletes the given item
 func DeleteItemNoIDURL(id string, itemType string, port string, verbose bool) []byte {
 
-	host := viper.GetString("Host")
+	host := viper.GetString("host")
 
 	url := "http://" + host + ":" + port + "/api/v1/" + itemType + "/" + id
 
