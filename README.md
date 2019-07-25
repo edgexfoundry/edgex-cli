@@ -86,7 +86,19 @@ $ edgex subscription rm A
 Remove a subscription by id:
 
 ```
-$ edgex subscription rm --id <SOMEID>
+$ edgex subscription add /path/to/file.toml // Add subscriptions from toml file.
+$ edgex subscription rm A // Remove a subscription by slug.
+$ edgex subscription rm --id SOMEID // Remove a subscription by id.
+```
+
+#### Intervals
+```
+$ edgex interval list // Lists all intervals provided their numbers is within the configured limit.
+$ edgex interval list A // List interval with name A.
+$ edgex interval list --id SOMEID // List interval with id SOMEID.
+$ edgex interval add /path/to/file.toml // Add intervals from toml file.
+$ edgex interval update /path/to/file.toml // Update intervals from toml file.
+$ edgex interval rm A // Remove a interval by id or name A.
 ```
 
 ### Developers
