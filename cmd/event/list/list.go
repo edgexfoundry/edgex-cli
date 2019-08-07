@@ -24,7 +24,7 @@ import (
 	"text/tabwriter"
 	"time"
 
-	"github.com/edgexfoundry/edgex-cli/pkg/utils"
+	"github.com/edgexfoundry-holding/edgex-cli/pkg/utils"
 	"github.com/edgexfoundry/go-mod-core-contracts/models"
 	"github.com/spf13/cobra"
 )

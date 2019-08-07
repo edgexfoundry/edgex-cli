@@ -19,21 +19,19 @@ import (
 	"log"
 	"os"
 
-	"github.com/spf13/viper"
-
 	"github.com/spf13/cobra"
 
-	"github.com/edgexfoundry/edgex-cli/cmd/db"
-	"github.com/edgexfoundry/edgex-cli/cmd/device"
-	"github.com/edgexfoundry/edgex-cli/cmd/deviceservice"
-	"github.com/edgexfoundry/edgex-cli/cmd/event"
-	"github.com/edgexfoundry/edgex-cli/cmd/interval"
-	"github.com/edgexfoundry/edgex-cli/cmd/notification"
-	"github.com/edgexfoundry/edgex-cli/cmd/profile"
-	"github.com/edgexfoundry/edgex-cli/cmd/reading"
-	"github.com/edgexfoundry/edgex-cli/cmd/status"
-	"github.com/edgexfoundry/edgex-cli/cmd/subscription"
-	"github.com/edgexfoundry/edgex-cli/config"
+	"github.com/edgexfoundry-holding/edgex-cli/cmd/db"
+	"github.com/edgexfoundry-holding/edgex-cli/cmd/device"
+	"github.com/edgexfoundry-holding/edgex-cli/cmd/deviceservice"
+	"github.com/edgexfoundry-holding/edgex-cli/cmd/event"
+	"github.com/edgexfoundry-holding/edgex-cli/cmd/interval"
+	"github.com/edgexfoundry-holding/edgex-cli/cmd/notification"
+	"github.com/edgexfoundry-holding/edgex-cli/cmd/profile"
+	"github.com/edgexfoundry-holding/edgex-cli/cmd/reading"
+	"github.com/edgexfoundry-holding/edgex-cli/cmd/status"
+	"github.com/edgexfoundry-holding/edgex-cli/cmd/subscription"
+	"github.com/edgexfoundry-holding/edgex-cli/config"
 )
 
 // NewCommand returns rootCmd which represents the base command when called without any subcommands
@@ -78,75 +76,16 @@ https://www.edgexfoundry.org/
 func Execute() {
 
 	// set default config
-	setConfig()
+	configFilePath := os.Getenv("HOME") + "/.edgex-cli/config.yaml"
+	env := config.NewViperEnv()
+	err := config.SetConfig(env, configFilePath)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	if err := NewCommand().Execute(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-}
-
-func setConfig() {
-	// Config file path
-	configFilePath := os.Getenv("HOME") + "/.edgex-cli/config.yaml"
-
-	// Set config file
-	viper.SetConfigFile(configFilePath)
-
-	var configuration config.Configuration
-
-	// checking if file already exists
-	if !exists(configFilePath) {
-		var defaultConfig = []byte(`
-host: "localhost"
-security:
-  enabled: false
-  token: "empty"
-ports:
-  CoreData: "48080" 
-  CoreMetadata: "48081"
-  CoreCommand: "48082" 
-  Notifications: "48060"  
-  Logging: "48061" 
-  Scheduling: "48085"
-  RulesEngine: "48075"
-  ClientRegistration: "48071"
-  SystemManagement: "48090"
-`)
-
-		f, err := os.Create(configFilePath)
-		if err != nil {
-			log.Fatalf("Error creating config file, %s", err)
-		}
-		defer f.Close()
-
-		_, err = f.Write(defaultConfig)
-		if err != nil {
-			log.Fatalf("Error write config file, %s", err)
-		}
-
-	}
-
-	// Reading from file that was already existing or newly created
-	if err := viper.ReadInConfig(); err != nil {
-		log.Fatalf("Error reading config file, %s", err)
-		// log.Printf("Error reading config file, %s", err)
-	}
-
-	err := viper.Unmarshal(&configuration)
-	if err != nil {
-		log.Fatalf("unable to decode into struct, %v", err)
-	}
-
-	viper.WriteConfig()
-	viper.SafeWriteConfig()
-}
-
-// Helper function to check whether file exists
-func exists(configPath string) bool {
-	if _, err := os.Stat(configPath); err != nil {
-		if os.IsNotExist(err) {
-			return false
-		}
-	}
-	return true
 }

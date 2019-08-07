@@ -15,8 +15,8 @@
 package deviceservice
 
 import (
-	listdeviceservice "github.com/edgexfoundry/edgex-cli/cmd/deviceservice/list"
-	rmdeviceservice "github.com/edgexfoundry/edgex-cli/cmd/deviceservice/rm"
+	listdeviceservice "github.com/edgexfoundry-holding/edgex-cli/cmd/deviceservice/list"
+	rmdeviceservice "github.com/edgexfoundry-holding/edgex-cli/cmd/deviceservice/rm"
 	"github.com/spf13/cobra"
 )
 
