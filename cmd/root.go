@@ -33,6 +33,7 @@ import (
 	"github.com/edgexfoundry/edgex-cli/cmd/reading"
 	"github.com/edgexfoundry/edgex-cli/cmd/status"
 	"github.com/edgexfoundry/edgex-cli/cmd/subscription"
+	"github.com/edgexfoundry/edgex-cli/cmd/version"
 	"github.com/edgexfoundry/edgex-cli/config"
 )
 
@@ -65,6 +66,7 @@ https://www.edgexfoundry.org/
 	cmd.AddCommand(notification.NewCommand())
 	cmd.AddCommand(subscription.NewCommand())
 	cmd.AddCommand(interval.NewCommand())
+	cmd.AddCommand(version.NewCommand())
 
 	// global flags
 	Verbose := false
@@ -76,7 +78,6 @@ https://www.edgexfoundry.org/
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
-
 	// set default config
 	setConfig()
 	if err := NewCommand().Execute(); err != nil {
