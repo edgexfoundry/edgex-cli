@@ -17,7 +17,8 @@ package rm
 import (
 	"fmt"
 
-	client "github.com/edgexfoundry/edgex-cli/pkg"
+	"github.com/edgexfoundry-holding/edgex-cli/config"
+	client "github.com/edgexfoundry-holding/edgex-cli/pkg"
 	"github.com/spf13/cobra"
 )
 
@@ -32,7 +33,7 @@ func NewCommand() *cobra.Command {
 			verbose, _ := cmd.Flags().GetBool("verbose")
 
 			deviceID := args[0]
-			respBody := client.DeleteItem(deviceID, "deviceprofile", "48081", verbose)
+			respBody := client.DeleteItem(deviceID, config.Conf.MetadataService.DeviceServiceByIDRoute, config.Conf.MetadataService.DeviceServiceBySlugNameRoute, config.Conf.MetadataService.Port, verbose)
 
 			// Display Results
 			if string(respBody) == "true" {

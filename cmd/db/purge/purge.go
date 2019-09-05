@@ -29,7 +29,8 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	client "github.com/edgexfoundry/edgex-cli/pkg"
+	"github.com/edgexfoundry-holding/edgex-cli/config"
+	client "github.com/edgexfoundry-holding/edgex-cli/pkg"
 	"github.com/edgexfoundry/go-mod-core-contracts/models"
 )
 
@@ -78,7 +79,7 @@ database. Currently, it only cleans up core-metadata.
 
 			for _, object := range devices.list {
 				// call delete function here
-				_ = client.DeleteItem(object.Id, "device", "48081", verbose)
+				_ = client.DeleteItem(object.Id, config.Conf.MetadataService.DeviceServiceByIDRoute, config.Conf.MetadataService.DeviceServiceBySlugNameRoute, config.Conf.MetadataService.Port, verbose)
 			}
 			fmt.Println("Removed ", numberDevices, " devices.")
 
@@ -101,7 +102,7 @@ database. Currently, it only cleans up core-metadata.
 			numberProfiles := len(deviceprofiles.list)
 			for _, object := range deviceprofiles.list {
 				// call delete function here
-				_ = client.DeleteItem(object.Id, "deviceprofile", "48081", verbose)
+				_ = client.DeleteItem(object.Id, config.Conf.MetadataService.DeviceServiceByIDRoute, config.Conf.MetadataService.DeviceServiceBySlugNameRoute, config.Conf.MetadataService.Port, verbose)
 			}
 			fmt.Println("Removed ", numberProfiles, " device profiles.")
 
@@ -125,7 +126,7 @@ database. Currently, it only cleans up core-metadata.
 			numberDRs := len(devicereports.list)
 			for _, object := range devicereports.list {
 				// call delete function here
-				_ = client.DeleteItem(object.Id, "deviceprofile", "48081", verbose)
+				_ = client.DeleteItem(object.Id, config.Conf.MetadataService.DeviceServiceByIDRoute, config.Conf.MetadataService.DeviceServiceBySlugNameRoute, config.Conf.MetadataService.Port, verbose)
 			}
 			fmt.Println("Removed ", numberDRs, " device reports.")
 
@@ -148,7 +149,7 @@ database. Currently, it only cleans up core-metadata.
 			numberDSs := len(deviceservices.list)
 			for _, object := range deviceservices.list {
 				// call delete function here
-				_ = client.DeleteItem(object.Id, "deviceservice", "48081", verbose)
+				_ = client.DeleteItem(object.Id, config.Conf.MetadataService.DeviceServiceByIDRoute, config.Conf.MetadataService.DeviceServiceBySlugNameRoute, config.Conf.MetadataService.Port, verbose)
 			}
 
 			fmt.Println("Removed ", numberDSs, " device services.")
@@ -178,7 +179,7 @@ database. Currently, it only cleans up core-metadata.
 			numberItems := len(list.list)
 			for _, addr := range list.list {
 				// call delete function here
-				_ = client.DeleteItem(addr.Id, "addressable", "48081", verbose)
+				_ = client.DeleteItem(addr.Id, config.Conf.MetadataService.DeviceServiceByIDRoute, config.Conf.MetadataService.DeviceServiceBySlugNameRoute, config.Conf.MetadataService.Port, verbose)
 			}
 			fmt.Println("Removed ", numberItems, " device provision watchers.")
 
@@ -202,7 +203,7 @@ database. Currently, it only cleans up core-metadata.
 			numberPRs := len(provisionwatchers.list)
 			for _, object := range provisionwatchers.list {
 				// call delete function here
-				_ = client.DeleteItem(object.Id, "provisionwatcher", "48081", verbose)
+				_ = client.DeleteItem(object.Id, config.Conf.MetadataService.DeviceServiceByIDRoute, config.Conf.MetadataService.DeviceServiceBySlugNameRoute, config.Conf.MetadataService.Port, verbose)
 			}
 
 			fmt.Println("Removed ", numberPRs, " device provision watchers.")
@@ -236,7 +237,8 @@ database. Currently, it only cleans up core-metadata.
 			for _, object := range readings.list {
 
 				// call delete function here
-				_ = client.DeleteItem(object.Id, "reading", "48080", verbose)
+
+				_ = client.DeleteItem(object.Id, config.Conf.DataService.ReadingByIDRoute, "", config.Conf.DataService.Port, verbose)
 			}
 
 			fmt.Println("Removed ", numberRs, " readings.")
@@ -262,7 +264,7 @@ database. Currently, it only cleans up core-metadata.
 			for _, object := range valuedescriptors.list {
 
 				// call delete function here
-				_ = client.DeleteItem(object.Id, "valuedescriptor", "48080", verbose)
+				_ = client.DeleteItem(object.Id, config.Conf.DataService.VDescriptorByIDRoute, config.Conf.DataService.VDescriptorByNameRoute, config.Conf.DataService.Port, verbose)
 			}
 
 			fmt.Println("Removed ", numberVDs, " value descriptors.")
@@ -299,7 +301,8 @@ database. Currently, it only cleans up core-metadata.
 			for _, object := range intervals.list {
 
 				// call delete function here
-				_ = client.DeleteItemNoIDURL(object.ID, "interval", "48085", verbose)
+				_ = client.DeleteItem(object.ID, config.Conf.SchedulerService.IntervalByIDRoute,
+					config.Conf.SchedulerService.IntervalByNameSlugRoute, config.Conf.SchedulerService.Port, verbose)
 			}
 
 			fmt.Println("Removed ", numberIs, " interval.")
@@ -324,7 +327,8 @@ database. Currently, it only cleans up core-metadata.
 			for _, object := range intervalactions.list {
 
 				// call delete function here
-				_ = client.DeleteItemNoIDURL(object.ID, "intervalaction", "48085", verbose)
+				_ = client.DeleteItem(object.ID, config.Conf.SchedulerService.IntervalActionByIDRoute,
+					config.Conf.SchedulerService.IntervalActionByNameSlugRoute, config.Conf.SchedulerService.Port, verbose)
 			}
 
 			fmt.Println("Removed ", numberIAs, " interval action.")
@@ -356,7 +360,8 @@ database. Currently, it only cleans up core-metadata.
 			for _, object := range registrations.list {
 
 				// call delete function here
-				_ = client.DeleteItem(object.ID, "registration", "48071", verbose)
+				_ = client.DeleteItem(object.ID, config.Conf.ExportService.RegistrationByIDRoute,
+					config.Conf.ExportService.RegistrationByNameRoute, config.Conf.ExportService.Port, verbose)
 			}
 
 			fmt.Println("Removed ", numberRegs, " registrations.")

@@ -15,7 +15,7 @@
 package reading
 
 import (
-	listevent "github.com/edgexfoundry/edgex-cli/cmd/reading/list"
+	listevent "github.com/edgexfoundry-holding/edgex-cli/cmd/reading/list"
 	"github.com/spf13/cobra"
 )
 

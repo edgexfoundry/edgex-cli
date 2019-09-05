@@ -17,7 +17,8 @@ package rm
 import (
 	"fmt"
 
-	client "github.com/edgexfoundry/edgex-cli/pkg"
+	"github.com/edgexfoundry-holding/edgex-cli/config"
+	client "github.com/edgexfoundry-holding/edgex-cli/pkg"
 	"github.com/spf13/cobra"
 )
 
@@ -25,7 +26,8 @@ func removeIntervalHandler(cmd *cobra.Command, args []string) {
 	// Create request
 	verbose, _ := cmd.Flags().GetBool("verbose")
 	intervalID := args[0]
-	respBody := client.DeleteItemNoIDURL(intervalID, "interval", "48085", verbose)
+	respBody := client.DeleteItem(intervalID, config.Conf.SchedulerService.IntervalByIDRoute,
+		config.Conf.SchedulerService.IntervalByNameSlugRoute, config.Conf.SchedulerService.Port, verbose)
 
 	// Display Results
 	if string(respBody) == "true" {

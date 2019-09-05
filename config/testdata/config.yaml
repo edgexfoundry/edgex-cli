@@ -1,0 +1,26 @@
+DataService:
+  Port: "48080"
+  ReadingByIDRoute: reading/id/
+  VDescriptorByIDRoute: valuedescriptor/id/
+  VDescriptorByNameRoute: valuedescriptor/name/
+Enabled: false
+ExportService:
+  Port: "48071"
+  RegistrationByIDRoute: registration/
+  RegistrationByNameRoute: registration/name/
+Host: ""
+MetadataService:
+  DeviceByIDRoute: device/id/
+  DeviceBySlugNameRoute: device/name/
+  DeviceProfileByIDRoute: deviceprofile/id/
+  DeviceProfileBySlugNameRoute: deviceprofile/name/
+  DeviceServiceByIDRoute: deviceservice/id/
+  DeviceServiceBySlugNameRoute: deviceservice/name/
+  Port: "48081"
+SchedulerService:
+  IntervalActionByIDRoute: intervalaction/
+  IntervalActionByNameSlugRoute: intervalaction/name/
+  IntervalByIDRoute: interval
+  IntervalByNameSlugRoute: interval/name/
+  Port: "48085"
+Token: ""
