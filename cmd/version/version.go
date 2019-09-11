@@ -3,7 +3,7 @@ package version
 import (
 	"fmt"
 
-	client "github.com/edgexfoundry/edgex-cli/pkg"
+	client "github.com/edgexfoundry-holding/edgex-cli/pkg"
 	"github.com/spf13/cobra"
 )
 
