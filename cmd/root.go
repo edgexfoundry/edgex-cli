@@ -21,7 +21,6 @@ import (
 
 	"github.com/spf13/cobra"
 
-
 	"github.com/edgexfoundry-holding/edgex-cli/cmd/db"
 	"github.com/edgexfoundry-holding/edgex-cli/cmd/device"
 	"github.com/edgexfoundry-holding/edgex-cli/cmd/deviceservice"
@@ -32,8 +31,8 @@ import (
 	"github.com/edgexfoundry-holding/edgex-cli/cmd/reading"
 	"github.com/edgexfoundry-holding/edgex-cli/cmd/status"
 	"github.com/edgexfoundry-holding/edgex-cli/cmd/subscription"
+	"github.com/edgexfoundry-holding/edgex-cli/cmd/version"
 	"github.com/edgexfoundry-holding/edgex-cli/config"
-
 )
 
 // NewCommand returns rootCmd which represents the base command when called without any subcommands
