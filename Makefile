@@ -1,6 +1,6 @@
 .PHONY: build clean install
 
-GO = CGO_ENABLED=0 GO111MODULE=off go
+GO = CGO_ENABLED=0 GO111MODULE=on go
 
 BINARY=edgex
 
