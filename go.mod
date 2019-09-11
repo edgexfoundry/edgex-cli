@@ -1,4 +1,4 @@
-module github.com/edgexfoundry/edgex-cli
+module github.com/edgexfoundry-holding/edgex-cli
 
 require (
 	github.com/edgexfoundry/go-mod-core-contracts v0.1.3
