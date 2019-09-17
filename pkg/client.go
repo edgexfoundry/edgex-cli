@@ -1,103 +1,109 @@
 package client
 
 import (
+	"errors"
 	"fmt"
+	"github.com/spf13/viper"
 	"io/ioutil"
 	"net/http"
-
-	"github.com/spf13/viper"
 )
 
-// GetAllItems returns a list of all Items in the DB
-func GetAllItems(itemType string, port string, verbose bool) []byte {
+var client = &http.Client{}
 
+func buildURL(itemType string, path string, port string) string {
 	host := viper.GetString("host")
+	url := "http://" + host + ":" + port + "/api/v1/" + path + itemType
+	return url
+}
 
-	url := "http://" + host + ":" + port + "/api/v1/" + itemType
+// GetAllItems returns a list of all Items in the DB
+func GetAllItems(itemType string, port string, verbose bool) ([]byte, error) {
+
+	url := buildURL(itemType, "", port)
 
 	if verbose {
 		fmt.Println("GET: " + url)
 	}
 
-	resp, err := http.Get(url)
+	resp, err := client.Get(url)
 	if err != nil {
-		// handle error
-		fmt.Println("An error occurred")
-		fmt.Println(err)
+		return nil, err
 	}
 	defer resp.Body.Close()
 
-	data, _ := ioutil.ReadAll(resp.Body)
-
-	return data
+	data, err := ioutil.ReadAll(resp.Body)
+	return data, err
 }
 
-// DeleteItem deletes the given item
-func DeleteItem(id string, pathID string, pathName string, port string, verbose bool) []byte {
+func DeleteItemByID(id string, pathID string, port string) ([]byte, error) {
 
-	// The ID parameter can be either NAME or ID. We are doing this to allow the user
-	// enter either the name or the ID of an object to delete.
-	// First, we try ID. If successful, stop. If unsuccessful, try name.
-
-	host := viper.GetString("host")
-
-	// Create client
-	client := &http.Client{}
-
-	// Try ID first
-	url := "http://" + host + ":" + port + "/api/v1/" + pathID + id
-
+	url := buildURL(id, pathID, port)
 	req, err := http.NewRequest("DELETE", url, nil)
 	if err != nil {
-		fmt.Println(err)
+		return nil, err
 	}
-
 	// Fetch Request
 	resp, err := client.Do(req)
 	if err != nil {
-		fmt.Println(err)
+		return nil, err
 	}
 
 	defer resp.Body.Close()
 
 	respBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		fmt.Println(err)
+		return nil, err
 	}
+	return respBody, nil
+}
 
-	if string(respBody) == "true" {
-		// deleting with ID worked
-		if verbose {
-			fmt.Println("DELETE: " + url)
-		}
-		return respBody
-	}
+func DeleteItemByName(id string, pathName string, port string) ([]byte, error) {
 
-	if pathName == "" {
-		fmt.Println("Deleting by ID failed: " + url)
-	}
+	url := buildURL(id, pathName, port)
+	req, err := http.NewRequest("DELETE", url, nil)
 
-	// deleting with IF failed. trying with name/slug
-	url = "http://" + host + ":" + port + "/api/v1/" + pathName + id
-
-	req, err = http.NewRequest("DELETE", url, nil)
 	if err != nil {
-		fmt.Println(err)
+		return nil, err
 	}
 
 	// Fetch Request
-	resp, err = client.Do(req)
+	resp, err := client.Do(req)
 	if err != nil {
-		fmt.Println(err)
+		return nil, err
 	}
 
 	defer resp.Body.Close()
 
-	respBody, err = ioutil.ReadAll(resp.Body)
+	respBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		fmt.Println(err)
+		return nil, err
 	}
 
-	return respBody
+	return respBody, nil
+}
 
+// DeleteItem deletes the given item
+// The ID parameter can be either NAME or ID. We are doing this to allow the user
+// enter either the name or the ID of an object to delete.
+// First, we try ID. If successful, stop. If unsuccessful, try name.
+
+func DeleteItem(id string, pathID string, pathName string, port string, verbose bool) ([]byte, error) {
+	// Try ID first
+	url := buildURL(id, pathID, port)
+	respBody, err := DeleteItemByID(id, pathID, port)
+
+	if string(respBody) == SUCCESSFUL_DELETE {
+		// deleting with ID worked
+		if verbose {
+			fmt.Println("DELETE: " + url)
+		}
+		return respBody, err
+	}
+
+	if pathName == "" {
+		return nil, errors.New("Deleting by ID failed: " + url)
+	}
+
+	respBody, err = DeleteItemByName(id, pathName, port)
+	return respBody, err
 }

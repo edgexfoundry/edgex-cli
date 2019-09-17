@@ -34,7 +34,12 @@ You can use: '$ edgex device list' to find a device's name and ID.`,
 			verbose, _ := cmd.Flags().GetBool("verbose")
 
 			deviceID := args[0]
-			respBody := client.DeleteItem(deviceID, config.Conf.MetadataService.DeviceServiceByIDRoute, config.Conf.MetadataService.DeviceServiceBySlugNameRoute, config.Conf.MetadataService.Port, verbose)
+			respBody, err := client.DeleteItem(deviceID, config.Conf.MetadataService.DeviceServiceByIDRoute, config.Conf.MetadataService.DeviceServiceBySlugNameRoute, config.Conf.MetadataService.Port, verbose)
+
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
 
 			// Display Results
 			if string(respBody) == "true" {

@@ -67,7 +67,12 @@ database. Currently, it only cleans up core-metadata.
 				list []models.Device
 			}
 
-			deviceData := client.GetAllItems("device", "48081", verbose)
+			deviceData, err := client.GetAllItems("device", "48081", verbose)
+
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
 
 			devices := deviceList{}
 			deviceerrjson := json.Unmarshal(deviceData, &devices.list)
@@ -79,7 +84,12 @@ database. Currently, it only cleans up core-metadata.
 
 			for _, object := range devices.list {
 				// call delete function here
-				_ = client.DeleteItem(object.Id, config.Conf.MetadataService.DeviceServiceByIDRoute, config.Conf.MetadataService.DeviceServiceBySlugNameRoute, config.Conf.MetadataService.Port, verbose)
+				_, err = client.DeleteItem(object.Id, config.Conf.MetadataService.DeviceServiceByIDRoute, config.Conf.MetadataService.DeviceServiceBySlugNameRoute, config.Conf.MetadataService.Port, verbose)
+
+				if err != nil {
+					fmt.Println(err)
+					return
+				}
 			}
 			fmt.Println("Removed ", numberDevices, " devices.")
 
@@ -90,7 +100,12 @@ database. Currently, it only cleans up core-metadata.
 				list []models.DeviceProfile
 			}
 
-			DeviceProfileData := client.GetAllItems("deviceprofile", "48081", verbose)
+			DeviceProfileData, err := client.GetAllItems("deviceprofile", "48081", verbose)
+
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
 
 			deviceprofiles := deviceProfileList{}
 
@@ -102,7 +117,12 @@ database. Currently, it only cleans up core-metadata.
 			numberProfiles := len(deviceprofiles.list)
 			for _, object := range deviceprofiles.list {
 				// call delete function here
-				_ = client.DeleteItem(object.Id, config.Conf.MetadataService.DeviceServiceByIDRoute, config.Conf.MetadataService.DeviceServiceBySlugNameRoute, config.Conf.MetadataService.Port, verbose)
+				_, err = client.DeleteItem(object.Id, config.Conf.MetadataService.DeviceServiceByIDRoute, config.Conf.MetadataService.DeviceServiceBySlugNameRoute, config.Conf.MetadataService.Port, verbose)
+
+				if err != nil {
+					fmt.Println(err)
+					return
+				}
 			}
 			fmt.Println("Removed ", numberProfiles, " device profiles.")
 
@@ -114,7 +134,12 @@ database. Currently, it only cleans up core-metadata.
 				list []models.DeviceReport
 			}
 
-			deviceReportData := client.GetAllItems("devicereport", "48081", verbose)
+			deviceReportData, err := client.GetAllItems("devicereport", "48081", verbose)
+
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
 
 			devicereports := deviceReportList{}
 
@@ -126,7 +151,12 @@ database. Currently, it only cleans up core-metadata.
 			numberDRs := len(devicereports.list)
 			for _, object := range devicereports.list {
 				// call delete function here
-				_ = client.DeleteItem(object.Id, config.Conf.MetadataService.DeviceServiceByIDRoute, config.Conf.MetadataService.DeviceServiceBySlugNameRoute, config.Conf.MetadataService.Port, verbose)
+				_, err = client.DeleteItem(object.Id, config.Conf.MetadataService.DeviceServiceByIDRoute, config.Conf.MetadataService.DeviceServiceBySlugNameRoute, config.Conf.MetadataService.Port, verbose)
+
+				if err != nil {
+					fmt.Println(err)
+					return
+				}
 			}
 			fmt.Println("Removed ", numberDRs, " device reports.")
 
@@ -137,8 +167,12 @@ database. Currently, it only cleans up core-metadata.
 				list []models.DeviceService
 			}
 
-			deviceServiceData := client.GetAllItems("deviceservice", "48081", verbose)
+			deviceServiceData, err := client.GetAllItems("deviceservice", "48081", verbose)
 
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
 			deviceservices := deviceServiceList{}
 
 			deviceserviceerrjson := json.Unmarshal(deviceServiceData, &deviceservices.list)
@@ -149,7 +183,12 @@ database. Currently, it only cleans up core-metadata.
 			numberDSs := len(deviceservices.list)
 			for _, object := range deviceservices.list {
 				// call delete function here
-				_ = client.DeleteItem(object.Id, config.Conf.MetadataService.DeviceServiceByIDRoute, config.Conf.MetadataService.DeviceServiceBySlugNameRoute, config.Conf.MetadataService.Port, verbose)
+				_, err = client.DeleteItem(object.Id, config.Conf.MetadataService.DeviceServiceByIDRoute, config.Conf.MetadataService.DeviceServiceBySlugNameRoute, config.Conf.MetadataService.Port, verbose)
+
+				if err != nil {
+					fmt.Println(err)
+					return
+				}
 			}
 
 			fmt.Println("Removed ", numberDSs, " device services.")
@@ -164,7 +203,12 @@ database. Currently, it only cleans up core-metadata.
 
 			// Calling GetAllItems function, which
 			// makes API call to get all items of given typ
-			data := client.GetAllItems("addressable", "48081", verbose)
+			data, err := client.GetAllItems("addressable", "48081", verbose)
+
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
 
 			// unmarshalling the json response
 			list := addressableList{}
@@ -179,7 +223,12 @@ database. Currently, it only cleans up core-metadata.
 			numberItems := len(list.list)
 			for _, addr := range list.list {
 				// call delete function here
-				_ = client.DeleteItem(addr.Id, config.Conf.MetadataService.DeviceServiceByIDRoute, config.Conf.MetadataService.DeviceServiceBySlugNameRoute, config.Conf.MetadataService.Port, verbose)
+				_, err = client.DeleteItem(addr.Id, config.Conf.MetadataService.DeviceServiceByIDRoute, config.Conf.MetadataService.DeviceServiceBySlugNameRoute, config.Conf.MetadataService.Port, verbose)
+
+				if err != nil {
+					fmt.Println(err)
+					return
+				}
 			}
 			fmt.Println("Removed ", numberItems, " device provision watchers.")
 
@@ -191,7 +240,12 @@ database. Currently, it only cleans up core-metadata.
 				list []models.ProvisionWatcher
 			}
 
-			provisionWatcherData := client.GetAllItems("provisionwatcher", "48081", verbose)
+			provisionWatcherData, err := client.GetAllItems("provisionwatcher", "48081", verbose)
+
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
 
 			provisionwatchers := provisionWatcherList{}
 
@@ -203,7 +257,12 @@ database. Currently, it only cleans up core-metadata.
 			numberPRs := len(provisionwatchers.list)
 			for _, object := range provisionwatchers.list {
 				// call delete function here
-				_ = client.DeleteItem(object.Id, config.Conf.MetadataService.DeviceServiceByIDRoute, config.Conf.MetadataService.DeviceServiceBySlugNameRoute, config.Conf.MetadataService.Port, verbose)
+				_, err = client.DeleteItem(object.Id, config.Conf.MetadataService.DeviceServiceByIDRoute, config.Conf.MetadataService.DeviceServiceBySlugNameRoute, config.Conf.MetadataService.Port, verbose)
+
+				if err != nil {
+					fmt.Println(err)
+					return
+				}
 			}
 
 			fmt.Println("Removed ", numberPRs, " device provision watchers.")
@@ -224,7 +283,12 @@ database. Currently, it only cleans up core-metadata.
 				list []models.Reading
 			}
 
-			readingData := client.GetAllItems("reading", "48080", verbose)
+			readingData, err := client.GetAllItems("reading", "48080", verbose)
+
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
 
 			readings := readingList{}
 
@@ -238,7 +302,12 @@ database. Currently, it only cleans up core-metadata.
 
 				// call delete function here
 
-				_ = client.DeleteItem(object.Id, config.Conf.DataService.ReadingByIDRoute, "", config.Conf.DataService.Port, verbose)
+				_, err = client.DeleteItem(object.Id, config.Conf.DataService.ReadingByIDRoute, "", config.Conf.DataService.Port, verbose)
+
+				if err != nil {
+					fmt.Println(err)
+					return
+				}
 			}
 
 			fmt.Println("Removed ", numberRs, " readings.")
@@ -251,7 +320,12 @@ database. Currently, it only cleans up core-metadata.
 				list []models.ValueDescriptor
 			}
 
-			valueDescriptorData := client.GetAllItems("valuedescriptor", "48080", verbose)
+			valueDescriptorData, err := client.GetAllItems("valuedescriptor", "48080", verbose)
+
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
 
 			valuedescriptors := valueDescriptorList{}
 
@@ -264,7 +338,12 @@ database. Currently, it only cleans up core-metadata.
 			for _, object := range valuedescriptors.list {
 
 				// call delete function here
-				_ = client.DeleteItem(object.Id, config.Conf.DataService.VDescriptorByIDRoute, config.Conf.DataService.VDescriptorByNameRoute, config.Conf.DataService.Port, verbose)
+				_, err = client.DeleteItem(object.Id, config.Conf.DataService.VDescriptorByIDRoute, config.Conf.DataService.VDescriptorByNameRoute, config.Conf.DataService.Port, verbose)
+
+				if err != nil {
+					fmt.Println(err)
+					return
+				}
 			}
 
 			fmt.Println("Removed ", numberVDs, " value descriptors.")
@@ -288,7 +367,12 @@ database. Currently, it only cleans up core-metadata.
 				list []models.Interval
 			}
 
-			intervalData := client.GetAllItems("interval", "48085", verbose)
+			intervalData, err := client.GetAllItems("interval", "48085", verbose)
+
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
 
 			intervals := intervalList{}
 
@@ -301,8 +385,13 @@ database. Currently, it only cleans up core-metadata.
 			for _, object := range intervals.list {
 
 				// call delete function here
-				_ = client.DeleteItem(object.ID, config.Conf.SchedulerService.IntervalByIDRoute,
+				_, err = client.DeleteItem(object.ID, config.Conf.SchedulerService.IntervalByIDRoute,
 					config.Conf.SchedulerService.IntervalByNameSlugRoute, config.Conf.SchedulerService.Port, verbose)
+
+				if err != nil {
+					fmt.Println(err)
+					return
+				}
 			}
 
 			fmt.Println("Removed ", numberIs, " interval.")
@@ -314,7 +403,12 @@ database. Currently, it only cleans up core-metadata.
 				list []models.IntervalAction
 			}
 
-			intervalactionData := client.GetAllItems("intervalaction", "48085", verbose)
+			intervalactionData, err := client.GetAllItems("intervalaction", "48085", verbose)
+
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
 
 			intervalactions := intervalactionList{}
 
@@ -327,8 +421,13 @@ database. Currently, it only cleans up core-metadata.
 			for _, object := range intervalactions.list {
 
 				// call delete function here
-				_ = client.DeleteItem(object.ID, config.Conf.SchedulerService.IntervalActionByIDRoute,
+				_, err = client.DeleteItem(object.ID, config.Conf.SchedulerService.IntervalActionByIDRoute,
 					config.Conf.SchedulerService.IntervalActionByNameSlugRoute, config.Conf.SchedulerService.Port, verbose)
+
+				if err != nil {
+					fmt.Println(err)
+					return
+				}
 			}
 
 			fmt.Println("Removed ", numberIAs, " interval action.")
@@ -347,7 +446,12 @@ database. Currently, it only cleans up core-metadata.
 				list []models.Registration
 			}
 
-			registrationData := client.GetAllItems("registration", "48071", verbose)
+			registrationData, err := client.GetAllItems("registration", "48071", verbose)
+
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
 
 			registrations := registrationList{}
 
@@ -360,8 +464,13 @@ database. Currently, it only cleans up core-metadata.
 			for _, object := range registrations.list {
 
 				// call delete function here
-				_ = client.DeleteItem(object.ID, config.Conf.ExportService.RegistrationByIDRoute,
+				_, err = client.DeleteItem(object.ID, config.Conf.ExportService.RegistrationByIDRoute,
 					config.Conf.ExportService.RegistrationByNameRoute, config.Conf.ExportService.Port, verbose)
+
+				if err != nil {
+					fmt.Println(err)
+					return
+				}
 			}
 
 			fmt.Println("Removed ", numberRegs, " registrations.")
