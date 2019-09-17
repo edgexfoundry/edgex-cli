@@ -41,7 +41,12 @@ func NewCommand() *cobra.Command {
 
 			verbose, _ := cmd.Flags().GetBool("verbose")
 
-			data := client.GetAllItems("deviceservice", "48081", verbose)
+			data, err := client.GetAllItems("deviceservice", "48081", verbose)
+
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
 
 			deviceServiceList1 := deviceServiceList{}
 

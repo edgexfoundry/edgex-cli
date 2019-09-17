@@ -26,8 +26,14 @@ func removeIntervalHandler(cmd *cobra.Command, args []string) {
 	// Create request
 	verbose, _ := cmd.Flags().GetBool("verbose")
 	intervalID := args[0]
-	respBody := client.DeleteItem(intervalID, config.Conf.SchedulerService.IntervalByIDRoute,
+
+	respBody, err := client.DeleteItem(intervalID, config.Conf.SchedulerService.IntervalByIDRoute,
 		config.Conf.SchedulerService.IntervalByNameSlugRoute, config.Conf.SchedulerService.Port, verbose)
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
 	// Display Results
 	if string(respBody) == "true" {
