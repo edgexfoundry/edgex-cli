@@ -77,9 +77,10 @@ https://www.edgexfoundry.org/
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
 	// set default config
-	configFilePath := os.Getenv("HOME") + "/.edgex-cli/config.yaml"
+	configDirPath := os.Getenv("HOME") + "/.edgex-cli/"
+	configFilePath := "config.yaml"
 	env := config.NewViperEnv()
-	err := config.SetConfig(env, configFilePath)
+	err := config.SetConfig(env, configDirPath, configFilePath)
 
 	if err != nil {
 		log.Fatal(err)

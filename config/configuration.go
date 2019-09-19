@@ -101,18 +101,27 @@ var Conf Configuration = Configuration{
 	},
 }
 
-func SetConfig(env Environment, configFilePath string) error {
+// SetConfig create the config file if doesn't exists
+func SetConfig(env Environment, configDirPath string, configFilePath string) error {
 
-	var configuration *Configuration = &Conf
-	if !exists(configFilePath) {
+	configuration := &Conf
+	completePath := configDirPath + configFilePath
 
-		err := createDefaultFile(configFilePath, configuration, AppFs)
+	if !exists(completePath) {
+		if !exists(configDirPath) {
+			err := os.Mkdir(configDirPath, os.ModePerm)
+			if err != nil {
+				return err
+			}
+		}
+
+		err := createDefaultFile(completePath, configuration, AppFs)
 		if err != nil {
 			return err
 		}
 	}
 
-	env.SetConfigFile(configFilePath)
+	env.SetConfigFile(completePath)
 
 	// Reading from file that was already existing or newly created
 	if err := env.ReadInConfig(); err != nil && exists(configFilePath) {
@@ -152,7 +161,7 @@ func createDefaultFile(configFilePath string, configuration *Configuration, fs a
 
 	f, err := fs.Create(configFilePath)
 	if err != nil {
-		return  err
+		return err
 	}
 	_, err = f.Write(y)
 	if err != nil {
