@@ -19,11 +19,9 @@ import (
 	"fmt"
 	"os"
 	"text/tabwriter"
-	"time"
 
 	client "github.com/edgexfoundry-holding/edgex-cli/pkg"
 
-	"github.com/edgexfoundry-holding/edgex-cli/pkg/utils"
 	models "github.com/edgexfoundry/go-mod-core-contracts/models"
 	"github.com/spf13/cobra"
 )
@@ -59,13 +57,11 @@ func NewCommand() *cobra.Command {
 
 			w := new(tabwriter.Writer)
 			w.Init(os.Stdout, 0, 8, 1, '\t', 0)
-			fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t%s\t\n", "Device ID", "Device Name", "Created", "Operating State", "Device Service", "Device Profile")
+			fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t\n", "Device ID", "Device Name", "Operating State", "Device Service", "Device Profile")
 			for _, device := range deviceList1.rd {
-				tCreated := time.Unix(device.Created/1000, 0)
-				fmt.Fprintf(w, "%s\t%s\t%v\t%v\t%s\t%s\t\n",
+				fmt.Fprintf(w, "%s\t%s\t%v\t%s\t%s\t\n",
 					device.Id,
 					device.Name,
-					utils.HumanDuration(time.Since(tCreated)),
 					device.OperatingState,
 					device.Service.Name,
 					device.Profile.Name,
