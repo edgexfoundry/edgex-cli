@@ -33,7 +33,7 @@ func NewCommand() *cobra.Command {
 			verbose, _ := cmd.Flags().GetBool("verbose")
 
 			deviceID := args[0]
-			respBody, err := client.DeleteItem(deviceID, config.Conf.MetadataService.DeviceServiceByIDRoute, config.Conf.MetadataService.DeviceServiceBySlugNameRoute, config.Conf.MetadataService.Port, verbose)
+			respBody, err := client.DeleteItem(deviceID, config.Conf.MetadataService.DeviceProfileByIDRoute, config.Conf.MetadataService.DeviceProfileBySlugNameRoute, config.Conf.MetadataService.Port, verbose)
 
 			if err != nil {
 				fmt.Println(err)
@@ -50,4 +50,3 @@ func NewCommand() *cobra.Command {
 	}
 	return cmd
 }
-
