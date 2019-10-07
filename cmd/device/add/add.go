@@ -5,51 +5,31 @@
 package add
 
 import (
-	"encoding/json"
-	"fmt"
-	"time"
 	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
-	"errors"
+	"time"
 
-	models "github.com/edgexfoundry/go-mod-core-contracts/models"
+	"github.com/BurntSushi/toml"
+	"github.com/edgexfoundry/go-mod-core-contracts/models"
 	"github.com/spf13/cobra"
-	"github.com/pelletier/go-toml"
 )
 
 type DeviceConfig struct {
-	Name string
-	Profile string
-	Description string
-	Labels []string
-	Protocols map[string]models.ProtocolProperties
-	AutoEvents []models.AutoEvent
-}
-
-type Profile struct {
-	Name string
-}
-
-type Service struct {
-	Name string
-}
-
-type Device struct {
-	Name string
-	Origin int64
-	Profile Profile
-	Service Service
-	Description string
-	Labels []string
-	AdminState models.AdminState
-	OperatingState models.OperatingState
-	Protocols map[string]models.ProtocolProperties
-	AutoEvents []models.AutoEvent
+	Name            string
+	Profile         string
+	Description     string
+	Service         string
+	Labels          []string
+	AddressableName string
+	Protocols       map[string]models.ProtocolProperties
+	AutoEvents      []models.AutoEvent
 }
 
 type DeviceFile struct {
-	Service string
 	DeviceList []DeviceConfig
 }
 
@@ -69,13 +49,14 @@ func NewCommand() *cobra.Command {
 	return cmd
 }
 
-func addDevice (dev Device) (string, error) {
-	jsonStr, err := json.Marshal (dev)
+func addDevice(dev models.Device) (string, error) {
+	jsonStr, err := json.Marshal(dev)
 	if err != nil {
 		return "", err
 	}
+	fmt.Println(string(jsonStr))
 	client := &http.Client{}
-	req, err := http.NewRequest("POST", "http://localhost:48081/api/v1/device", bytes.NewBuffer (jsonStr))
+	req, err := http.NewRequest("POST", "http://localhost:48081/api/v1/device", bytes.NewBuffer(jsonStr))
 	if err != nil {
 		return "", err
 	}
@@ -95,11 +76,11 @@ func addDevice (dev Device) (string, error) {
 	if resp.StatusCode == 200 {
 		return string(respBody), nil
 	} else {
-		return "", errors.New (string(respBody))
+		return "", errors.New(string(respBody))
 	}
 }
 
-func processFile (fname string) {
+func processFile(fname string) {
 	defer func() {
 		if r := recover(); r != nil {
 			fmt.Println("...Invalid TOML")
@@ -121,25 +102,19 @@ func processFile (fname string) {
 
 	for _, d := range content.DeviceList {
 		fmt.Println("...Create device ", d.Name)
-		prf := Profile {
-			Name:	d.Profile,
-		}
-		svc := Service {
-			Name:	content.Service,
-		}
 		millis := time.Now().UnixNano() / int64(time.Millisecond)
-		dev := Device {
-			Name:		d.Name,
-			Profile:	prf,
-			Protocols:	d.Protocols,
-			Labels:		d.Labels,
-			Service:	svc,
-			AdminState:	models.Unlocked,
-			OperatingState:	models.Enabled,
-			AutoEvents:	d.AutoEvents,
+		dev := models.Device{
+			Name:           d.Name,
+			Profile:        models.DeviceProfile{Name: d.Profile},
+			Protocols:      d.Protocols,
+			Labels:         d.Labels,
+			Service:        models.DeviceService{Name: d.Service, Addressable: models.Addressable{Name: d.AddressableName}},
+			AdminState:     models.Unlocked,
+			OperatingState: models.Enabled,
+			AutoEvents:     d.AutoEvents,
 		}
 		dev.Origin = millis
-		id, err := addDevice (dev)
+		id, err := addDevice(dev)
 		if err != nil {
 			fmt.Println("......Error: ", err.Error())
 		} else {
