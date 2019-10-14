@@ -4,7 +4,7 @@
 
 ## Introduction
 
-A command line interface to interact with EdgeX microservices. You can use this CLI tool instead of complicated CURL command or developer scripts.
+A command line interface to interact with EdgeX microservices. Replaces the need to manually construct complex CURL commands and/or maintain developer scripts.
 
 ## Installation
 
