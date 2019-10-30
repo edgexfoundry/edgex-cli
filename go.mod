@@ -1,6 +1,7 @@
 module github.com/edgexfoundry-holding/edgex-cli
 
 require (
+	github.com/BurntSushi/toml v0.3.1
 	github.com/edgexfoundry/go-mod-core-contracts v0.1.3
 	github.com/ghodss/yaml v1.0.0
 	github.com/pelletier/go-toml v1.2.0
