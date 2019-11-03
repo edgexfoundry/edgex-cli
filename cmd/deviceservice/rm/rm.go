@@ -32,6 +32,12 @@ func NewCommand() *cobra.Command {
 
 			verbose, _ := cmd.Flags().GetBool("verbose")
 
+			// Checking for args
+			if len(args) == 0 {
+				fmt.Printf("Error: No device service ID/Name provided.\n")
+				return
+			}
+
 			deviceID := args[0]
 			respBody, err := client.DeleteItem(deviceID, config.Conf.MetadataService.DeviceServiceByIDRoute, config.Conf.MetadataService.DeviceServiceBySlugNameRoute, config.Conf.MetadataService.Port, verbose)
 

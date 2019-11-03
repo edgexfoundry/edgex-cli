@@ -30,6 +30,11 @@ func NewCommand() *cobra.Command {
 		Long:  `Removes the device profile given a device profile name or ID.`,
 		Run: func(cmd *cobra.Command, args []string) {
 
+			// Checking for args
+			if len(args) == 0 {
+				fmt.Printf("Error: No profile ID/Name provided.\n")
+				return
+			}
 			verbose, _ := cmd.Flags().GetBool("verbose")
 
 			deviceID := args[0]
