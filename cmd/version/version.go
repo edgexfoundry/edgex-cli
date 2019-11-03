@@ -19,7 +19,6 @@ func NewCommand() *cobra.Command {
 			// Printing the CLI's version
 			fmt.Println("edgex-cli version: ", version)
 			// printing the version of each service
-			// ports :=
 			data := client.GetVersion("48080")
 			fmt.Println("version: ", string(data))
 		},

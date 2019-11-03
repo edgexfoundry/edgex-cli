@@ -33,8 +33,14 @@ You can use: '$ edgex device list' to find a device's name and ID.`,
 
 			verbose, _ := cmd.Flags().GetBool("verbose")
 
+			// Checking for args
+			if len(args) == 0 {
+				fmt.Printf("Error: No device ID/Name provided.\n")
+				return
+			}
+
 			deviceID := args[0]
-			respBody, err := client.DeleteItem(deviceID, config.Conf.MetadataService.DeviceServiceByIDRoute, config.Conf.MetadataService.DeviceServiceBySlugNameRoute, config.Conf.MetadataService.Port, verbose)
+			respBody, err := client.DeleteItem(deviceID, config.Conf.MetadataService.DeviceByIDRoute, config.Conf.MetadataService.DeviceBySlugNameRoute, config.Conf.MetadataService.Port, verbose)
 
 			if err != nil {
 				fmt.Println(err)
@@ -45,7 +51,7 @@ You can use: '$ edgex device list' to find a device's name and ID.`,
 			if string(respBody) == "true" {
 				fmt.Printf("Removed: %s\n", deviceID)
 			} else {
-				fmt.Printf("Remove Unsuccessful!\n")
+				fmt.Printf("Error: Remove Unsuccessful!\n")
 			}
 		},
 	}
