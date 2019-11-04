@@ -23,6 +23,12 @@ import (
 )
 
 func removeIntervalHandler(cmd *cobra.Command, args []string) {
+	// Checking for args
+	if len(args) == 0 {
+		fmt.Printf("Error: No interval ID/Name provided.\n")
+		return
+	}
+
 	// Create request
 	verbose, _ := cmd.Flags().GetBool("verbose")
 	intervalID := args[0]

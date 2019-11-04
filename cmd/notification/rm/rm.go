@@ -36,6 +36,9 @@ func removeNotificationHandler(cmd *cobra.Command, args []string) {
 		} else {
 			url = "http://localhost:48060/api/v1/notification/slug/" + args[0]
 		}
+	} else {
+		fmt.Printf("Error: No slug or age provided.\n")
+		return
 	}
 	fmt.Println(url)
 	req, err := http.NewRequest("DELETE", url, nil)
