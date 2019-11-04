@@ -16,16 +16,18 @@ package config
 
 import (
 	"errors"
-	"github.com/spf13/afero"
-	"github.com/stretchr/testify/mock"
-	"os"
 	"reflect"
 	"testing"
+
+	"github.com/spf13/afero"
+	"github.com/stretchr/testify/mock"
 
 	"github.com/edgexfoundry-holding/edgex-cli/config/mocks"
 )
 
-var TestConfigFilePath = "testdata/config.yaml"
+var TestConfigFilePath = "config.yaml"
+var TestConfigDirPath = "testdata/"
+var TestCompletePath = TestConfigDirPath + TestConfigFilePath
 var TestInvalidConfigFilePath = ""
 var Error = errors.New("test error")
 
@@ -64,49 +66,47 @@ func TestSetConfig(t *testing.T) {
 		name              string
 		env               Environment
 		configFilePath    string
+		configDirPath     string
 		expectError       bool
 		expectedErrorType error
 	}{
-
-		{
-			name:              "Successful SetConfig",
-			env:               createMocEnvSuccess(),
-			configFilePath:    TestConfigFilePath,
-			expectError:       false,
-			expectedErrorType: nil,
-		},
-		{
-			name:              "Error SetConfigFile",
-			env:               createMocEnvSuccess(),
-			configFilePath:    TestInvalidConfigFilePath,
-			expectError:       true,
-			expectedErrorType: &os.PathError{},
-		},
 		{
 			name:              "Error ReadInConfig",
-			env:               createMocEnvReadInConfigErr(),
+			env:               createMockEnvReadInConfigErr(),
 			configFilePath:    TestConfigFilePath,
+			configDirPath:     TestConfigDirPath,
 			expectError:       true,
 			expectedErrorType: Error,
 		},
 		{
-			name:              "Error Unmarshal",
-			env:               createMocEnvUnmarshalErr(),
+			name:              "Successful SetConfig",
+			env:               createMockEnvSuccess(),
 			configFilePath:    TestConfigFilePath,
+			configDirPath:     TestConfigDirPath,
+			expectError:       false,
+			expectedErrorType: nil,
+		},
+
+		{
+			name:              "Error Unmarshal",
+			env:               createMockEnvUnmarshalErr(),
+			configFilePath:    TestConfigFilePath,
+			configDirPath:     TestConfigDirPath,
 			expectError:       true,
 			expectedErrorType: Error,
 		},
 		{
 			name:              "Error WriteConfig",
-			env:               createMocEnvWriteConfigErr(),
+			env:               createMockEnvWriteConfigErr(),
 			configFilePath:    TestConfigFilePath,
+			configDirPath:     TestConfigDirPath,
 			expectError:       true,
 			expectedErrorType: Error,
 		},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			err := SetConfig(test.env, test.configFilePath)
+			err := SetConfig(test.env, test.configDirPath, test.configFilePath)
 
 			if test.expectError && err == nil {
 				t.Error("We expected an error but did not get one")
@@ -129,36 +129,36 @@ func TestSetConfig(t *testing.T) {
 	}
 }
 
-func createMocEnvSuccess() Environment {
+func createMockEnvSuccess() Environment {
 	dbMock := mocks.Environment{}
-	dbMock.On("SetConfigFile", TestConfigFilePath).Return(nil)
+	dbMock.On("SetConfigFile", TestCompletePath).Return(nil)
 	dbMock.On("ReadInConfig").Return(nil)
 	dbMock.On("Unmarshal", &TestConf).Return(nil)
 	dbMock.On("WriteConfig").Return(nil)
 	return &dbMock
 }
 
-func createMocEnvReadInConfigErr() Environment {
+func createMockEnvReadInConfigErr() Environment {
 	dbMock := mocks.Environment{}
-	dbMock.On("SetConfigFile", TestConfigFilePath).Return(nil)
+	dbMock.On("SetConfigFile", TestCompletePath).Return(nil)
 	dbMock.On("ReadInConfig").Return(Error)
 	dbMock.On("Unmarshal", &TestConf).Return(nil)
 	dbMock.On("WriteConfig").Return(nil)
 	return &dbMock
 }
 
-func createMocEnvUnmarshalErr() Environment {
+func createMockEnvUnmarshalErr() Environment {
 	dbMock := mocks.Environment{}
-	dbMock.On("SetConfigFile", TestConfigFilePath).Return(nil)
+	dbMock.On("SetConfigFile", TestCompletePath).Return(nil)
 	dbMock.On("ReadInConfig").Return(nil)
 	dbMock.On("Unmarshal", &TestConf).Return(Error)
 	dbMock.On("WriteConfig").Return(nil)
 	return &dbMock
 }
 
-func createMocEnvWriteConfigErr() Environment {
+func createMockEnvWriteConfigErr() Environment {
 	dbMock := mocks.Environment{}
-	dbMock.On("SetConfigFile", TestConfigFilePath).Return(nil)
+	dbMock.On("SetConfigFile", TestCompletePath).Return(nil)
 	dbMock.On("ReadInConfig").Return(nil)
 	dbMock.On("Unmarshal", &TestConf).Return(nil)
 	dbMock.On("WriteConfig").Return(Error)
@@ -242,7 +242,6 @@ func TestCreateDefaultFile(t *testing.T) {
 			expectError:       true,
 			expectedErrorType: Error,
 		},
-
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
