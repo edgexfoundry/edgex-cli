@@ -10,6 +10,8 @@ GOFLAGS=-ldflags "-X github.com/edgexfoundry-holding/edgex-cli/cmd/version.versi
 build:
 	$(GO) build -o $(BINARY) $(GOFLAGS)
 
+test:
+	$(GO) test ./... -coverprofile coverage.out
 install:
 	$(GO) install $(GOFLAGS)
 

@@ -124,7 +124,7 @@ func SetConfig(env Environment, configDirPath string, configFilePath string) err
 	env.SetConfigFile(completePath)
 
 	// Reading from file that was already existing or newly created
-	if err := env.ReadInConfig(); err != nil && exists(configFilePath) {
+	if err := env.ReadInConfig(); err != nil && exists(completePath) {
 		return fmt.Errorf("error reading config file, %s", err)
 	}
 

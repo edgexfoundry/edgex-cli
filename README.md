@@ -78,3 +78,15 @@ $ ./edgex-cli
 ```
 $ go run main.go [COMMAND]
 ```
+
+* Running tests:
+
+```
+$ make test
+```
+
+This will generate a coverage.out file in the root directory of the repo which you can use to see test coverage of code by running
+
+```
+$ go tool cover -html=coverage.out
+```
