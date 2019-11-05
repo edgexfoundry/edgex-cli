@@ -17,13 +17,14 @@ package list
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
-	"os"
 	"text/tabwriter"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/models"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 type intervalList struct {
@@ -71,8 +72,10 @@ func listHandler(cmd *cobra.Command, args []string) {
 		fmt.Println(errjson)
 		return
 	}
+
+	pw := viper.Get("writer").(io.WriteCloser)
 	w := new(tabwriter.Writer)
-	w.Init(os.Stdout, 0, 8, 1, '\t', 0)
+	w.Init(pw, 0, 8, 1, '\t', 0)
 	fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t%s\t%s\t\n", "Interval ID", "Name", "Start",
 		"End", "Frequency", "Cron", "RunOnce")
 	if len(args) > 0 {

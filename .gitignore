@@ -1,3 +1,7 @@
 edgex-cli
 edgex
 go.sum
+coverage.out
+
+.idea/
+

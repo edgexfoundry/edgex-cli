@@ -16,10 +16,12 @@ package cmd
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"os"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 
 	"github.com/edgexfoundry-holding/edgex-cli/cmd/db"
 	"github.com/edgexfoundry-holding/edgex-cli/cmd/device"
@@ -33,11 +35,38 @@ import (
 	"github.com/edgexfoundry-holding/edgex-cli/cmd/subscription"
 	"github.com/edgexfoundry-holding/edgex-cli/cmd/version"
 	"github.com/edgexfoundry-holding/edgex-cli/config"
+	"github.com/edgexfoundry-holding/edgex-cli/pkg/pager"
 )
 
 // NewCommand returns rootCmd which represents the base command when called without any subcommands
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
+		PersistentPreRun: func(cmd *cobra.Command, args []string) {
+			noPager, err := cmd.Flags().GetBool("no-pager")
+			if err != nil {
+				fmt.Println("couldn't get no-pager flag")
+			}
+			viper.Set("writer", os.Stdout)
+			if !noPager {
+				w, err := pager.NewWriter()
+				if err == nil {
+					viper.Set("writer", w)
+					viper.Set("writerShouldClose", true) // This flag prevents us from calling close on stdout
+				}
+			}
+		},
+		PersistentPostRun: func(cmd *cobra.Command, args []string) {
+			shouldClose := viper.GetBool("writerShouldClose")
+			if shouldClose {
+				pw := viper.Get("writer").(io.Closer)
+				if pw != os.Stdout {
+					err := pw.Close()
+					if err != nil {
+						_ = fmt.Errorf(err.Error())
+					}
+				}
+			}
+		},
 		Use:   "edgex",
 		Short: "EdgeX command line interface",
 		Long: " _____    _           __  __  _____                     _            \n" +
@@ -68,7 +97,9 @@ https://www.edgexfoundry.org/
 
 	// global flags
 	Verbose := false
+	NoPager := false
 	cmd.PersistentFlags().BoolVarP(&Verbose, "verbose", "v", false, "Print URL(s) used by the entered command.")
+	cmd.PersistentFlags().BoolVarP(&NoPager, "no-pager", "", false, "Do not pipe output into a pager.")
 
 	return cmd
 }

@@ -17,16 +17,18 @@ package list
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
-	"os"
 	"strconv"
 	"text/tabwriter"
 	"time"
 
-	"github.com/edgexfoundry-holding/edgex-cli/pkg/utils"
 	"github.com/edgexfoundry/go-mod-core-contracts/models"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+
+	"github.com/edgexfoundry-holding/edgex-cli/pkg/utils"
 )
 
 // var rd []models.Device
@@ -78,15 +80,17 @@ func NewCommand() *cobra.Command {
 				fmt.Println(errjson)
 				return
 			}
+
+			pw := viper.Get("writer").(io.WriteCloser)
 			w := new(tabwriter.Writer)
-			w.Init(os.Stdout, 0, 8, 1, '\t', 0)
+			w.Init(pw, 0, 8, 1, '\t', 0)
 			fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t\n", "Reading ID", "Name", "Device",
 				"Origin", "Value", "Created", "Modified", "Pushed")
 			for _, reading := range readingList.rd {
 				tCreated := time.Unix(reading.Created/1000, 0)
 				tModified := time.Unix(reading.Modified/1000, 0)
 				tPushed := time.Unix(reading.Pushed/1000, 0)
-				fmt.Fprintf(w, "%s\t%s\t%s\t%d\t%s\t%s\t%s\t%s\t\n",
+				_, err = fmt.Fprintf(w, "%s\t%s\t%s\t%d\t%s\t%s\t%s\t%s\t\n",
 					reading.Id,
 					reading.Name,
 					reading.Device,
@@ -96,6 +100,9 @@ func NewCommand() *cobra.Command {
 					utils.HumanDuration(time.Since(tModified)),
 					utils.HumanDuration(time.Since(tPushed)),
 				)
+				if err != nil {
+					return
+				}
 			}
 			w.Flush()
 		},

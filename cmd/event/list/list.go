@@ -17,16 +17,18 @@ package list
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
-	"os"
 	"strconv"
 	"text/tabwriter"
 	"time"
 
-	"github.com/edgexfoundry-holding/edgex-cli/pkg/utils"
 	"github.com/edgexfoundry/go-mod-core-contracts/models"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+
+	"github.com/edgexfoundry-holding/edgex-cli/pkg/utils"
 )
 
 // var rd []models.Device
@@ -79,8 +81,10 @@ func NewCommand() *cobra.Command {
 				fmt.Println(errjson)
 				return
 			}
+
+			pw := viper.Get("writer").(io.WriteCloser)
 			w := new(tabwriter.Writer)
-			w.Init(os.Stdout, 0, 8, 1, '\t', 0)
+			w.Init(pw, 0, 8, 1, '\t', 0)
 			fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t\n", "Event ID", "Device", "Origin", "Created", "Modified")
 			for _, event := range eventList.rd {
 				tCreated := time.Unix(event.Created/1000, 0)

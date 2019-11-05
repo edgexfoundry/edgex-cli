@@ -17,14 +17,16 @@ package list
 import (
 	"encoding/json"
 	"fmt"
-	"os"
+	"io"
 	"text/tabwriter"
 	"time"
 
-	client "github.com/edgexfoundry-holding/edgex-cli/pkg"
-	"github.com/edgexfoundry-holding/edgex-cli/pkg/utils"
 	models "github.com/edgexfoundry/go-mod-core-contracts/models"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+
+	client "github.com/edgexfoundry-holding/edgex-cli/pkg"
+	"github.com/edgexfoundry-holding/edgex-cli/pkg/utils"
 )
 
 type deviceProfileList struct {
@@ -56,8 +58,10 @@ func NewCommand() *cobra.Command {
 			}
 
 			// TODO: Add commands and resources? They both are lists, so we need to think about how to display them
+
+			pw := viper.Get("writer").(io.WriteCloser)
 			w := new(tabwriter.Writer)
-			w.Init(os.Stdout, 0, 8, 1, '\t', 0)
+			w.Init(pw, 0, 8, 1, '\t', 0)
 			fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t%s\t\n", "Profile ID", "Profile Name", "Created", "Modified", "Manufacturer", "Model")
 			for _, device := range deviceProfileList1.rd {
 				tCreated := time.Unix(device.Created/1000, 0)
