@@ -17,16 +17,16 @@ package list
 import (
 	"encoding/json"
 	"fmt"
-	"os"
+	"io"
 	"text/tabwriter"
 
-	client "github.com/edgexfoundry-holding/edgex-cli/pkg"
-
-	models "github.com/edgexfoundry/go-mod-core-contracts/models"
+	"github.com/edgexfoundry/go-mod-core-contracts/models"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+
+	client "github.com/edgexfoundry-holding/edgex-cli/pkg"
 )
 
-// var rd []models.Device
 type deviceList struct {
 	rd []models.Device
 }
@@ -55,9 +55,13 @@ func NewCommand() *cobra.Command {
 				fmt.Println(errjson)
 			}
 
+			pw := viper.Get("writer").(io.Writer)
 			w := new(tabwriter.Writer)
-			w.Init(os.Stdout, 0, 8, 1, '\t', 0)
-			fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t\n", "Device ID", "Device Name", "Operating State", "Device Service", "Device Profile")
+			w.Init(pw, 0, 8, 1, '\t', 0)
+			_, err = fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t\n", "Device ID", "Device Name", "Operating State", "Device Service", "Device Profile")
+			if err != nil {
+				fmt.Println(err.Error())
+			}
 			for _, device := range deviceList1.rd {
 				fmt.Fprintf(w, "%s\t%s\t%v\t%s\t%s\t\n",
 					device.Id,
@@ -67,7 +71,14 @@ func NewCommand() *cobra.Command {
 					device.Profile.Name,
 				)
 			}
-			w.Flush()
+			if err != nil {
+				fmt.Errorf(err.Error())
+				return
+			}
+			err = w.Flush()
+			if err != nil {
+				fmt.Println(err.Error())
+			}
 		},
 	}
 	return cmd
