@@ -24,43 +24,6 @@ $ make install
 
 You can now use the CLI by entering `edgex-cli` anywhere on your machine. 
 
-### Available Commands
-
-#### Readings
-
-```
-$ edgex reading list    // All readings
-$ edgex reading list <device> // All readings for device, default limit is 50
-$ edgex reading list <device> -l <limit>  // All readings for device with limit
-```
-
-#### Notifications
-
-```
-$ edgex notification add </path/to/file.toml> // Add notifications from toml file
-$ edgex notification rm <slug> // Remove a notification by slug
-$ edgex notification rm --age 1561939200 // Remove a notification by age (timestamp)
-```
-
-#### Subscriptions
-
-```
-$ edgex subscription add </path/to/file.toml> // Add subscriptions from toml file
-$ edgex subscription rm A // Remove a subscription by slug
-$ edgex subscription add /path/to/file.toml // Add subscriptions from toml file.
-$ edgex subscription rm A // Remove a subscription by slug.
-$ edgex subscription rm --id SOMEID // Remove a subscription by id.
-```
-
-#### Intervals
-```
-$ edgex interval list // Lists all intervals provided their numbers is within the configured limit.
-$ edgex interval list A // List interval with name A.
-$ edgex interval list --id SOMEID // List interval with id SOMEID.
-$ edgex interval add /path/to/file.toml // Add intervals from toml file.
-$ edgex interval update /path/to/file.toml // Update intervals from toml file.
-$ edgex interval rm A // Remove a interval by id or name A.
-```
 
 ### Developers
 
