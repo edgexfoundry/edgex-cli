@@ -94,39 +94,6 @@ database. Currently, it only cleans up core-metadata.
 			fmt.Println("Removed ", numberDevices, " devices.")
 
 			//////////////////////////////////////////////////////
-			// DP
-			//////////////////////////////////////////////////////
-			type deviceProfileList struct {
-				list []models.DeviceProfile
-			}
-
-			DeviceProfileData, err := client.GetAllItems("deviceprofile", "48081", verbose)
-
-			if err != nil {
-				fmt.Println(err)
-				return
-			}
-
-			deviceprofiles := deviceProfileList{}
-
-			deviceprofileerrjson := json.Unmarshal(DeviceProfileData, &deviceprofiles.list)
-			if deviceprofileerrjson != nil {
-				fmt.Println(deviceprofileerrjson)
-			}
-
-			numberProfiles := len(deviceprofiles.list)
-			for _, object := range deviceprofiles.list {
-				// call delete function here
-				_, err = client.DeleteItem(object.Id, config.Conf.MetadataService.DeviceServiceByIDRoute, config.Conf.MetadataService.DeviceServiceBySlugNameRoute, config.Conf.MetadataService.Port, verbose)
-
-				if err != nil {
-					fmt.Println(err)
-					return
-				}
-			}
-			fmt.Println("Removed ", numberProfiles, " device profiles.")
-
-			//////////////////////////////////////////////////////
 			// DR
 			//////////////////////////////////////////////////////
 
@@ -192,6 +159,39 @@ database. Currently, it only cleans up core-metadata.
 			}
 
 			fmt.Println("Removed ", numberDSs, " device services.")
+
+			//////////////////////////////////////////////////////
+			// DP
+			//////////////////////////////////////////////////////
+			type deviceProfileList struct {
+				list []models.DeviceProfile
+			}
+
+			DeviceProfileData, err := client.GetAllItems("deviceprofile", "48081", verbose)
+
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
+
+			deviceprofiles := deviceProfileList{}
+
+			deviceprofileerrjson := json.Unmarshal(DeviceProfileData, &deviceprofiles.list)
+			if deviceprofileerrjson != nil {
+				fmt.Println(deviceprofileerrjson)
+			}
+
+			numberProfiles := len(deviceprofiles.list)
+			for _, object := range deviceprofiles.list {
+				// call delete function here
+				_, err = client.DeleteItem(object.Id, config.Conf.MetadataService.DeviceProfileByIDRoute, config.Conf.MetadataService.DeviceProfileBySlugNameRoute, config.Conf.MetadataService.Port, verbose)
+
+				if err != nil {
+					fmt.Println(err)
+					return
+				}
+			}
+			fmt.Println("Removed ", numberProfiles, " device profiles.")
 
 			//////////////////////////////////////////////////////
 			// ADDRESSABLES
