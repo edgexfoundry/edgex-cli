@@ -42,7 +42,24 @@ import (
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
+			// set flags
 			noPager, err := cmd.Flags().GetBool("no-pager")
+
+			verbose, _ := cmd.Flags().GetBool("verbose")
+			if err != nil {
+				fmt.Println("couldn't get verbose flag")
+			}
+			viper.Set("verbose", verbose)
+			if verbose {
+				noPager = true
+			}
+
+			url, _ := cmd.Flags().GetBool("url")
+			if err != nil {
+				fmt.Println("couldn't get url flag")
+			}
+			viper.Set("url", url)
+
 			if err != nil {
 				fmt.Println("couldn't get no-pager flag")
 			}
@@ -54,6 +71,7 @@ func NewCommand() *cobra.Command {
 					viper.Set("writerShouldClose", true) // This flag prevents us from calling close on stdout
 				}
 			}
+
 		},
 		PersistentPostRun: func(cmd *cobra.Command, args []string) {
 			shouldClose := viper.GetBool("writerShouldClose")
@@ -97,8 +115,12 @@ https://www.edgexfoundry.org/
 
 	// global flags
 	Verbose := false
+	URL := false
 	NoPager := false
-	cmd.PersistentFlags().BoolVarP(&Verbose, "verbose", "v", false, "Print URL(s) used by the entered command.")
+
+	// get flags values
+	cmd.PersistentFlags().BoolVarP(&URL, "url", "u", false, "Print URL(s) used by the entered command.")
+	cmd.PersistentFlags().BoolVarP(&Verbose, "verbose", "v", false, "Print entire HTTP response.")
 	cmd.PersistentFlags().BoolVarP(&NoPager, "no-pager", "", false, "Do not pipe output into a pager.")
 
 	return cmd

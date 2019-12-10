@@ -50,7 +50,7 @@ func NewCommand() *cobra.Command {
 			if string(respBody) == "true" {
 				fmt.Printf("Removed: %s\n", deviceID)
 			} else {
-				fmt.Printf("Remove Unsuccessful!\n")
+				fmt.Printf("Remove Unsuccessful: %s\n", string(respBody))
 			}
 		},
 	}

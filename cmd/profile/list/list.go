@@ -40,10 +40,7 @@ func NewCommand() *cobra.Command {
 		Short: "Returns a list of device profiles",
 		Long:  `Returns the list of device profiles currently in the core-metadata database.`,
 		Run: func(cmd *cobra.Command, args []string) {
-
-			verbose, _ := cmd.Flags().GetBool("verbose")
-
-			data, err := client.GetAllItems("deviceprofile", "48081", verbose)
+			data, err := client.GetAllItems("deviceprofile", "48081")
 
 			if err != nil {
 				fmt.Println(err)

@@ -39,9 +39,11 @@ func NewCommand() *cobra.Command {
 		Long:  `Return all device services sorted by id.`,
 		Run: func(cmd *cobra.Command, args []string) {
 
-			verbose, _ := cmd.Flags().GetBool("verbose")
+			data, err := client.GetAllItems("device", "48081")
 
-			data, err := client.GetAllItems("device", "48081", verbose)
+			if data == nil {
+				return
+			}
 
 			if err != nil {
 				fmt.Println(err)
