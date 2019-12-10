@@ -72,6 +72,7 @@ type ExportService struct {
 }
 
 var Conf Configuration = Configuration{
+	Host: "localhost",
 	SchedulerService: SchedulerService{
 		Port:                          "48085",
 		IntervalByIDRoute:             "interval",
