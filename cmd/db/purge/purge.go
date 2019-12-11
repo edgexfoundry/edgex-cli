@@ -67,7 +67,7 @@ database. Currently, it only cleans up core-metadata.
 				list []models.Device
 			}
 
-			deviceData, err := client.GetAllItems("device", "48081", verbose)
+			deviceData, err := client.GetAllItems("device", "48081")
 
 			if err != nil {
 				fmt.Println(err)
@@ -101,7 +101,7 @@ database. Currently, it only cleans up core-metadata.
 				list []models.DeviceReport
 			}
 
-			deviceReportData, err := client.GetAllItems("devicereport", "48081", verbose)
+			deviceReportData, err := client.GetAllItems("devicereport", "48081")
 
 			if err != nil {
 				fmt.Println(err)
@@ -134,7 +134,7 @@ database. Currently, it only cleans up core-metadata.
 				list []models.DeviceService
 			}
 
-			deviceServiceData, err := client.GetAllItems("deviceservice", "48081", verbose)
+			deviceServiceData, err := client.GetAllItems("deviceservice", "48081")
 
 			if err != nil {
 				fmt.Println(err)
@@ -167,7 +167,7 @@ database. Currently, it only cleans up core-metadata.
 				list []models.DeviceProfile
 			}
 
-			DeviceProfileData, err := client.GetAllItems("deviceprofile", "48081", verbose)
+			DeviceProfileData, err := client.GetAllItems("deviceprofile", "48081")
 
 			if err != nil {
 				fmt.Println(err)
@@ -203,7 +203,7 @@ database. Currently, it only cleans up core-metadata.
 
 			// Calling GetAllItems function, which
 			// makes API call to get all items of given typ
-			data, err := client.GetAllItems("addressable", "48081", verbose)
+			data, err := client.GetAllItems("addressable", "48081")
 
 			if err != nil {
 				fmt.Println(err)
@@ -240,7 +240,7 @@ database. Currently, it only cleans up core-metadata.
 				list []models.ProvisionWatcher
 			}
 
-			provisionWatcherData, err := client.GetAllItems("provisionwatcher", "48081", verbose)
+			provisionWatcherData, err := client.GetAllItems("provisionwatcher", "48081")
 
 			if err != nil {
 				fmt.Println(err)
@@ -283,7 +283,7 @@ database. Currently, it only cleans up core-metadata.
 				list []models.Reading
 			}
 
-			readingData, err := client.GetAllItems("reading", "48080", verbose)
+			readingData, err := client.GetAllItems("reading", "48080")
 
 			if err != nil {
 				fmt.Println(err)
@@ -320,7 +320,7 @@ database. Currently, it only cleans up core-metadata.
 				list []models.ValueDescriptor
 			}
 
-			valueDescriptorData, err := client.GetAllItems("valuedescriptor", "48080", verbose)
+			valueDescriptorData, err := client.GetAllItems("valuedescriptor", "48080")
 
 			if err != nil {
 				fmt.Println(err)
@@ -367,7 +367,7 @@ database. Currently, it only cleans up core-metadata.
 				list []models.Interval
 			}
 
-			intervalData, err := client.GetAllItems("interval", "48085", verbose)
+			intervalData, err := client.GetAllItems("interval", "48085")
 
 			if err != nil {
 				fmt.Println(err)
@@ -403,7 +403,7 @@ database. Currently, it only cleans up core-metadata.
 				list []models.IntervalAction
 			}
 
-			intervalactionData, err := client.GetAllItems("intervalaction", "48085", verbose)
+			intervalactionData, err := client.GetAllItems("intervalaction", "48085")
 
 			if err != nil {
 				fmt.Println(err)
@@ -446,7 +446,7 @@ database. Currently, it only cleans up core-metadata.
 				list []models.Registration
 			}
 
-			registrationData, err := client.GetAllItems("registration", "48071", verbose)
+			registrationData, err := client.GetAllItems("registration", "48071")
 
 			if err != nil {
 				fmt.Println(err)

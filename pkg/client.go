@@ -3,9 +3,10 @@ package client
 import (
 	"errors"
 	"fmt"
-	"github.com/spf13/viper"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/spf13/viper"
 )
 
 var client = &http.Client{}
@@ -17,11 +18,15 @@ func buildURL(itemType string, path string, port string) string {
 }
 
 // GetAllItems returns a list of all Items in the DB
-func GetAllItems(itemType string, port string, verbose bool) ([]byte, error) {
+func GetAllItems(itemType string, port string) ([]byte, error) {
+
+	// Get URL and VERBOSE from viper
+	urlFlag := viper.GetBool("url")
+	verboseFlag := viper.GetBool("verbose")
 
 	url := buildURL(itemType, "", port)
 
-	if verbose {
+	if urlFlag {
 		fmt.Println("GET: " + url)
 	}
 
@@ -31,13 +36,39 @@ func GetAllItems(itemType string, port string, verbose bool) ([]byte, error) {
 	}
 	defer resp.Body.Close()
 
-	data, err := ioutil.ReadAll(resp.Body)
-	return data, err
+	// Need to read body from response
+	body, errBody := ioutil.ReadAll(resp.Body)
+
+	// If verbose is enabled, print Header and Body + errors if any
+	if verboseFlag {
+		fmt.Println("HEADER")
+		for k, v := range resp.Header {
+			fmt.Printf("%v : %v\n", k, v)
+		}
+
+		if errBody != nil {
+			fmt.Println(errBody)
+		} else {
+			fmt.Println("BODY")
+			fmt.Println(string(body))
+		}
+		return nil, nil
+	}
+
+	return body, errBody
 }
 
+// DeleteItemByID deletes an item by ID
 func DeleteItemByID(id string, pathID string, port string) ([]byte, error) {
 
+	urlFlag := viper.GetBool("url")
+	verboseFlag := viper.GetBool("verbose")
 	url := buildURL(id, pathID, port)
+
+	if urlFlag {
+		fmt.Println("GET: " + url)
+	}
+
 	req, err := http.NewRequest("DELETE", url, nil)
 	if err != nil {
 		return nil, err
@@ -50,16 +81,40 @@ func DeleteItemByID(id string, pathID string, port string) ([]byte, error) {
 
 	defer resp.Body.Close()
 
-	respBody, err := ioutil.ReadAll(resp.Body)
+	body, errBody := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
-	return respBody, nil
+
+	// If verbose is enabled, print Header and Body + errors if any
+	if verboseFlag {
+		fmt.Println("HEADER")
+		for k, v := range resp.Header {
+			fmt.Printf("%v : %v\n", k, v)
+		}
+
+		if errBody != nil {
+			fmt.Println(errBody)
+		} else {
+			fmt.Println("BODY")
+			fmt.Println(string(body))
+		}
+	}
+
+	return body, nil
 }
 
+// DeleteItemByName deletes the item by name
 func DeleteItemByName(id string, pathName string, port string) ([]byte, error) {
 
+	urlFlag := viper.GetBool("url")
+	verboseFlag := viper.GetBool("verbose")
 	url := buildURL(id, pathName, port)
+
+	if urlFlag {
+		fmt.Println("GET: " + url)
+	}
+
 	req, err := http.NewRequest("DELETE", url, nil)
 
 	if err != nil {
@@ -74,9 +129,24 @@ func DeleteItemByName(id string, pathName string, port string) ([]byte, error) {
 
 	defer resp.Body.Close()
 
-	respBody, err := ioutil.ReadAll(resp.Body)
+	respBody, errBody := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
+	}
+
+	// If verbose is enabled, print Header and Body + errors if any
+	if verboseFlag {
+		fmt.Println("HEADER")
+		for k, v := range resp.Header {
+			fmt.Printf("%v : %v\n", k, v)
+		}
+
+		if errBody != nil {
+			fmt.Println(errBody)
+		} else {
+			fmt.Println("BODY")
+			fmt.Println(string(respBody))
+		}
 	}
 
 	return respBody, nil
@@ -86,17 +156,16 @@ func DeleteItemByName(id string, pathName string, port string) ([]byte, error) {
 // The ID parameter can be either NAME or ID. We are doing this to allow the user
 // enter either the name or the ID of an object to delete.
 // First, we try ID. If successful, stop. If unsuccessful, try name.
-
 func DeleteItem(id string, pathID string, pathName string, port string, verbose bool) ([]byte, error) {
 	// Try ID first
 	url := buildURL(id, pathID, port)
+	urlFlag := viper.GetBool("url")
 	respBody, err := DeleteItemByID(id, pathID, port)
-
+	if urlFlag {
+		fmt.Println("DELETE: " + url)
+	}
 	if string(respBody) == SUCCESSFUL_DELETE {
 		// deleting with ID worked
-		if verbose {
-			fmt.Println("DELETE: " + url)
-		}
 		return respBody, err
 	}
 

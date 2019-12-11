@@ -41,9 +41,7 @@ func NewCommand() *cobra.Command {
 		Long:  `Return the list fo current device services.`,
 		Run: func(cmd *cobra.Command, args []string) {
 
-			verbose, _ := cmd.Flags().GetBool("verbose")
-
-			data, err := client.GetAllItems("deviceservice", "48081", verbose)
+			data, err := client.GetAllItems("deviceservice", "48081")
 
 			if err != nil {
 				fmt.Println(err)

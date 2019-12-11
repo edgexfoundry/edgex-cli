@@ -51,7 +51,7 @@ You can use: '$ edgex device list' to find a device's name and ID.`,
 			if string(respBody) == "true" {
 				fmt.Printf("Removed: %s\n", deviceID)
 			} else {
-				fmt.Printf("Error: Remove Unsuccessful!\n")
+				fmt.Printf("Error: Remove Unsuccessful: %s\n", string(respBody))
 			}
 		},
 	}
