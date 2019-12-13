@@ -16,9 +16,9 @@ package rm
 
 import (
 	"fmt"
-	"io/ioutil"
-	"net/http"
 
+	"github.com/edgexfoundry-holding/edgex-cli/config"
+	client "github.com/edgexfoundry-holding/edgex-cli/pkg"
 	"github.com/spf13/cobra"
 )
 
@@ -26,45 +26,35 @@ import (
 var byAge bool
 
 func removeNotificationHandler(cmd *cobra.Command, args []string) {
-	client := &http.Client{}
 
-	// Create request
+	// Checking for args
+	if len(args) == 0 {
+		fmt.Printf("Error: No profile ID/Name provided.\n")
+		return
+	}
+
 	var url string
-	if len(args) > 0 {
-		if byAge {
-			url = "http://localhost:48060/api/v1/notification/age/" + args[0]
-		} else {
-			url = "http://localhost:48060/api/v1/notification/slug/" + args[0]
-		}
+	if byAge {
+		url = config.Conf.NotificationService.NotificationByAgeRoute
 	} else {
-		fmt.Printf("Error: No slug or age provided.\n")
-		return
-	}
-	fmt.Println(url)
-	req, err := http.NewRequest("DELETE", url, nil)
-	if err != nil {
-		fmt.Println(err)
-		return
+		url = config.Conf.NotificationService.NotificationByNameSlugRoute
 	}
 
-	// Fetch Request
-	resp, err := client.Do(req)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	defer resp.Body.Close()
+	respBody, err := client.DeleteItemByName(args[0],
+		url,
+		config.Conf.MetadataService.Port)
 
-	respBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
 	// Display Results
-	fmt.Println("response Status : ", resp.Status)
-	fmt.Println("response Headers : ", resp.Header)
-	fmt.Println("response Body : ", string(respBody))
+	if string(respBody) == "true" {
+		fmt.Printf("Removed: %s\n", args[0])
+	} else {
+		fmt.Printf("Remove Unsuccessful: %s\n", respBody)
+	}
 }
 
 func NewCommand() *cobra.Command {

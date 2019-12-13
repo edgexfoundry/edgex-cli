@@ -16,9 +16,9 @@ package rm
 
 import (
 	"fmt"
-	"io/ioutil"
-	"net/http"
 
+	"github.com/edgexfoundry-holding/edgex-cli/config"
+	client "github.com/edgexfoundry-holding/edgex-cli/pkg"
 	"github.com/spf13/cobra"
 )
 
@@ -26,48 +26,34 @@ import (
 var byID bool
 
 func removeSubscriptionHandler(cmd *cobra.Command, args []string) {
-	client := &http.Client{}
+	// Checking for args
+	if len(args) == 0 {
+		fmt.Printf("Error: No subription ID/Name provided.\n")
+		return
+	}
 
 	// Create request
-	var url string
-	if len(args) > 0 {
-		if byID {
-			url = "http://localhost:48060/api/v1/subscription/" + args[0]
-		} else {
-			url = "http://localhost:48060/api/v1/subscription/slug/" + args[0]
-		}
-	} else {
-		fmt.Printf("Error: No slug or age provided.\n")
-		return
-	}
+	subscriptionlID := args[0]
 
-	fmt.Println(url)
-	req, err := http.NewRequest("DELETE", url, nil)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
+	respBody, err := client.DeleteItem(subscriptionlID,
+		config.Conf.NotificationService.SubscriptionByIDRoute,
+		config.Conf.NotificationService.SubscriptionByNameSlugRoute,
+		config.Conf.NotificationService.Port)
 
-	// Fetch Request
-	resp, err := client.Do(req)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	defer resp.Body.Close()
-
-	respBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
 	// Display Results
-	fmt.Println("response Status : ", resp.Status)
-	fmt.Println("response Headers : ", resp.Header)
-	fmt.Println("response Body : ", string(respBody))
+	if string(respBody) == "true" {
+		fmt.Printf("Removed: %s\n", subscriptionlID)
+	} else {
+		fmt.Printf("Remove Unsuccessful!\n")
+	}
 }
 
+// NewCommand returns remove subscription command
 func NewCommand() *cobra.Command {
 	var cmd = &cobra.Command{
 		Use:   "rm [notification slug or age]",

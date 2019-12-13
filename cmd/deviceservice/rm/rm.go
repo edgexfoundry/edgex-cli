@@ -30,8 +30,6 @@ func NewCommand() *cobra.Command {
 		Long:  `Removes a device service from the core-metadata DB.`,
 		Run: func(cmd *cobra.Command, args []string) {
 
-			verbose, _ := cmd.Flags().GetBool("verbose")
-
 			// Checking for args
 			if len(args) == 0 {
 				fmt.Printf("Error: No device service ID/Name provided.\n")
@@ -39,7 +37,10 @@ func NewCommand() *cobra.Command {
 			}
 
 			deviceID := args[0]
-			respBody, err := client.DeleteItem(deviceID, config.Conf.MetadataService.DeviceServiceByIDRoute, config.Conf.MetadataService.DeviceServiceBySlugNameRoute, config.Conf.MetadataService.Port, verbose)
+			respBody, err := client.DeleteItem(deviceID,
+				config.Conf.MetadataService.DeviceServiceByIDRoute,
+				config.Conf.MetadataService.DeviceServiceBySlugNameRoute,
+				config.Conf.MetadataService.Port)
 
 			if err != nil {
 				fmt.Println(err)

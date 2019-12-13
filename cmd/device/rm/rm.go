@@ -31,8 +31,6 @@ func NewCommand() *cobra.Command {
 You can use: '$ edgex device list' to find a device's name and ID.`,
 		Run: func(cmd *cobra.Command, args []string) {
 
-			verbose, _ := cmd.Flags().GetBool("verbose")
-
 			// Checking for args
 			if len(args) == 0 {
 				fmt.Printf("Error: No device ID/Name provided.\n")
@@ -40,7 +38,10 @@ You can use: '$ edgex device list' to find a device's name and ID.`,
 			}
 
 			deviceID := args[0]
-			respBody, err := client.DeleteItem(deviceID, config.Conf.MetadataService.DeviceByIDRoute, config.Conf.MetadataService.DeviceBySlugNameRoute, config.Conf.MetadataService.Port, verbose)
+			respBody, err := client.DeleteItem(deviceID,
+				config.Conf.MetadataService.DeviceByIDRoute,
+				config.Conf.MetadataService.DeviceBySlugNameRoute,
+				config.Conf.MetadataService.Port)
 
 			if err != nil {
 				fmt.Println(err)

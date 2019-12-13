@@ -66,7 +66,7 @@ func DeleteItemByID(id string, pathID string, port string) ([]byte, error) {
 	url := buildURL(id, pathID, port)
 
 	if urlFlag {
-		fmt.Println("GET: " + url)
+		fmt.Println("DELETE: " + url)
 	}
 
 	req, err := http.NewRequest("DELETE", url, nil)
@@ -112,7 +112,7 @@ func DeleteItemByName(id string, pathName string, port string) ([]byte, error) {
 	url := buildURL(id, pathName, port)
 
 	if urlFlag {
-		fmt.Println("GET: " + url)
+		fmt.Println("DELETE: " + url)
 	}
 
 	req, err := http.NewRequest("DELETE", url, nil)
@@ -156,7 +156,7 @@ func DeleteItemByName(id string, pathName string, port string) ([]byte, error) {
 // The ID parameter can be either NAME or ID. We are doing this to allow the user
 // enter either the name or the ID of an object to delete.
 // First, we try ID. If successful, stop. If unsuccessful, try name.
-func DeleteItem(id string, pathID string, pathName string, port string, verbose bool) ([]byte, error) {
+func DeleteItem(id string, pathID string, pathName string, port string) ([]byte, error) {
 	// Try ID first
 	url := buildURL(id, pathID, port)
 	urlFlag := viper.GetBool("url")
