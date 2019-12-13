@@ -65,6 +65,7 @@ type MetadataService struct {
 	DeviceBySlugNameRoute        string
 	DeviceProfileByIDRoute       string
 	DeviceProfileBySlugNameRoute string
+	AddressableList              string
 }
 
 type DataService struct {
@@ -105,6 +106,7 @@ var Conf Configuration = Configuration{
 		DeviceBySlugNameRoute:        "device/name/",
 		DeviceProfileByIDRoute:       "deviceprofile/id/",
 		DeviceProfileBySlugNameRoute: "deviceprofile/name/",
+		AddressableList:              "addressable",
 	},
 	DataService: DataService{
 		Port:                       "48080",
