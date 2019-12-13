@@ -23,6 +23,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
+	"github.com/edgexfoundry-holding/edgex-cli/cmd/addressable"
 	"github.com/edgexfoundry-holding/edgex-cli/cmd/db"
 	"github.com/edgexfoundry-holding/edgex-cli/cmd/device"
 	"github.com/edgexfoundry-holding/edgex-cli/cmd/deviceservice"
@@ -107,6 +108,7 @@ https://www.edgexfoundry.org/
 	cmd.AddCommand(reading.NewCommand())
 	cmd.AddCommand(status.NewCommand())
 	cmd.AddCommand(db.NewCommand())
+	cmd.AddCommand(addressable.NewCommand())
 	// --- Support Services Commands ---
 	cmd.AddCommand(notification.NewCommand())
 	cmd.AddCommand(subscription.NewCommand())
