@@ -35,10 +35,12 @@ func NewCommand() *cobra.Command {
 				fmt.Printf("Error: No profile ID/Name provided.\n")
 				return
 			}
-			verbose, _ := cmd.Flags().GetBool("verbose")
 
 			deviceID := args[0]
-			respBody, err := client.DeleteItem(deviceID, config.Conf.MetadataService.DeviceProfileByIDRoute, config.Conf.MetadataService.DeviceProfileBySlugNameRoute, config.Conf.MetadataService.Port, verbose)
+			respBody, err := client.DeleteItem(deviceID,
+				config.Conf.MetadataService.DeviceProfileByIDRoute,
+				config.Conf.MetadataService.DeviceProfileBySlugNameRoute,
+				config.Conf.MetadataService.Port)
 
 			if err != nil {
 				fmt.Println(err)

@@ -28,10 +28,11 @@ var AppFs = afero.NewOsFs()
 type Configuration struct {
 	Host string
 	Security
-	DataService      DataService
-	MetadataService  MetadataService
-	SchedulerService SchedulerService
-	ExportService    ExportService
+	DataService         DataService
+	MetadataService     MetadataService
+	SchedulerService    SchedulerService
+	ExportService       ExportService
+	NotificationService NotificationService
 }
 
 // Security struct for security related config
@@ -48,6 +49,14 @@ type SchedulerService struct {
 	IntervalActionByNameSlugRoute string
 }
 
+type NotificationService struct {
+	Port                        string
+	SubscriptionByIDRoute       string
+	SubscriptionByNameSlugRoute string
+	NotificationByAgeRoute      string
+	NotificationByNameSlugRoute string
+}
+
 type MetadataService struct {
 	Port                         string
 	DeviceServiceByIDRoute       string
@@ -59,10 +68,11 @@ type MetadataService struct {
 }
 
 type DataService struct {
-	Port                   string
-	ReadingByIDRoute       string
-	VDescriptorByIDRoute   string
-	VDescriptorByNameRoute string
+	Port                       string
+	ReadingByIDRoute           string
+	VDescriptorByIDRoute       string
+	VDescriptorByNameRoute     string
+	DeleteEventByDeviceIDRoute string
 }
 
 type ExportService struct {
@@ -80,6 +90,13 @@ var Conf Configuration = Configuration{
 		IntervalActionByIDRoute:       "intervalaction/",
 		IntervalActionByNameSlugRoute: "intervalaction/name/",
 	},
+	NotificationService: NotificationService{
+		Port:                        "48060",
+		SubscriptionByIDRoute:       "subscription",
+		SubscriptionByNameSlugRoute: "subscription/name/",
+		NotificationByAgeRoute:      "notification/age/",
+		NotificationByNameSlugRoute: "notification/slug/",
+	},
 	MetadataService: MetadataService{
 		Port:                         "48081",
 		DeviceServiceByIDRoute:       "deviceservice/id/",
@@ -90,10 +107,11 @@ var Conf Configuration = Configuration{
 		DeviceProfileBySlugNameRoute: "deviceprofile/name/",
 	},
 	DataService: DataService{
-		Port:                   "48080",
-		ReadingByIDRoute:       "reading/id/",
-		VDescriptorByIDRoute:   "valuedescriptor/id/",
-		VDescriptorByNameRoute: "valuedescriptor/name/",
+		Port:                       "48080",
+		ReadingByIDRoute:           "reading/id/",
+		VDescriptorByIDRoute:       "valuedescriptor/id/",
+		VDescriptorByNameRoute:     "valuedescriptor/name/",
+		DeleteEventByDeviceIDRoute: "event/device/",
 	},
 	ExportService: ExportService{
 		Port:                    "48071",

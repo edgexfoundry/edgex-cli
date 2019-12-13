@@ -60,7 +60,6 @@ func NewCommand() *cobra.Command {
 			} else {
 				url = "http://localhost:48080/api/v1/event"
 			}
-			fmt.Println(url)
 			resp, err := http.Get(url)
 			if err != nil {
 				// handle error

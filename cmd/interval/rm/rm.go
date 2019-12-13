@@ -30,11 +30,12 @@ func removeIntervalHandler(cmd *cobra.Command, args []string) {
 	}
 
 	// Create request
-	verbose, _ := cmd.Flags().GetBool("verbose")
 	intervalID := args[0]
 
-	respBody, err := client.DeleteItem(intervalID, config.Conf.SchedulerService.IntervalByIDRoute,
-		config.Conf.SchedulerService.IntervalByNameSlugRoute, config.Conf.SchedulerService.Port, verbose)
+	respBody, err := client.DeleteItem(intervalID,
+		config.Conf.SchedulerService.IntervalByIDRoute,
+		config.Conf.SchedulerService.IntervalByNameSlugRoute,
+		config.Conf.SchedulerService.Port)
 
 	if err != nil {
 		fmt.Println(err)
@@ -49,6 +50,7 @@ func removeIntervalHandler(cmd *cobra.Command, args []string) {
 	}
 }
 
+// NewCommand returns rm interval command
 func NewCommand() *cobra.Command {
 	var cmd = &cobra.Command{
 		Use:   "rm [interval name or id]",
