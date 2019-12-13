@@ -16,6 +16,7 @@ package subscription
 
 import (
 	addsubscription "github.com/edgexfoundry-holding/edgex-cli/cmd/subscription/add"
+	listsubscription "github.com/edgexfoundry-holding/edgex-cli/cmd/subscription/list"
 	rmsubscription "github.com/edgexfoundry-holding/edgex-cli/cmd/subscription/rm"
 	"github.com/spf13/cobra"
 )
@@ -28,5 +29,6 @@ func NewCommand() *cobra.Command {
 	}
 	cmd.AddCommand(addsubscription.NewCommand())
 	cmd.AddCommand(rmsubscription.NewCommand())
+	cmd.AddCommand(listsubscription.NewCommand())
 	return cmd
 }
