@@ -1,26 +1,34 @@
-DataService:
-  Port: "48080"
-  ReadingByIDRoute: reading/id/
-  VDescriptorByIDRoute: valuedescriptor/id/
-  VDescriptorByNameRoute: valuedescriptor/name/
-Enabled: false
-ExportService:
-  Port: "48071"
-  RegistrationByIDRoute: registration/
-  RegistrationByNameRoute: registration/name/
-Host: ""
-MetadataService:
-  DeviceByIDRoute: device/id/
-  DeviceBySlugNameRoute: device/name/
-  DeviceProfileByIDRoute: deviceprofile/id/
-  DeviceProfileBySlugNameRoute: deviceprofile/name/
-  DeviceServiceByIDRoute: deviceservice/id/
-  DeviceServiceBySlugNameRoute: deviceservice/name/
-  Port: "48081"
-SchedulerService:
-  IntervalActionByIDRoute: intervalaction/
-  IntervalActionByNameSlugRoute: intervalaction/name/
-  IntervalByIDRoute: interval
-  IntervalByNameSlugRoute: interval/name/
-  Port: "48085"
-Token: ""
+dataservice:
+  deleteeventbydeviceidroute: event/device/
+  port: "48080"
+  readingbyidroute: reading/id/
+  vdescriptorbyidroute: valuedescriptor/id/
+  vdescriptorbynameroute: valuedescriptor/name/
+enabled: false
+exportservice:
+  port: "48071"
+  registrationbyidroute: registration/
+  registrationbynameroute: registration/name/
+host: localhost
+metadataservice:
+  addressablelist: addressable
+  devicebyidroute: device/id/
+  devicebyslugnameroute: device/name/
+  deviceprofilebyidroute: deviceprofile/id/
+  deviceprofilebyslugnameroute: deviceprofile/name/
+  deviceservicebyidroute: deviceservice/id/
+  deviceservicebyslugnameroute: deviceservice/name/
+  port: "48081"
+notificationservice:
+  notificationbyageroute: notification/age/
+  notificationbynameslugroute: notification/slug/
+  port: "48060"
+  subscriptionbyidroute: subscription
+  subscriptionbynameslugroute: subscription/name/
+schedulerservice:
+  intervalactionbyidroute: intervalaction/
+  intervalactionbynameslugroute: intervalaction/name/
+  intervalbyidroute: interval
+  intervalbynameslugroute: interval/name/
+  port: "48085"
+token: ""
