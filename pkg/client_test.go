@@ -65,7 +65,7 @@ func TestGetAllItems(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			client = test.mockClient
-			actual, err := GetAllItems("blabla", "1312", true)
+			actual, err := GetAllItems("blabla", "1312")
 
 			if test.expectedError && err == nil {
 				t.Error("Expected an error")
@@ -327,37 +327,36 @@ func TestDeleteItem(t *testing.T) {
 		testID         string
 		testPathID     string
 		testPathName   string
-		isVerbose      bool
 		expectedResult []byte
 		expectedError  bool
 	}{
 		{
-			name:           "Successful call",
-			mockClient:     mockClientDeleteByNameSuccess(),
-			testID:         TestID,
-			testPathID:     TestPathID,
-			testPathName:   TestPathName,
-			isVerbose:      true,
+			name:         "Successful call",
+			mockClient:   mockClientDeleteByNameSuccess(),
+			testID:       TestID,
+			testPathID:   TestPathID,
+			testPathName: TestPathName,
+
 			expectedResult: []byte(SUCCESSFUL_DELETE),
 			expectedError:  false,
 		},
 		{
-			name:           "Unsuccessful DeleteItemByID and no pathName",
-			mockClient:     mockClientDeleteByIDErr(),
-			testID:         TestID,
-			testPathID:     string(TestInvalidPathID),
-			testPathName:   "",
-			isVerbose:      true,
+			name:         "Unsuccessful DeleteItemByID and no pathName",
+			mockClient:   mockClientDeleteByIDErr(),
+			testID:       TestID,
+			testPathID:   string(TestInvalidPathID),
+			testPathName: "",
+
 			expectedResult: nil,
 			expectedError:  true,
 		},
 		{
-			name:           "Unsuccessful DeleteItemByID has pathname",
-			mockClient:     mockClientDeleteByIDErr(),
-			testID:         TestID,
-			testPathID:     TestPathID,
-			testPathName:   TestPathName,
-			isVerbose:      true,
+			name:         "Unsuccessful DeleteItemByID has pathname",
+			mockClient:   mockClientDeleteByIDErr(),
+			testID:       TestID,
+			testPathID:   TestPathID,
+			testPathName: TestPathName,
+
 			expectedResult: nil,
 			expectedError:  true,
 		},
@@ -366,7 +365,7 @@ func TestDeleteItem(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			client = test.mockClient
-			actual, err := DeleteItem(test.testID, test.testPathID, test.testPathName, TestPort, TestVerboseTrue)
+			actual, err := DeleteItem(test.testID, test.testPathID, test.testPathName, TestPort)
 
 			if test.expectedError && err == nil {
 				t.Error("Expected an error")

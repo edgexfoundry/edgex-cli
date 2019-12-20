@@ -32,12 +32,20 @@ var TestInvalidConfigFilePath = ""
 var Error = errors.New("test error")
 
 var TestConf = Configuration{
+	Host: "localhost",
 	SchedulerService: SchedulerService{
 		Port:                          "48085",
 		IntervalByIDRoute:             "interval",
 		IntervalByNameSlugRoute:       "interval/name/",
 		IntervalActionByIDRoute:       "intervalaction/",
 		IntervalActionByNameSlugRoute: "intervalaction/name/",
+	},
+	NotificationService: NotificationService{
+		Port:                        "48060",
+		SubscriptionByIDRoute:       "subscription",
+		SubscriptionByNameSlugRoute: "subscription/name/",
+		NotificationByAgeRoute:      "notification/age/",
+		NotificationByNameSlugRoute: "notification/slug/",
 	},
 	MetadataService: MetadataService{
 		Port:                         "48081",
@@ -47,12 +55,14 @@ var TestConf = Configuration{
 		DeviceBySlugNameRoute:        "device/name/",
 		DeviceProfileByIDRoute:       "deviceprofile/id/",
 		DeviceProfileBySlugNameRoute: "deviceprofile/name/",
+		AddressableList:              "addressable",
 	},
 	DataService: DataService{
-		Port:                   "48080",
-		ReadingByIDRoute:       "reading/id/",
-		VDescriptorByIDRoute:   "valuedescriptor/id/",
-		VDescriptorByNameRoute: "valuedescriptor/name/",
+		Port:                       "48080",
+		ReadingByIDRoute:           "reading/id/",
+		VDescriptorByIDRoute:       "valuedescriptor/id/",
+		VDescriptorByNameRoute:     "valuedescriptor/name/",
+		DeleteEventByDeviceIDRoute: "event/device/",
 	},
 	ExportService: ExportService{
 		Port:                    "48071",
