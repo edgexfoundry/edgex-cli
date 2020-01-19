@@ -56,9 +56,9 @@ func NewCommand() *cobra.Command {
 				} else {
 					limitUrl = strconv.FormatInt(int64(50), 10)
 				}
-				url = "http://localhost:48080/api/v1/event/device/" + device + "/" + limitUrl
+				url = "http://" + viper.GetString("Host") + ":48080/api/v1/event/device/" + device + "/" + limitUrl
 			} else {
-				url = "http://localhost:48080/api/v1/event"
+				url = "http://" + viper.GetString("Host") + ":48080/api/v1/event"
 			}
 			resp, err := http.Get(url)
 			if err != nil {

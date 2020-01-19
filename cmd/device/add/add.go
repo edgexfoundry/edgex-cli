@@ -16,6 +16,7 @@ import (
 	"github.com/BurntSushi/toml"
 	"github.com/edgexfoundry/go-mod-core-contracts/models"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 type DeviceConfig struct {
@@ -56,7 +57,7 @@ func addDevice(dev models.Device) (string, error) {
 	}
 	fmt.Println(string(jsonStr))
 	client := &http.Client{}
-	req, err := http.NewRequest("POST", "http://localhost:48081/api/v1/device", bytes.NewBuffer(jsonStr))
+	req, err := http.NewRequest("POST", "http://" + viper.GetString("Host") + ":48081/api/v1/device", bytes.NewBuffer(jsonStr))
 	if err != nil {
 		return "", err
 	}
