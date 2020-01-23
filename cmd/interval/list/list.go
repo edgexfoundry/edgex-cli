@@ -35,7 +35,7 @@ var limit int32
 var byID bool
 
 func listHandler(cmd *cobra.Command, args []string) {
-	var url string = "http://localhost:48085/api/v1/"
+	var url string = "http://" + viper.GetString("Host") + ":48085/api/v1/"
 	if len(args) > 0 {
 		if byID {
 			url += "interval/" + args[0]

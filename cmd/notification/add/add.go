@@ -25,6 +25,7 @@ import (
 	"github.com/edgexfoundry/go-mod-core-contracts/models"
 	"github.com/pelletier/go-toml"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 type NotificationsFile struct {
@@ -55,7 +56,7 @@ func addNotification(n *models.Notification) (string, error) {
 		return "", err
 	}
 	client := &http.Client{}
-	req, err := http.NewRequest("POST", "http://localhost:48060/api/v1/notification", bytes.NewBuffer(jsonStr))
+	req, err := http.NewRequest("POST", "http://" + viper.GetString("Host") + ":48060/api/v1/notification", bytes.NewBuffer(jsonStr))
 	if err != nil {
 		return "", err
 	}
