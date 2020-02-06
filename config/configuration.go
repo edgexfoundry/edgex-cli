@@ -18,8 +18,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ghodss/yaml"
 	"github.com/spf13/afero"
+	"gopkg.in/yaml.v2"
 )
 
 var AppFs = afero.NewOsFs()
