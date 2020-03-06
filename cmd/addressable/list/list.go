@@ -17,15 +17,14 @@ package list
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/edgexfoundry-holding/edgex-cli/config"
+	client "github.com/edgexfoundry-holding/edgex-cli/pkg"
 	"io"
 	"text/tabwriter"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/models"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-
-	"github.com/edgexfoundry-holding/edgex-cli/config"
-	client "github.com/edgexfoundry-holding/edgex-cli/pkg"
 )
 
 type addressableList struct {

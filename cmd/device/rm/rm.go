@@ -15,10 +15,13 @@
 package rm
 
 import (
+	"context"
 	"fmt"
+	"github.com/edgexfoundry-holding/edgex-cli/pkg/urlclient"
+	"github.com/edgexfoundry/go-mod-core-contracts/clients"
+	"github.com/edgexfoundry/go-mod-core-contracts/clients/metadata"
 
 	"github.com/edgexfoundry-holding/edgex-cli/config"
-	client "github.com/edgexfoundry-holding/edgex-cli/pkg"
 	"github.com/spf13/cobra"
 )
 
@@ -38,22 +41,40 @@ You can use: '$ edgex device list' to find a device's name and ID.`,
 			}
 
 			deviceID := args[0]
-			respBody, err := client.DeleteItem(deviceID,
-				config.Conf.MetadataService.DeviceByIDRoute,
-				config.Conf.MetadataService.DeviceBySlugNameRoute,
-				config.Conf.MetadataService.Port)
+
+			ctx, _ := context.WithCancel(context.Background())
+
+			url := config.Conf.MetadataService.Protocol + "://" +
+				config.Conf.MetadataService.Host + ":" +
+				config.Conf.MetadataService.Port
+
+			mdc := metadata.NewDeviceClient(
+				urlclient.New(
+					ctx,
+					clients.CoreMetaDataServiceKey,
+					clients.ApiDeviceRoute,
+					15000,
+					url +  clients.ApiDeviceRoute,
+				),
+			)
+
+			//devices, err := mdc.Devices(ctx)
+
+			err := mdc.DeleteByName(ctx, deviceID)
 
 			if err != nil {
+				fmt.Printf("Removed: %s\n", deviceID)
+				return
+			}
+
+			err = mdc.Delete(ctx, deviceID)
+			if err != nil {
+				fmt.Printf("Not removed: %s\n", deviceID)
 				fmt.Println(err)
 				return
 			}
 
-			// Display Results
-			if string(respBody) == "true" {
-				fmt.Printf("Removed: %s\n", deviceID)
-			} else {
-				fmt.Printf("Error: Remove Unsuccessful: %s\n", string(respBody))
-			}
+			fmt.Printf("Removed: %s\n", deviceID)
 		},
 	}
 	return cmd

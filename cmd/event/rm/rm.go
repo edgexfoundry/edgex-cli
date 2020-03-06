@@ -15,10 +15,13 @@
 package rm
 
 import (
+	"context"
 	"fmt"
+	"github.com/edgexfoundry-holding/edgex-cli/pkg/urlclient"
+	"github.com/edgexfoundry/go-mod-core-contracts/clients"
+	"github.com/edgexfoundry/go-mod-core-contracts/clients/coredata"
 
 	"github.com/edgexfoundry-holding/edgex-cli/config"
-	client "github.com/edgexfoundry-holding/edgex-cli/pkg"
 	"github.com/spf13/cobra"
 )
 
@@ -37,24 +40,50 @@ func NewCommand() *cobra.Command {
 			}
 
 			deviceID := args[0]
-			respBody, err := client.DeleteItemByName(deviceID,
-				config.Conf.DataService.DeleteEventByDeviceIDRoute,
-				config.Conf.DataService.Port)
+
+
+			ctx, _ := context.WithCancel(context.Background())
+
+			url := config.Conf.DataService.Protocol + "://" +
+				config.Conf.DataService.Host + ":" +
+				config.Conf.DataService.Port
+
+			dc := coredata.NewEventClient(
+				urlclient.New(
+					ctx,
+					clients.CoreDataServiceKey,
+					clients.ApiEventRoute,
+					15000,
+					url + clients.ApiEventRoute))
+
+			err := dc.DeleteForDevice(ctx, deviceID)
 
 			if err != nil {
 				fmt.Println(err)
 				return
 			}
 
-			// Display Results
-			if string(respBody) == "0" {
-				fmt.Printf("Removed events for device: %s\n", deviceID)
-			} else {
-				fmt.Printf("Remove Unsuccessful!\n")
-			}
-
 			fmt.Println("Removing events for device:")
 			fmt.Println(deviceID)
+
+			//respBody, err := client.DeleteItemByName(deviceID,
+			//	config.Conf.DataService.DeleteEventByDeviceIDRoute,
+			//	config.Conf.DataService.Port)
+			//
+			//if err != nil {
+			//	fmt.Println(err)
+			//	return
+			//}
+			//
+			//// Display Results
+			//if string(respBody) == "0" {
+			//	fmt.Printf("Removed events for device: %s\n", deviceID)
+			//} else {
+			//	fmt.Printf("Remove Unsuccessful!\n")
+			//}
+			//
+			//fmt.Println("Removing events for device:")
+			//fmt.Println(deviceID)
 		},
 	}
 	return cmd

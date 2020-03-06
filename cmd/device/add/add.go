@@ -5,18 +5,18 @@
 package add
 
 import (
-	"bytes"
-	"encoding/json"
-	"errors"
+	"context"
 	"fmt"
+	"github.com/edgexfoundry-holding/edgex-cli/config"
+	"github.com/edgexfoundry-holding/edgex-cli/pkg/urlclient"
+	"github.com/edgexfoundry/go-mod-core-contracts/clients"
+	"github.com/edgexfoundry/go-mod-core-contracts/clients/metadata"
 	"io/ioutil"
-	"net/http"
 	"time"
 
 	"github.com/BurntSushi/toml"
 	"github.com/edgexfoundry/go-mod-core-contracts/models"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 type DeviceConfig struct {
@@ -51,34 +51,30 @@ func NewCommand() *cobra.Command {
 }
 
 func addDevice(dev models.Device) (string, error) {
-	jsonStr, err := json.Marshal(dev)
-	if err != nil {
-		return "", err
-	}
-	fmt.Println(string(jsonStr))
-	client := &http.Client{}
-	req, err := http.NewRequest("POST", "http://" + viper.GetString("Host") + ":48081/api/v1/device", bytes.NewBuffer(jsonStr))
-	if err != nil {
-		return "", err
-	}
-	req.Header.Add("Content-Type", "application/json")
 
-	resp, err := client.Do(req)
+	ctx, _ := context.WithCancel(context.Background())
+
+	url := config.Conf.MetadataService.Protocol + "://" +
+		config.Conf.MetadataService.Host + ":" +
+		config.Conf.MetadataService.Port
+
+	mdc := metadata.NewDeviceClient(
+		urlclient.New(
+			ctx,
+			clients.CoreMetaDataServiceKey,
+			clients.ApiDeviceRoute,
+			15000,
+			url +  clients.ApiDeviceRoute,
+		),
+	)
+
+
+	resp, err := mdc.Add(ctx, &dev)
 	if err != nil {
 		return "", err
 	}
-	defer resp.Body.Close()
 
-	respBody, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return "", err
-	}
-
-	if resp.StatusCode == 200 {
-		return string(respBody), nil
-	} else {
-		return "", errors.New(string(respBody))
-	}
+	return resp, nil
 }
 
 func processFile(fname string) {
