@@ -181,7 +181,7 @@ func DeleteItem(id string, pathID string, pathName string, port string) ([]byte,
 func GetVersion(port string) []byte {
 	host := viper.GetString("host")
 
-	url := "http://" + host + ":" + port + "/version"
+	url := "http://" + host + ":" + port + "/api/version"
 
 	resp, err := http.Get(url)
 	if err != nil {
