@@ -41,67 +41,61 @@ type Security struct {
 	Token   string
 }
 
-//type ClientInfo struct {
-//	Protocol string
-//	Host string
-//	Port int
-//}
-
 type SchedulerService struct {
-	Port		string
-	Host		string
-	Protocol	string
+	Port     string
+	Host     string
+	Protocol string
 }
 
 type NotificationService struct {
-	Port		string
-	Host		string
-	Protocol	string
+	Port     string
+	Host     string
+	Protocol string
 }
 
 type MetadataService struct {
-	Port		string
-	Host		string
-	Protocol	string
+	Port     string
+	Host     string
+	Protocol string
 }
 
 type DataService struct {
-	Port		string
-	Host		string
-	Protocol	string
+	Port     string
+	Host     string
+	Protocol string
 }
 
 type ExportService struct {
-	Port		string
-	Host		string
-	Protocol	string
+	Port     string
+	Host     string
+	Protocol string
 }
 
 var Conf Configuration = Configuration{
 	SchedulerService: SchedulerService{
-		Port:		"48085",
-		Host:		"localhost",
-		Protocol:	"http",
+		Port:     "48085",
+		Host:     "localhost",
+		Protocol: "http",
 	},
 	NotificationService: NotificationService{
-		Port:		"48060",
-		Host:		"localhost",
-		Protocol:	"http",
+		Port:     "48060",
+		Host:     "localhost",
+		Protocol: "http",
 	},
 	MetadataService: MetadataService{
-		Port:		"48081",
-		Host:		"localhost",
-		Protocol:	"http",
+		Port:     "48081",
+		Host:     "localhost",
+		Protocol: "http",
 	},
 	DataService: DataService{
-		Port:		"48080",
-		Host:		"localhost",
-		Protocol:	"http",
+		Port:     "48080",
+		Host:     "localhost",
+		Protocol: "http",
 	},
 	ExportService: ExportService{
-		Port:		"48071",
-		Host:		"localhost",
-		Protocol:	"http",
+		Port:     "48071",
+		Host:     "localhost",
+		Protocol: "http",
 	},
 }
 

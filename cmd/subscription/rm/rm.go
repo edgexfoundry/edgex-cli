@@ -17,7 +17,6 @@ package rm
 import (
 	"fmt"
 
-	"github.com/edgexfoundry-holding/edgex-cli/config"
 	client "github.com/edgexfoundry-holding/edgex-cli/pkg"
 	"github.com/spf13/cobra"
 )
@@ -36,9 +35,9 @@ func removeSubscriptionHandler(cmd *cobra.Command, args []string) {
 	subscriptionlID := args[0]
 
 	respBody, err := client.DeleteItem(subscriptionlID,
-		config.Conf.NotificationService.SubscriptionByIDRoute,
-		config.Conf.NotificationService.SubscriptionByNameSlugRoute,
-		config.Conf.NotificationService.Port)
+		"subscription",
+		"subscription/name/",
+		"48060")
 
 	if err != nil {
 		fmt.Println(err)

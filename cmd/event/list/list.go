@@ -15,12 +15,8 @@
 package list
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/edgexfoundry-holding/edgex-cli/config"
-	"github.com/edgexfoundry-holding/edgex-cli/pkg/urlclient"
-	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -33,8 +29,6 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/edgexfoundry-holding/edgex-cli/pkg/utils"
-
-	"github.com/edgexfoundry/go-mod-core-contracts/clients/coredata"
 )
 
 // var rd []models.Device
@@ -52,24 +46,6 @@ func NewCommand() *cobra.Command {
 		Long:  `Return all device services sorted by id.`,
 		Args:  cobra.MaximumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-
-
-			//ctx, _ := context.WithCancel(context.Background())
-			//
-			//url := config.Conf.DataService.Protocol + "://" +
-			//	config.Conf.DataService.Host + ":" +
-			//	config.Conf.DataService.Port
-			//
-			//dc := coredata.NewEventClient(
-			//	urlclient.New(
-			//		ctx,
-			//		clients.CoreDataServiceKey,
-			//		clients.ApiEventRoute,
-			//		15000,
-			//		url + clients.ApiEventRoute))
-			//
-			//events, err := dc.Events(ctx)
-
 
 			var url string
 			if len(args) > 0 {

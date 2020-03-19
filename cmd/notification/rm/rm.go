@@ -17,7 +17,6 @@ package rm
 import (
 	"fmt"
 
-	"github.com/edgexfoundry-holding/edgex-cli/config"
 	client "github.com/edgexfoundry-holding/edgex-cli/pkg"
 	"github.com/spf13/cobra"
 )
@@ -35,14 +34,14 @@ func removeNotificationHandler(cmd *cobra.Command, args []string) {
 
 	var url string
 	if byAge {
-		url = config.Conf.NotificationService.NotificationByAgeRoute
+		url = "notification/age/"
 	} else {
-		url = config.Conf.NotificationService.NotificationByNameSlugRoute
+		url = "notification/slug/"
 	}
 
 	respBody, err := client.DeleteItemByName(args[0],
 		url,
-		config.Conf.MetadataService.Port)
+		"48060")
 
 	if err != nil {
 		fmt.Println(err)
