@@ -15,11 +15,15 @@
 package rm
 
 import (
+	"context"
 	"fmt"
+	"github.com/edgexfoundry-holding/edgex-cli/pkg/urlclient"
+	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 
 	"github.com/edgexfoundry-holding/edgex-cli/config"
-	client "github.com/edgexfoundry-holding/edgex-cli/pkg"
 	"github.com/spf13/cobra"
+
+	"github.com/edgexfoundry/go-mod-core-contracts/clients/scheduler"
 )
 
 func removeIntervalHandler(cmd *cobra.Command, args []string) {
@@ -29,25 +33,40 @@ func removeIntervalHandler(cmd *cobra.Command, args []string) {
 		return
 	}
 
+	ctx, _ := context.WithCancel(context.Background())
+
+	url := config.Conf.SchedulerService.Protocol + "://" +
+		config.Conf.SchedulerService.Host + ":" +
+		config.Conf.SchedulerService.Port
+
 	// Create request
 	intervalID := args[0]
 
-	respBody, err := client.DeleteItem(intervalID,
-		config.Conf.SchedulerService.IntervalByIDRoute,
-		config.Conf.SchedulerService.IntervalByNameSlugRoute,
-		config.Conf.SchedulerService.Port)
+	sc := scheduler.NewIntervalClient(
+		urlclient.New(
+			ctx,
+			clients.SupportSchedulerServiceKey,
+			clients.ApiIntervalRoute,
+			15000,
+			url +  clients.ApiIntervalRoute,
+		),
+		)
+
+	err := sc.Delete(ctx, intervalID)
 
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
+	fmt.Printf("Removed: %s\n", intervalID)
+
 	// Display Results
-	if string(respBody) == "true" {
-		fmt.Printf("Removed: %s\n", intervalID)
-	} else {
-		fmt.Printf("Remove Unsuccessful!\n")
-	}
+	//if string(respBody) == "true" {
+	//	fmt.Printf("Removed: %s\n", intervalID)
+	//} else {
+	//	fmt.Printf("Remove Unsuccessful!\n")
+	//}
 }
 
 // NewCommand returns rm interval command

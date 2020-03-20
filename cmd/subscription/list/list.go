@@ -41,7 +41,7 @@ func NewCommand() *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 
 			data, err := client.GetAllItems(
-				config.Conf.NotificationService.SubscriptionByIDRoute,
+				"subscription",
 				config.Conf.NotificationService.Port)
 
 			if data == nil {

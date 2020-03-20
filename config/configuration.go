@@ -26,8 +26,8 @@ var AppFs = afero.NewOsFs()
 
 // Configuration struct will use this to write config file eventually
 type Configuration struct {
-	Host string
 	Security
+	//Client 				map[string]ClientInfo
 	DataService         DataService
 	MetadataService     MetadataService
 	SchedulerService    SchedulerService
@@ -42,83 +42,60 @@ type Security struct {
 }
 
 type SchedulerService struct {
-	Port                          string
-	IntervalByIDRoute             string
-	IntervalByNameSlugRoute       string
-	IntervalActionByIDRoute       string
-	IntervalActionByNameSlugRoute string
+	Port     string
+	Host     string
+	Protocol string
 }
 
 type NotificationService struct {
-	Port                        string
-	SubscriptionByIDRoute       string
-	SubscriptionByNameSlugRoute string
-	NotificationByAgeRoute      string
-	NotificationByNameSlugRoute string
+	Port     string
+	Host     string
+	Protocol string
 }
 
 type MetadataService struct {
-	Port                         string
-	DeviceServiceByIDRoute       string
-	DeviceServiceBySlugNameRoute string
-	DeviceByIDRoute              string
-	DeviceBySlugNameRoute        string
-	DeviceProfileByIDRoute       string
-	DeviceProfileBySlugNameRoute string
-	AddressableList              string
+	Port     string
+	Host     string
+	Protocol string
 }
 
 type DataService struct {
-	Port                       string
-	ReadingByIDRoute           string
-	VDescriptorByIDRoute       string
-	VDescriptorByNameRoute     string
-	DeleteEventByDeviceIDRoute string
+	Port     string
+	Host     string
+	Protocol string
 }
 
 type ExportService struct {
-	Port                    string
-	RegistrationByIDRoute   string
-	RegistrationByNameRoute string
+	Port     string
+	Host     string
+	Protocol string
 }
 
 var Conf Configuration = Configuration{
-	Host: "localhost",
 	SchedulerService: SchedulerService{
-		Port:                          "48085",
-		IntervalByIDRoute:             "interval",
-		IntervalByNameSlugRoute:       "interval/name/",
-		IntervalActionByIDRoute:       "intervalaction/",
-		IntervalActionByNameSlugRoute: "intervalaction/name/",
+		Port:     "48085",
+		Host:     "localhost",
+		Protocol: "http",
 	},
 	NotificationService: NotificationService{
-		Port:                        "48060",
-		SubscriptionByIDRoute:       "subscription",
-		SubscriptionByNameSlugRoute: "subscription/name/",
-		NotificationByAgeRoute:      "notification/age/",
-		NotificationByNameSlugRoute: "notification/slug/",
+		Port:     "48060",
+		Host:     "localhost",
+		Protocol: "http",
 	},
 	MetadataService: MetadataService{
-		Port:                         "48081",
-		DeviceServiceByIDRoute:       "deviceservice/id/",
-		DeviceServiceBySlugNameRoute: "deviceservice/name/",
-		DeviceByIDRoute:              "device/id/",
-		DeviceBySlugNameRoute:        "device/name/",
-		DeviceProfileByIDRoute:       "deviceprofile/id/",
-		DeviceProfileBySlugNameRoute: "deviceprofile/name/",
-		AddressableList:              "addressable",
+		Port:     "48081",
+		Host:     "localhost",
+		Protocol: "http",
 	},
 	DataService: DataService{
-		Port:                       "48080",
-		ReadingByIDRoute:           "reading/id/",
-		VDescriptorByIDRoute:       "valuedescriptor/id/",
-		VDescriptorByNameRoute:     "valuedescriptor/name/",
-		DeleteEventByDeviceIDRoute: "event/device/",
+		Port:     "48080",
+		Host:     "localhost",
+		Protocol: "http",
 	},
 	ExportService: ExportService{
-		Port:                    "48071",
-		RegistrationByIDRoute:   "registration/",
-		RegistrationByNameRoute: "registration/name/",
+		Port:     "48071",
+		Host:     "localhost",
+		Protocol: "http",
 	},
 }
 

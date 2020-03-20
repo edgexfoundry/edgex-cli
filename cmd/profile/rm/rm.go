@@ -15,10 +15,13 @@
 package rm
 
 import (
+	"context"
 	"fmt"
+	"github.com/edgexfoundry-holding/edgex-cli/pkg/urlclient"
+	"github.com/edgexfoundry/go-mod-core-contracts/clients"
+	"github.com/edgexfoundry/go-mod-core-contracts/clients/metadata"
 
 	"github.com/edgexfoundry-holding/edgex-cli/config"
-	client "github.com/edgexfoundry-holding/edgex-cli/pkg"
 	"github.com/spf13/cobra"
 )
 
@@ -37,21 +40,37 @@ func NewCommand() *cobra.Command {
 			}
 
 			deviceID := args[0]
-			respBody, err := client.DeleteItem(deviceID,
-				config.Conf.MetadataService.DeviceProfileByIDRoute,
-				config.Conf.MetadataService.DeviceProfileBySlugNameRoute,
-				config.Conf.MetadataService.Port)
 
-			if err != nil {
-				fmt.Println(err)
+			ctx, _ := context.WithCancel(context.Background())
+
+			url := config.Conf.MetadataService.Protocol + "://" +
+				config.Conf.MetadataService.Host + ":" +
+				config.Conf.MetadataService.Port
+
+			mdc := metadata.NewDeviceProfileClient(
+				urlclient.New(
+					ctx,
+					clients.CoreMetaDataServiceKey,
+					clients.ApiDeviceProfileRoute,
+					15000,
+					url +  clients.ApiDeviceProfileRoute,
+				),
+			)
+
+			//err := mdc.Delete(ctx, deviceID)
+
+			err := mdc.DeleteByName(ctx, deviceID)
+
+			if err == nil {
+				fmt.Printf("Removed: %s\n", deviceID)
 				return
 			}
 
-			// Display Results
-			if string(respBody) == "true" {
-				fmt.Printf("Removed: %s\n", deviceID)
-			} else {
-				fmt.Printf("Remove Unsuccessful: %s\n", respBody)
+			err = mdc.Delete(ctx, deviceID)
+			if err != nil {
+				fmt.Printf("Not removed: %s\n", deviceID)
+				fmt.Println(err)
+				return
 			}
 		},
 	}

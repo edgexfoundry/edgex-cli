@@ -15,21 +15,20 @@
 package list
 
 import (
-	"encoding/json"
+	"context"
 	"fmt"
+	"github.com/edgexfoundry-holding/edgex-cli/pkg/urlclient"
+
+	"github.com/edgexfoundry/go-mod-core-contracts/clients"
+	"github.com/edgexfoundry/go-mod-core-contracts/clients/metadata"
+	"github.com/edgexfoundry-holding/edgex-cli/config"
+
 	"io"
 	"text/tabwriter"
 
-	"github.com/edgexfoundry/go-mod-core-contracts/models"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-
-	client "github.com/edgexfoundry-holding/edgex-cli/pkg"
 )
-
-type deviceList struct {
-	rd []models.Device
-}
 
 // NewCommand returns the list device command
 func NewCommand() *cobra.Command {
@@ -39,23 +38,23 @@ func NewCommand() *cobra.Command {
 		Long:  `Return all device services sorted by id.`,
 		Run: func(cmd *cobra.Command, args []string) {
 
-			data, err := client.GetAllItems("device", "48081")
+			ctx, _ := context.WithCancel(context.Background())
 
-			if data == nil {
-				return
-			}
+			url := config.Conf.MetadataService.Protocol + "://" +
+				config.Conf.MetadataService.Host + ":" +
+				config.Conf.MetadataService.Port
 
-			if err != nil {
-				fmt.Println(err)
-				return
-			}
+			mdc := metadata.NewDeviceClient(
+				urlclient.New(
+					ctx,
+					clients.CoreMetaDataServiceKey,
+					clients.ApiDeviceRoute,
+					15000,
+					url +  clients.ApiDeviceRoute,
+				),
+			)
 
-			deviceList1 := deviceList{}
-
-			errjson := json.Unmarshal(data, &deviceList1.rd)
-			if errjson != nil {
-				fmt.Println(errjson)
-			}
+			devices, err := mdc.Devices(ctx)
 
 			pw := viper.Get("writer").(io.Writer)
 			w := new(tabwriter.Writer)
@@ -64,7 +63,7 @@ func NewCommand() *cobra.Command {
 			if err != nil {
 				fmt.Println(err.Error())
 			}
-			for _, device := range deviceList1.rd {
+			for _, device := range devices {
 				fmt.Fprintf(w, "%s\t%s\t%v\t%s\t%s\t\n",
 					device.Id,
 					device.Name,

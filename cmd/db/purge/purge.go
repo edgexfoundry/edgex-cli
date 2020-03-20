@@ -137,8 +137,8 @@ func purge() {
 	for _, object := range devices.list {
 		// call delete function here
 		_, err = client.DeleteItem(object.Id,
-			config.Conf.MetadataService.DeviceServiceByIDRoute,
-			config.Conf.MetadataService.DeviceServiceBySlugNameRoute,
+			"device/id/",
+			"device/name/",
 			config.Conf.MetadataService.Port)
 
 		if err != nil {
@@ -147,43 +147,6 @@ func purge() {
 		}
 	}
 	fmt.Println("Removed ", numberDevices, " devices.")
-
-	//////////////////////////////////////////////////////
-	// DR
-	//////////////////////////////////////////////////////
-
-	type deviceReportList struct {
-		list []models.DeviceReport
-	}
-
-	deviceReportData, err := client.GetAllItems("devicereport", "48081")
-
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	devicereports := deviceReportList{}
-
-	devicereporterrjson := json.Unmarshal(deviceReportData, &devicereports.list)
-	if devicereporterrjson != nil {
-		fmt.Println(devicereporterrjson)
-	}
-
-	numberDRs := len(devicereports.list)
-	for _, object := range devicereports.list {
-		// call delete function here
-		_, err = client.DeleteItem(object.Id,
-			config.Conf.MetadataService.DeviceServiceByIDRoute,
-			config.Conf.MetadataService.DeviceServiceBySlugNameRoute,
-			config.Conf.MetadataService.Port)
-
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-	}
-	fmt.Println("Removed ", numberDRs, " device reports.")
 
 	//////////////////////////////////////////////////////
 	// DS
@@ -209,8 +172,8 @@ func purge() {
 	for _, object := range deviceservices.list {
 		// call delete function here
 		_, err = client.DeleteItem(object.Id,
-			config.Conf.MetadataService.DeviceServiceByIDRoute,
-			config.Conf.MetadataService.DeviceServiceBySlugNameRoute,
+			"deviceservice/id/",
+			"deviceservice/name/",
 			config.Conf.MetadataService.Port)
 
 		if err != nil {
@@ -246,8 +209,8 @@ func purge() {
 	for _, object := range deviceprofiles.list {
 		// call delete function here
 		_, err = client.DeleteItem(object.Id,
-			config.Conf.MetadataService.DeviceProfileByIDRoute,
-			config.Conf.MetadataService.DeviceProfileBySlugNameRoute,
+			"deviceprofile/id/",
+			"deviceprofile/name/",
 			config.Conf.MetadataService.Port)
 
 		if err != nil {
@@ -288,8 +251,8 @@ func purge() {
 	for _, addr := range list.list {
 		// call delete function here
 		_, err = client.DeleteItem(addr.Id,
-			config.Conf.MetadataService.DeviceServiceByIDRoute,
-			config.Conf.MetadataService.DeviceServiceBySlugNameRoute,
+			"addressable/id/",
+			"addressable/name/",
 			config.Conf.MetadataService.Port)
 
 		if err != nil {
@@ -297,45 +260,7 @@ func purge() {
 			return
 		}
 	}
-	fmt.Println("Removed ", numberItems, " device provision watchers.")
-
-	//////////////////////////////////////////////////////
-	// Provision watchers
-	//////////////////////////////////////////////////////
-
-	type provisionWatcherList struct {
-		list []models.ProvisionWatcher
-	}
-
-	provisionWatcherData, err := client.GetAllItems("provisionwatcher", "48081")
-
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	provisionwatchers := provisionWatcherList{}
-
-	provisionwatchererrjson := json.Unmarshal(provisionWatcherData, &provisionwatchers.list)
-	if provisionwatchererrjson != nil {
-		fmt.Println(provisionwatchererrjson)
-	}
-
-	numberPRs := len(provisionwatchers.list)
-	for _, object := range provisionwatchers.list {
-		// call delete function here
-		_, err = client.DeleteItem(object.Id,
-			config.Conf.MetadataService.DeviceServiceByIDRoute,
-			config.Conf.MetadataService.DeviceServiceBySlugNameRoute,
-			config.Conf.MetadataService.Port)
-
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-	}
-
-	fmt.Println("Removed ", numberPRs, " device provision watchers.")
+	fmt.Println("Removed ", numberItems, " addressables.")
 
 	// CORE-DATA:
 	fmt.Println("* core-data")
@@ -373,7 +298,7 @@ func purge() {
 		// call delete function here
 
 		_, err = client.DeleteItem(object.Id,
-			config.Conf.DataService.ReadingByIDRoute,
+			"reading/id/",
 			"",
 			config.Conf.DataService.Port)
 
@@ -412,8 +337,8 @@ func purge() {
 
 		// call delete function here
 		_, err = client.DeleteItem(object.Id,
-			config.Conf.DataService.VDescriptorByIDRoute,
-			config.Conf.DataService.VDescriptorByNameRoute,
+			"valuedescriptor/id/",
+			"valuedescriptor/name/",
 			config.Conf.DataService.Port)
 
 		if err != nil {
@@ -462,8 +387,8 @@ func purge() {
 
 		// call delete function here
 		_, err = client.DeleteItem(object.ID,
-			config.Conf.SchedulerService.IntervalByIDRoute,
-			config.Conf.SchedulerService.IntervalByNameSlugRoute,
+			"interval",
+			"interval/name/",
 			config.Conf.SchedulerService.Port)
 
 		if err != nil {
@@ -500,8 +425,8 @@ func purge() {
 
 		// call delete function here
 		_, err = client.DeleteItem(object.ID,
-			config.Conf.SchedulerService.IntervalActionByIDRoute,
-			config.Conf.SchedulerService.IntervalActionByNameSlugRoute,
+			"intervalaction/",
+			"intervalaction/name/",
 			config.Conf.SchedulerService.Port)
 
 		if err != nil {
@@ -518,44 +443,44 @@ func purge() {
 	fmt.Println("* Notifications")
 	removeNotifications()
 
-	//////////////////////////////////////////////////////
-	// exportclient
-	//////////////////////////////////////////////////////
-
-	type registrationList struct {
-		list []models.Registration
-	}
-
-	registrationData, err := client.GetAllItems("registration", "48071")
-
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	registrations := registrationList{}
-
-	registrationerrjson := json.Unmarshal(registrationData, &registrations.list)
-	if registrationerrjson != nil {
-		fmt.Println(registrationerrjson)
-	}
-
-	numberRegs := len(registrations.list)
-	for _, object := range registrations.list {
-
-		// call delete function here
-		_, err = client.DeleteItem(object.ID,
-			config.Conf.ExportService.RegistrationByIDRoute,
-			config.Conf.ExportService.RegistrationByNameRoute,
-			config.Conf.ExportService.Port)
-
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-	}
-
-	fmt.Println("Removed ", numberRegs, " registrations.")
+	////////////////////////////////////////////////////////
+	//// exportclient
+	////////////////////////////////////////////////////////
+	//
+	//type registrationList struct {
+	//	list []models.Registration
+	//}
+	//
+	//registrationData, err := client.GetAllItems("registration", "48071")
+	//
+	//if err != nil {
+	//	fmt.Println(err)
+	//	return
+	//}
+	//
+	//registrations := registrationList{}
+	//
+	//registrationerrjson := json.Unmarshal(registrationData, &registrations.list)
+	//if registrationerrjson != nil {
+	//	fmt.Println(registrationerrjson)
+	//}
+	//
+	//numberRegs := len(registrations.list)
+	//for _, object := range registrations.list {
+	//
+	//	// call delete function here
+	//	_, err = client.DeleteItem(object.ID,
+	//		config.Conf.ExportService.RegistrationByIDRoute,
+	//		config.Conf.ExportService.RegistrationByNameRoute,
+	//		config.Conf.ExportService.Port)
+	//
+	//	if err != nil {
+	//		fmt.Println(err)
+	//		return
+	//	}
+	//}
+	//
+	//fmt.Println("Removed ", numberRegs, " registrations.")
 }
 
 func removeEventsAndReadings() {

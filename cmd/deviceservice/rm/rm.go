@@ -17,7 +17,6 @@ package rm
 import (
 	"fmt"
 
-	"github.com/edgexfoundry-holding/edgex-cli/config"
 	client "github.com/edgexfoundry-holding/edgex-cli/pkg"
 	"github.com/spf13/cobra"
 )
@@ -38,9 +37,9 @@ func NewCommand() *cobra.Command {
 
 			deviceID := args[0]
 			respBody, err := client.DeleteItem(deviceID,
-				config.Conf.MetadataService.DeviceServiceByIDRoute,
-				config.Conf.MetadataService.DeviceServiceBySlugNameRoute,
-				config.Conf.MetadataService.Port)
+				"deviceservice/id/",
+				"deviceservice/name/",
+				"48081")
 
 			if err != nil {
 				fmt.Println(err)

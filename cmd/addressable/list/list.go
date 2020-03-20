@@ -20,12 +20,12 @@ import (
 	"io"
 	"text/tabwriter"
 
+	"github.com/edgexfoundry-holding/edgex-cli/config"
+	client "github.com/edgexfoundry-holding/edgex-cli/pkg"
+
 	"github.com/edgexfoundry/go-mod-core-contracts/models"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-
-	"github.com/edgexfoundry-holding/edgex-cli/config"
-	client "github.com/edgexfoundry-holding/edgex-cli/pkg"
 )
 
 type addressableList struct {
@@ -41,7 +41,7 @@ func NewCommand() *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 
 			data, err := client.GetAllItems(
-				config.Conf.MetadataService.AddressableList,
+				"addressable",
 				config.Conf.MetadataService.Port)
 
 			if data == nil {
