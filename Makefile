@@ -9,7 +9,7 @@ ifndef GOPATH
   export GOPATH
 endif
 
-ifndef $(GOBIN)
+ifndef GOBIN
   	GOBIN=$(GOPATH)/bin
   export GOBIN
 endif
