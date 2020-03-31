@@ -2,8 +2,8 @@
 
 GO = CGO_ENABLED=0 GO111MODULE=on go
 
-# Base go inside of module, to avoid collisions with other projects.
-ifndef $(GOPATH)
+# If GOPATH undefined, base within module to avoid collisions"
+ifndef GOPATH
   	GOMOD=$(shell go env GOMOD)
   GOPATH=$(dir ${GOMOD})go
   export GOPATH
@@ -22,6 +22,7 @@ VERSION=$(shell cat ./VERSION)
 GOFLAGS=-ldflags "-X github.com/edgexfoundry-holding/edgex-cli/cmd/version.version=$(VERSION)"
 
 build:
+	echo "GOPATH=$(GOPATH)"
 	$(GO) build -o $(BINARY) $(GOFLAGS)
 
 test:
