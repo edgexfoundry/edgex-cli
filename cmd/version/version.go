@@ -1,26 +1,26 @@
 package version
 
 import (
-	"fmt"
+	"github.com/edgexfoundry-holding/edgex-cli/pkg/cmd/version"
 
-	client "github.com/edgexfoundry-holding/edgex-cli/pkg"
 	"github.com/spf13/cobra"
 )
 
-var version string
-
+var Version = "master"
 // NewCommand returns the version command
 func NewCommand() *cobra.Command {
 	var cmd = &cobra.Command{
 		Use:   "version",
 		Short: "Version command",
-		Long:  `Outputs the current version of edgex-cli.`,
-		Run: func(cmd *cobra.Command, args []string) {
-			// Printing the CLI's version
-			fmt.Println("edgex-cli version: ", version)
-			// printing the version of each service
-			data := client.GetVersion("48080")
-			fmt.Println("version: ", string(data))
+		Long:  `Outputs the current versions of EdgeX CLI and EdgeX Foundry.`,
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			cmd.Println("EdgeX CLI version: ", Version)
+			edgeXVersion, err := version.GetEdgeXVersion("48080")
+			if err != nil {
+				return err
+			}
+			cmd.Println("EdgeX Foundry version: ", edgeXVersion.Version)
+			return
 		},
 	}
 

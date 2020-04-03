@@ -19,7 +19,7 @@ endif
 BINARY=edgex-cli
 
 VERSION=$(shell cat ./VERSION)
-GOFLAGS=-ldflags "-X github.com/edgexfoundry-holding/edgex-cli/cmd/version.version=$(VERSION)"
+GOFLAGS=-ldflags "-X github.com/edgexfoundry-holding/edgex-cli/cmd/version.Version=$(VERSION)"
 
 build:
 	echo "GOPATH=$(GOPATH)"
