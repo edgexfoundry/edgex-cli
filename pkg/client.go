@@ -176,22 +176,3 @@ func DeleteItem(id string, pathID string, pathName string, port string) ([]byte,
 	respBody, err = DeleteItemByName(id, pathName, port)
 	return respBody, err
 }
-
-// GetVersion returns the version of a service given its port
-func GetVersion(port string) []byte {
-	host := viper.GetString("host")
-
-	url := "http://" + host + ":" + port + "/api/version"
-
-	resp, err := http.Get(url)
-	if err != nil {
-		// handle error
-		fmt.Println("An error occurred")
-		fmt.Println(err)
-	}
-	defer resp.Body.Close()
-
-	data, _ := ioutil.ReadAll(resp.Body)
-
-	return data
-}
