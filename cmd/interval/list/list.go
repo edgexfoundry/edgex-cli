@@ -22,29 +22,27 @@ import (
 	"net/http"
 	"text/tabwriter"
 
+	"github.com/edgexfoundry-holding/edgex-cli/config"
+
+	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 	"github.com/edgexfoundry/go-mod-core-contracts/models"
+
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
-
-type intervalList struct {
-	intervals []models.Interval
-}
 
 var limit int32
 var byID bool
 
 func listHandler(cmd *cobra.Command, args []string) {
-	var url string = "http://" + viper.GetString("Host") + ":48085/api/v1/"
+	var url string = config.Conf.Clients["Scheduler"].Url() + clients.ApiIntervalRoute
 	if len(args) > 0 {
 		if byID {
-			url += "interval/" + args[0]
+			url += "/" + args[0]
 		} else {
-			url += "interval/name/" + args[0]
+			url += "/name/" + args[0]
 		}
 
-	} else {
-		url += "interval"
 	}
 	fmt.Println(url)
 	resp, err := http.Get(url)
@@ -57,19 +55,18 @@ func listHandler(cmd *cobra.Command, args []string) {
 
 	data, _ := ioutil.ReadAll(resp.Body)
 
-	intervalList := intervalList{}
-	var errjson error
+	var intervals []models.Interval
 	var interval models.Interval
 	if len(args) > 0 {
-		errjson = json.Unmarshal(data, &interval)
+		err = json.Unmarshal(data, &interval)
 	} else {
-		errjson = json.Unmarshal(data, &intervalList.intervals)
+		err = json.Unmarshal(data, &intervals)
 	}
-	if errjson != nil {
+	if err != nil {
 		if string(data) == "Error, exceeded the max limit as defined in config" {
 			fmt.Println("The number of intervals to be returned exceeds the MaxResultCount limit defined in configuration.toml")
 		}
-		fmt.Println(errjson)
+		fmt.Println(err)
 		return
 	}
 
@@ -82,7 +79,7 @@ func listHandler(cmd *cobra.Command, args []string) {
 
 		printIntervalDetails(w, &interval)
 	} else {
-		for _, interval := range intervalList.intervals {
+		for _, interval := range intervals {
 			printIntervalDetails(w, &interval)
 		}
 	}

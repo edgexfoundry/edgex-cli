@@ -17,13 +17,14 @@ package rm
 import (
 	"context"
 	"fmt"
-	"github.com/edgexfoundry-holding/edgex-cli/pkg/urlclient"
-	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 
 	"github.com/edgexfoundry-holding/edgex-cli/config"
-	"github.com/spf13/cobra"
+	"github.com/edgexfoundry-holding/edgex-cli/pkg/urlclient"
 
+	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 	"github.com/edgexfoundry/go-mod-core-contracts/clients/scheduler"
+
+	"github.com/spf13/cobra"
 )
 
 func removeIntervalHandler(cmd *cobra.Command, args []string) {
@@ -34,10 +35,7 @@ func removeIntervalHandler(cmd *cobra.Command, args []string) {
 	}
 
 	ctx, _ := context.WithCancel(context.Background())
-
-	url := config.Conf.SchedulerService.Protocol + "://" +
-		config.Conf.SchedulerService.Host + ":" +
-		config.Conf.SchedulerService.Port
+	url := config.Conf.Clients["Scheduler"].Url()
 
 	// Create request
 	intervalID := args[0]
@@ -48,9 +46,9 @@ func removeIntervalHandler(cmd *cobra.Command, args []string) {
 			clients.SupportSchedulerServiceKey,
 			clients.ApiIntervalRoute,
 			15000,
-			url +  clients.ApiIntervalRoute,
+			url+clients.ApiIntervalRoute,
 		),
-		)
+	)
 
 	err := sc.Delete(ctx, intervalID)
 

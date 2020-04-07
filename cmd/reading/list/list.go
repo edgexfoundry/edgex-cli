@@ -24,18 +24,15 @@ import (
 	"text/tabwriter"
 	"time"
 
+	"github.com/edgexfoundry-holding/edgex-cli/config"
+	"github.com/edgexfoundry-holding/edgex-cli/pkg/utils"
+
+	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 	"github.com/edgexfoundry/go-mod-core-contracts/models"
+
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-
-	"github.com/edgexfoundry-holding/edgex-cli/pkg/utils"
 )
-
-// var rd []models.Device
-type readingList struct {
-	rd []models.Reading
-}
-
 var limit int32
 
 // NewCommand returns the list device command
@@ -56,9 +53,9 @@ func NewCommand() *cobra.Command {
 				} else {
 					limitUrl = strconv.FormatInt(int64(50), 10)
 				}
-				url = "http://" + viper.GetString("Host") + ":48080/api/v1/reading/device/" + device + "/" + limitUrl
+				url = config.Conf.Clients["CoreData"].Url() + clients.ApiReadingRoute + "/device/" + device + "/" + limitUrl
 			} else {
-				url = "http://" + viper.GetString("Host") + ":48080/api/v1/reading"
+				url = config.Conf.Clients["CoreData"].Url() + clients.ApiReadingRoute
 			}
 
 			resp, err := http.Get(url)
@@ -71,13 +68,13 @@ func NewCommand() *cobra.Command {
 
 			data, _ := ioutil.ReadAll(resp.Body)
 
-			readingList := readingList{}
-			errjson := json.Unmarshal(data, &readingList.rd)
-			if errjson != nil {
+			var readings []models.Reading
+			err = json.Unmarshal(data, &readings)
+			if err != nil {
 				if string(data) == "Error, exceeded the max limit as defined in config" {
 					fmt.Println("The number of readings to be returned exceeds the MaxResultCount limit defined in configuration.toml")
 				}
-				fmt.Println(errjson)
+				fmt.Println(err)
 				return
 			}
 
@@ -86,7 +83,7 @@ func NewCommand() *cobra.Command {
 			w.Init(pw, 0, 8, 1, '\t', 0)
 			fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t\n", "Reading ID", "Name", "Device",
 				"Origin", "Value", "Created", "Modified", "Pushed")
-			for _, reading := range readingList.rd {
+			for _, reading := range readings {
 				tCreated := time.Unix(reading.Created/1000, 0)
 				tModified := time.Unix(reading.Modified/1000, 0)
 				tPushed := time.Unix(reading.Pushed/1000, 0)

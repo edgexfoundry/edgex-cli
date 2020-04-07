@@ -17,6 +17,7 @@ package rm
 import (
 	"context"
 	"fmt"
+
 	"github.com/edgexfoundry-holding/edgex-cli/pkg/urlclient"
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 	"github.com/edgexfoundry/go-mod-core-contracts/clients/coredata"
@@ -41,12 +42,8 @@ func NewCommand() *cobra.Command {
 
 			deviceID := args[0]
 
-
 			ctx, _ := context.WithCancel(context.Background())
-
-			url := config.Conf.DataService.Protocol + "://" +
-				config.Conf.DataService.Host + ":" +
-				config.Conf.DataService.Port
+			url := config.Conf.Clients["CoreData"].Url()
 
 			dc := coredata.NewEventClient(
 				urlclient.New(
@@ -54,7 +51,7 @@ func NewCommand() *cobra.Command {
 					clients.CoreDataServiceKey,
 					clients.ApiEventRoute,
 					15000,
-					url + clients.ApiEventRoute))
+					url+clients.ApiEventRoute))
 
 			err := dc.DeleteForDevice(ctx, deviceID)
 
@@ -67,8 +64,8 @@ func NewCommand() *cobra.Command {
 			fmt.Println(deviceID)
 
 			//respBody, err := client.DeleteItemByName(deviceID,
-			//	config.Conf.DataService.DeleteEventByDeviceIDRoute,
-			//	config.Conf.DataService.Port)
+			//	config.Conf.CoreData.DeleteEventByDeviceIDRoute,
+			//	config.Conf.CoreData.Port)
 			//
 			//if err != nil {
 			//	fmt.Println(err)

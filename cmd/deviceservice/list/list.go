@@ -21,17 +21,16 @@ import (
 	"text/tabwriter"
 	"time"
 
-	models "github.com/edgexfoundry/go-mod-core-contracts/models"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
-
+	"github.com/edgexfoundry-holding/edgex-cli/config"
 	client "github.com/edgexfoundry-holding/edgex-cli/pkg"
 	"github.com/edgexfoundry-holding/edgex-cli/pkg/utils"
-)
 
-type deviceServiceList struct {
-	rd []models.DeviceService
-}
+	"github.com/edgexfoundry/go-mod-core-contracts/clients"
+	"github.com/edgexfoundry/go-mod-core-contracts/models"
+
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+)
 
 // NewCommand returns the list device services command
 func NewCommand() *cobra.Command {
@@ -40,32 +39,32 @@ func NewCommand() *cobra.Command {
 		Short: "Lists existing devices services",
 		Long:  `Return the list fo current device services.`,
 		Run: func(cmd *cobra.Command, args []string) {
-
-			data, err := client.GetAllItems("deviceservice", "48081")
+			data, err := client.GetAllItems(config.Conf.Clients["Metadata"].Url() + clients.ApiDeviceServiceRoute)
 
 			if err != nil {
 				fmt.Println(err)
 				return
 			}
 
-			deviceServiceList1 := deviceServiceList{}
+			deviceServices := []models.DeviceService{}
 
-			errjson := json.Unmarshal(data, &deviceServiceList1.rd)
-			if errjson != nil {
-				fmt.Println(errjson)
+			err = json.Unmarshal(data, &deviceServices)
+			if err != nil {
+				fmt.Println(err)
+				return
 			}
 
 			pw := viper.Get("writer").(io.WriteCloser)
 			w := new(tabwriter.Writer)
 			w.Init(pw, 0, 8, 1, '\t', 0)
 			fmt.Fprintf(w, "%s\t%s\t%s\t%s\t\n", "Service ID", "Service Name", "Created", "Operating State")
-			for _, device := range deviceServiceList1.rd {
-				tCreated := time.Unix(device.Created/1000, 0)
+			for _, deviceService := range deviceServices {
+				tCreated := time.Unix(deviceService.Created/1000, 0)
 				fmt.Fprintf(w, "%s\t%s\t%v\t%v\t\n",
-					device.Id,
-					device.Name,
+					deviceService.Id,
+					deviceService.Name,
 					utils.HumanDuration(time.Since(tCreated)),
-					device.OperatingState,
+					deviceService.OperatingState,
 				)
 			}
 			w.Flush()

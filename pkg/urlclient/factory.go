@@ -17,6 +17,7 @@ package urlclient
 
 import (
 	"context"
+
 	"github.com/edgexfoundry/go-mod-core-contracts/clients/interfaces"
 	"github.com/edgexfoundry/go-mod-core-contracts/clients/urlclient/local"
 )

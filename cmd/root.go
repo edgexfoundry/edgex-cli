@@ -17,7 +17,6 @@ package cmd
 import (
 	"fmt"
 	"io"
-	"log"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -45,8 +44,11 @@ func NewCommand() *cobra.Command {
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
 			// set flags
 			noPager, err := cmd.Flags().GetBool("no-pager")
+			if err != nil {
+				fmt.Println("couldn't get no-pager flag")
+			}
 
-			verbose, _ := cmd.Flags().GetBool("verbose")
+			verbose, err := cmd.Flags().GetBool("verbose")
 			if err != nil {
 				fmt.Println("couldn't get verbose flag")
 			}
@@ -55,15 +57,18 @@ func NewCommand() *cobra.Command {
 				noPager = true
 			}
 
-			url, _ := cmd.Flags().GetBool("url")
+			url, err := cmd.Flags().GetBool("url")
 			if err != nil {
 				fmt.Println("couldn't get url flag")
 			}
 			viper.Set("url", url)
 
+			configFile, err := cmd.Flags().GetString("config-file")
 			if err != nil {
-				fmt.Println("couldn't get no-pager flag")
+				fmt.Println("couldn't get config-file flag")
 			}
+			viper.Set("config-file", configFile)
+
 			viper.Set("writer", os.Stdout)
 			if !noPager {
 				w, err := pager.NewWriter()
@@ -126,11 +131,13 @@ https://www.edgexfoundry.org/
 	Verbose := false
 	URL := false
 	NoPager := false
+	Configfile := ""
 
 	// get flags values
 	cmd.PersistentFlags().BoolVarP(&URL, "url", "u", false, "Print URL(s) used by the entered command.")
 	cmd.PersistentFlags().BoolVarP(&Verbose, "verbose", "v", false, "Print entire HTTP response.")
 	cmd.PersistentFlags().BoolVarP(&NoPager, "no-pager", "", false, "Do not pipe output into a pager.")
+	cmd.PersistentFlags().StringVar(&Configfile, "config-file", "", "configuration file")
 
 	return cmd
 }
@@ -138,18 +145,8 @@ https://www.edgexfoundry.org/
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
-	// set default config
-	configDirPath := os.Getenv("HOME") + "/.edgex-cli/"
-	configFilePath := "config.yaml"
-	env := config.NewViperEnv()
-	err := config.SetConfig(env, configDirPath, configFilePath)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
+	config.LoadConfig()
 	if err := NewCommand().Execute(); err != nil {
-		fmt.Println(err)
 		os.Exit(1)
 	}
 }

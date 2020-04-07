@@ -20,6 +20,7 @@ package db
 
 import (
 	purgedb "github.com/edgexfoundry-holding/edgex-cli/cmd/db/purge"
+
 	"github.com/spf13/cobra"
 )
 

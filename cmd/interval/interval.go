@@ -19,6 +19,7 @@ import (
 	listinterval "github.com/edgexfoundry-holding/edgex-cli/cmd/interval/list"
 	rminterval "github.com/edgexfoundry-holding/edgex-cli/cmd/interval/rm"
 	updateinterval "github.com/edgexfoundry-holding/edgex-cli/cmd/interval/update"
+
 	"github.com/spf13/cobra"
 )
 

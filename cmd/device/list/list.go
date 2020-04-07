@@ -17,14 +17,14 @@ package list
 import (
 	"context"
 	"fmt"
+	"io"
+	"text/tabwriter"
+
+	"github.com/edgexfoundry-holding/edgex-cli/config"
 	"github.com/edgexfoundry-holding/edgex-cli/pkg/urlclient"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 	"github.com/edgexfoundry/go-mod-core-contracts/clients/metadata"
-	"github.com/edgexfoundry-holding/edgex-cli/config"
-
-	"io"
-	"text/tabwriter"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -40,25 +40,26 @@ func NewCommand() *cobra.Command {
 
 			ctx, _ := context.WithCancel(context.Background())
 
-			url := config.Conf.MetadataService.Protocol + "://" +
-				config.Conf.MetadataService.Host + ":" +
-				config.Conf.MetadataService.Port
-
+			url := config.Conf.Clients["Metadata"].Url() + clients.ApiDeviceRoute
 			mdc := metadata.NewDeviceClient(
 				urlclient.New(
 					ctx,
 					clients.CoreMetaDataServiceKey,
 					clients.ApiDeviceRoute,
 					15000,
-					url +  clients.ApiDeviceRoute,
+					url,
 				),
 			)
 
 			devices, err := mdc.Devices(ctx)
+			if err != nil {
+				fmt.Errorf(err.Error())
+				return
+			}
 
 			pw := viper.Get("writer").(io.Writer)
 			w := new(tabwriter.Writer)
-			w.Init(pw, 0, 8, 1, '\t', 0)
+			w.Init(pw, 0, 8, 3, ' ', 0)
 			_, err = fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t\n", "Device ID", "Device Name", "Operating State", "Device Service", "Device Profile")
 			if err != nil {
 				fmt.Println(err.Error())

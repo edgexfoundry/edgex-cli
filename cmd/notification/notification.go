@@ -17,6 +17,7 @@ package notification
 import (
 	addnotification "github.com/edgexfoundry-holding/edgex-cli/cmd/notification/add"
 	rmdnotification "github.com/edgexfoundry-holding/edgex-cli/cmd/notification/rm"
+
 	"github.com/spf13/cobra"
 )
 

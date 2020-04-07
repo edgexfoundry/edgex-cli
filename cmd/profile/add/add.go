@@ -14,8 +14,11 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/edgexfoundry-holding/edgex-cli/config"
+
+	"github.com/edgexfoundry/go-mod-core-contracts/clients"
+
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 // NewCommand return add profile command
@@ -55,7 +58,8 @@ func NewCommand() *cobra.Command {
 					return
 				}
 				// Create request
-				req, err := http.NewRequest("POST", "http://" + viper.GetString("Host") + ":48081/api/v1/deviceprofile/uploadfile", body)
+				//DOTO create actions list. Add /uploadfile
+				req, err := http.NewRequest("POST", config.Conf.Clients["Metadata"].Url()+clients.ApiDeviceProfileRoute + "/uploadfile", body)
 				if err != nil {
 					fmt.Println(err)
 					return

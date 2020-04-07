@@ -23,6 +23,7 @@ import (
 	"github.com/edgexfoundry-holding/edgex-cli/config"
 	client "github.com/edgexfoundry-holding/edgex-cli/pkg"
 
+	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 	"github.com/edgexfoundry/go-mod-core-contracts/models"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -39,10 +40,9 @@ func NewCommand() *cobra.Command {
 		Short: "A list of all device services",
 		Long:  `Return all device services sorted by id.`,
 		Run: func(cmd *cobra.Command, args []string) {
-
-			data, err := client.GetAllItems(
-				"addressable",
-				config.Conf.MetadataService.Port)
+			//TODO Open issue in go-mod-contracts to extend the AddressableClient interface to support getAll Addressable
+			url := config.Conf.Clients["Metadata"].Url() + clients.ApiAddressableRoute
+			data, err := client.GetAllItems(url)
 
 			if data == nil {
 				return

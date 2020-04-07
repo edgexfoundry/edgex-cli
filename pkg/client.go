@@ -11,20 +11,19 @@ import (
 
 var client = &http.Client{}
 
-func buildURL(itemType string, path string, port string) string {
+// deprecated
+func buildURL(itemType string, path string, port int) string {
 	host := viper.GetString("host")
-	url := "http://" + host + ":" + port + "/api/v1/" + path + itemType
+	url := fmt.Sprintf("http://%s:%d/api/v1/%s%s", host, port, path, itemType)
 	return url
 }
 
-// GetAllItems returns a list of all Items in the DB
-func GetAllItems(itemType string, port string) ([]byte, error) {
+// GetAllItemsDepricated returns a list of all Items in the DB
+func GetAllItems(url string) ([]byte, error) {
 
 	// Get URL and VERBOSE from viper
 	urlFlag := viper.GetBool("url")
 	verboseFlag := viper.GetBool("verbose")
-
-	url := buildURL(itemType, "", port)
 
 	if urlFlag {
 		fmt.Println("GET: " + url)
@@ -59,7 +58,7 @@ func GetAllItems(itemType string, port string) ([]byte, error) {
 }
 
 // DeleteItemByID deletes an item by ID
-func DeleteItemByID(id string, pathID string, port string) ([]byte, error) {
+func DeleteItemByID(id string, pathID string, port int) ([]byte, error) {
 
 	urlFlag := viper.GetBool("url")
 	verboseFlag := viper.GetBool("verbose")
@@ -105,7 +104,7 @@ func DeleteItemByID(id string, pathID string, port string) ([]byte, error) {
 }
 
 // DeleteItemByName deletes the item by name
-func DeleteItemByName(id string, pathName string, port string) ([]byte, error) {
+func DeleteItemByName(id string, pathName string, port int) ([]byte, error) {
 
 	urlFlag := viper.GetBool("url")
 	verboseFlag := viper.GetBool("verbose")
@@ -156,7 +155,7 @@ func DeleteItemByName(id string, pathName string, port string) ([]byte, error) {
 // The ID parameter can be either NAME or ID. We are doing this to allow the user
 // enter either the name or the ID of an object to delete.
 // First, we try ID. If successful, stop. If unsuccessful, try name.
-func DeleteItem(id string, pathID string, pathName string, port string) ([]byte, error) {
+func DeleteItem(id string, pathID string, pathName string, port int) ([]byte, error) {
 	// Try ID first
 	url := buildURL(id, pathID, port)
 	urlFlag := viper.GetBool("url")

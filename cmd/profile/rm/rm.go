@@ -17,11 +17,13 @@ package rm
 import (
 	"context"
 	"fmt"
+
+	"github.com/edgexfoundry-holding/edgex-cli/config"
 	"github.com/edgexfoundry-holding/edgex-cli/pkg/urlclient"
+
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 	"github.com/edgexfoundry/go-mod-core-contracts/clients/metadata"
 
-	"github.com/edgexfoundry-holding/edgex-cli/config"
 	"github.com/spf13/cobra"
 )
 
@@ -42,10 +44,7 @@ func NewCommand() *cobra.Command {
 			deviceID := args[0]
 
 			ctx, _ := context.WithCancel(context.Background())
-
-			url := config.Conf.MetadataService.Protocol + "://" +
-				config.Conf.MetadataService.Host + ":" +
-				config.Conf.MetadataService.Port
+			url := config.Conf.Clients["Metadata"].Url()
 
 			mdc := metadata.NewDeviceProfileClient(
 				urlclient.New(
@@ -53,7 +52,7 @@ func NewCommand() *cobra.Command {
 					clients.CoreMetaDataServiceKey,
 					clients.ApiDeviceProfileRoute,
 					15000,
-					url +  clients.ApiDeviceProfileRoute,
+					url+clients.ApiDeviceProfileRoute,
 				),
 			)
 

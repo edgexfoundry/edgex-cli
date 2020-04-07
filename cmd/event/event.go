@@ -17,6 +17,7 @@ package event
 import (
 	listevent "github.com/edgexfoundry-holding/edgex-cli/cmd/event/list"
 	rmevent "github.com/edgexfoundry-holding/edgex-cli/cmd/event/rm"
+
 	"github.com/spf13/cobra"
 )
 

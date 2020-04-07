@@ -21,7 +21,9 @@ import (
 	"os"
 	"text/tabwriter"
 
-	"github.com/spf13/viper"
+	"github.com/edgexfoundry-holding/edgex-cli/config"
+
+	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 
 	"github.com/spf13/cobra"
 )
@@ -37,38 +39,20 @@ This command pings each edgex microservice and prints their status.
 This command is not stable yet.
 `,
 		Run: func(cmd *cobra.Command, args []string) {
-
-			host := viper.GetString("Host")
-
-			fmt.Printf("Host: %s\n", viper.GetString("Host"))
-
-			// Maps of microservices pointing to their port numbers
-			microservices := make(map[string]string)
-
-			microservices["Core Data"] = "48080"
-			microservices["Core Metadata"] = "48081"
-			microservices["Core Command"] = "48082"
-			microservices["Alerts & Notifications"] = "48060"
-			microservices["Logging"] = "48061"
-			microservices["Scheduling"] = "48085"
-			microservices["Rules Engine"] = "48075"
-			microservices["Client Registration"] = "48071"
-			microservices["System Management"] = "48090"
-
 			w := new(tabwriter.Writer)
 			w.Init(os.Stdout, 0, 8, 1, '\t', 0)
 
-			for microservice, port := range microservices {
-				resp, err := http.Get("http://" + host + ":" + port + "/api/v1/ping")
+			for clientName, client := range config.Conf.Clients {
+				resp, err := http.Get(client.Url() + clients.ApiPingRoute)
 				if err != nil {
-					fmt.Fprintf(w, "%s \t not connected\n", microservice)
+					fmt.Fprintf(w, "%s \t not connected\n", clientName)
 				} else {
 					data, err := ioutil.ReadAll(resp.Body)
 					if err != nil {
-						fmt.Fprintf(w, "%s \t Unexpected error: %v\n", microservice, err)
+						fmt.Fprintf(w, "%s \t Unexpected error: %v\n", clientName, err)
 					}
 					if string(data) == "pong" {
-						fmt.Fprintf(w, "%s \t OK\n", microservice)
+						fmt.Fprintf(w, "%s \t OK\n", clientName)
 					}
 					resp.Body.Close()
 				}
