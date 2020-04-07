@@ -31,7 +31,6 @@ type Configuration struct {
 	DataService         DataService
 	MetadataService     MetadataService
 	SchedulerService    SchedulerService
-	ExportService       ExportService
 	NotificationService NotificationService
 }
 
@@ -65,12 +64,6 @@ type DataService struct {
 	Protocol string
 }
 
-type ExportService struct {
-	Port     string
-	Host     string
-	Protocol string
-}
-
 var Conf Configuration = Configuration{
 	SchedulerService: SchedulerService{
 		Port:     "48085",
@@ -89,11 +82,6 @@ var Conf Configuration = Configuration{
 	},
 	DataService: DataService{
 		Port:     "48080",
-		Host:     "localhost",
-		Protocol: "http",
-	},
-	ExportService: ExportService{
-		Port:     "48071",
 		Host:     "localhost",
 		Protocol: "http",
 	},
