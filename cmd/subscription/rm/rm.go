@@ -20,6 +20,8 @@ import (
 	"github.com/edgexfoundry-holding/edgex-cli/config"
 	client "github.com/edgexfoundry-holding/edgex-cli/pkg"
 
+	"github.com/edgexfoundry/go-mod-core-contracts/clients"
+
 	"github.com/spf13/cobra"
 )
 
@@ -35,11 +37,11 @@ func removeSubscriptionHandler(cmd *cobra.Command, args []string) {
 
 	// Create request
 	subscriptionlID := args[0]
-
-	respBody, err := client.DeleteItem(subscriptionlID,
-		"subscription",
-		"subscription/name/",
-		config.Conf.Clients["Notification"].Port)
+	url:=config.Conf.Clients["Notification"].Url() + clients.ApiSubscriptionRoute
+	respBody, err := client.DeleteItemByIdOrName(subscriptionlID,
+		"/",
+		config.PathName,
+		url)
 
 	if err != nil {
 		fmt.Println(err)
@@ -47,6 +49,7 @@ func removeSubscriptionHandler(cmd *cobra.Command, args []string) {
 	}
 
 	// Display Results
+	//TODO should check if the http.status code 200 , but if the body is true +
 	if string(respBody) == "true" {
 		fmt.Printf("Removed: %s\n", subscriptionlID)
 	} else {

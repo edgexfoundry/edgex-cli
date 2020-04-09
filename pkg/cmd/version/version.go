@@ -13,7 +13,7 @@ type Version struct {
 	Version string `json:"version" yaml:"version,omitempty"`
 }
 // GetEdgeXVersion returns the version of core-data microservice
-func GetEdgeXVersion(port string) (version Version, err error) {
+func GetEdgeXVersion() (version Version, err error) {
 	url := config.Conf.Clients["CoreData"].Url() + clients.ApiVersionRoute
 	resp, err := http.Get(url)
 	if err != nil {

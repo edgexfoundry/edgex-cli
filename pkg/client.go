@@ -11,13 +11,6 @@ import (
 
 var client = &http.Client{}
 
-// deprecated
-func buildURL(itemType string, path string, port int) string {
-	host := viper.GetString("host")
-	url := fmt.Sprintf("http://%s:%d/api/v1/%s%s", host, port, path, itemType)
-	return url
-}
-
 // GetAllItemsDepricated returns a list of all Items in the DB
 func GetAllItems(url string) ([]byte, error) {
 
@@ -57,58 +50,10 @@ func GetAllItems(url string) ([]byte, error) {
 	return body, errBody
 }
 
-// DeleteItemByID deletes an item by ID
-func DeleteItemByID(id string, pathID string, port int) ([]byte, error) {
+func DeleteItem(url string) ([]byte, error) {
 
 	urlFlag := viper.GetBool("url")
 	verboseFlag := viper.GetBool("verbose")
-	url := buildURL(id, pathID, port)
-
-	if urlFlag {
-		fmt.Println("DELETE: " + url)
-	}
-
-	req, err := http.NewRequest("DELETE", url, nil)
-	if err != nil {
-		return nil, err
-	}
-	// Fetch Request
-	resp, err := client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-
-	defer resp.Body.Close()
-
-	body, errBody := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	// If verbose is enabled, print Header and Body + errors if any
-	if verboseFlag {
-		fmt.Println("HEADER")
-		for k, v := range resp.Header {
-			fmt.Printf("%v : %v\n", k, v)
-		}
-
-		if errBody != nil {
-			fmt.Println(errBody)
-		} else {
-			fmt.Println("BODY")
-			fmt.Println(string(body))
-		}
-	}
-
-	return body, nil
-}
-
-// DeleteItemByName deletes the item by name
-func DeleteItemByName(id string, pathName string, port int) ([]byte, error) {
-
-	urlFlag := viper.GetBool("url")
-	verboseFlag := viper.GetBool("verbose")
-	url := buildURL(id, pathName, port)
 
 	if urlFlag {
 		fmt.Println("DELETE: " + url)
@@ -151,27 +96,24 @@ func DeleteItemByName(id string, pathName string, port int) ([]byte, error) {
 	return respBody, nil
 }
 
-// DeleteItem deletes the given item
+// DeleteItemByIdOrName deletes the given item
 // The ID parameter can be either NAME or ID. We are doing this to allow the user
 // enter either the name or the ID of an object to delete.
 // First, we try ID. If successful, stop. If unsuccessful, try name.
-func DeleteItem(id string, pathID string, pathName string, port int) ([]byte, error) {
-	// Try ID first
-	url := buildURL(id, pathID, port)
-	urlFlag := viper.GetBool("url")
-	respBody, err := DeleteItemByID(id, pathID, port)
-	if urlFlag {
-		fmt.Println("DELETE: " + url)
-	}
+
+//depricated
+func DeleteItemByIdOrName(id string, pathID string, pathName string, url string) ([]byte, error) {
+	// Try to delete the object by Id
+	respBody, err := DeleteItem(url+pathID+id)
 	if string(respBody) == SUCCESSFUL_DELETE {
 		// deleting with ID worked
 		return respBody, err
 	}
 
+	// Try to delete the object by name
 	if pathName == "" {
 		return nil, errors.New("Deleting by ID failed: " + url)
 	}
-
-	respBody, err = DeleteItemByName(id, pathName, port)
+	respBody, err = DeleteItem(url+pathName+id)
 	return respBody, err
 }

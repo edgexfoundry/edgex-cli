@@ -133,10 +133,7 @@ func purge() {
 	numberDevices := len(devices)
 	for _, device := range devices {
 		// call delete function here
-		_, err = client.DeleteItem(device.Id,
-			"device/id/",
-			"device/name/",
-			config.Conf.Clients["Metadata"].Port)
+		_, err = client.DeleteItem(url + config.PathId + device.Id)
 
 		if err != nil {
 			fmt.Println(err)
@@ -149,7 +146,8 @@ func purge() {
 	// DS
 	//////////////////////////////////////////////////////
 
-	deviceServiceData, err := client.GetAllItems(config.Conf.Clients["Metadata"].Url() + clients.ApiDeviceServiceRoute)
+	url = config.Conf.Clients["Metadata"].Url() + clients.ApiDeviceServiceRoute
+	deviceServiceData, err := client.GetAllItems(url)
 
 	if err != nil {
 		fmt.Println(err)
@@ -165,10 +163,7 @@ func purge() {
 	numberDSs := len(deviceServices)
 	for _, deviceService := range deviceServices {
 		// call delete function here
-		_, err = client.DeleteItem(deviceService.Id,
-			"deviceservice/id/",
-			"deviceservice/name/",
-			config.Conf.Clients["Metadata"].Port)
+		_, err = client.DeleteItem(url + config.PathId + deviceService.Id)
 
 		if err != nil {
 			fmt.Println(err)
@@ -199,10 +194,7 @@ func purge() {
 	numberProfiles := len(deviceProfiles)
 	for _, deviceProfile := range deviceProfiles {
 		// call delete function here
-		_, err = client.DeleteItem(deviceProfile.Id,
-			"deviceprofile/id/",
-			"deviceprofile/name/",
-			config.Conf.Clients["Metadata"].Port)
+		_, err = client.DeleteItem(url + config.PathId + deviceProfile.Id)
 
 		if err != nil {
 			fmt.Println(err)
@@ -237,10 +229,7 @@ func purge() {
 	numberItems := len(addressables)
 	for _, addr := range addressables {
 		// call delete function here
-		_, err = client.DeleteItem(addr.Id,
-			"addressable/id/",
-			"addressable/name/",
-			config.Conf.Clients["Metadata"].Port)
+		_, err = client.DeleteItem(url + config.PathId + addr.Id)
 
 		if err != nil {
 			fmt.Println(err)
@@ -270,18 +259,15 @@ func purge() {
 
 	var readings []models.Reading
 
-	readingerrjson := json.Unmarshal(readingData, &readings)
-	if readingerrjson != nil {
-		fmt.Println(readingerrjson)
+	err = json.Unmarshal(readingData, &readings)
+	if err != nil {
+		fmt.Println(err)
 	}
 
 	numberRs := len(readings)
 	for _, reading := range readings {
 		// call delete function here
-		_, err = client.DeleteItem(reading.Id,
-			"reading/id/",
-			"",
-			config.Conf.Clients["CoreData"].Port)
+		_, err = client.DeleteItem(url + config.PathId + reading.Id)
 
 		if err != nil {
 			fmt.Println(err)
@@ -294,7 +280,7 @@ func purge() {
 	//////////////////////////////////////////////////////
 	// value descriptors
 	//////////////////////////////////////////////////////
-	url = config.Conf.Clients["CoreData"].Url() + "/api/v1/valuedescriptor"
+	url = config.Conf.Clients["CoreData"].Url() + clients.ApiValueDescriptorRoute
 	valueDescriptorData, err := client.GetAllItems(url)
 
 	if err != nil {
@@ -312,10 +298,7 @@ func purge() {
 	numberVDs := len(valueDescriptors)
 	for _, valueDescriptor := range valueDescriptors {
 		// call delete function here
-		_, err = client.DeleteItem(valueDescriptor.Id,
-			"valuedescriptor/id/",
-			"valuedescriptor/name/",
-			config.Conf.Clients["CoreData"].Port)
+		_, err = client.DeleteItem(url + config.PathId + valueDescriptor.Id)
 
 		if err != nil {
 			fmt.Println(err)
@@ -360,10 +343,7 @@ func purge() {
 	for _, interval := range intervals {
 
 		// call delete function here
-		_, err = client.DeleteItem(interval.ID,
-			"interval",
-			"interval/name/",
-			config.Conf.Clients["Scheduler"].Port)
+		_, err = client.DeleteItem(url + "/" + interval.ID)
 
 		if err != nil {
 			fmt.Println(err)
@@ -395,13 +375,11 @@ func purge() {
 	numberIAs := len(intervalActions)
 	for _, intervalAction := range intervalActions {
 		// call delete function here
-		_, err = client.DeleteItem(intervalAction.ID,
-			"intervalaction/",
-			"intervalaction/name/",
-			config.Conf.Clients["Scheduler"].Port)
+		_, err = client.DeleteItem(url + "/" + intervalAction.ID)
 
 		if err != nil {
 			fmt.Println(err)
+			//TODO should we stop the execution of the purge command. Anywhy previous successful request cannot be reverted?
 			return
 		}
 	}
@@ -440,7 +418,7 @@ func purge() {
 	//for _, object := range registrations.list {
 	//
 	//	// call delete function here
-	//	_, err = client.DeleteItem(object.ID,
+	//	_, err = client.DeleteItemByIdOrName(object.ID,
 	//		config.Conf.ExportService.RegistrationByIDRoute,
 	//		config.Conf.ExportService.RegistrationByNameRoute,
 	//		config.Conf.ExportService.Port)

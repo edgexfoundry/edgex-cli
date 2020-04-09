@@ -212,7 +212,8 @@ func TestDeleteItemByID(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			client = test.mockClient
-			actual, err := DeleteItemByID(test.testID, test.testPathID, TestPort)
+			url:="http://localhost:2222/api/v1/testurl"
+			actual, err := DeleteItemByIdOrName(test.testID, test.testPathID, "/name/", url)
 
 			if test.expectedError && err == nil {
 				t.Error("Expected an error")
@@ -257,6 +258,8 @@ func mockClientDeleteByNameErr() *http.Client {
 	return httpclient
 }
 
+//TODO both `TestDeleteItemByName` and 'TestDeleteItemByID' now call one and the same method DeleteItem(url)
+//no need to have two tests
 func TestDeleteItemByName(t *testing.T) {
 	tests := []struct {
 		name           string
@@ -303,7 +306,8 @@ func TestDeleteItemByName(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			client = test.mockClient
-			actual, err := DeleteItemByName(test.testID, test.testPathName, TestPort)
+			url:="http://localhost:2222/api/v1/testurl/"+ test.testPathName+ test.testID
+			actual, err := DeleteItem(url)
 
 			if test.expectedError && err == nil {
 				t.Error("Expected an error")
@@ -368,7 +372,8 @@ func TestDeleteItem(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			client = test.mockClient
-			actual, err := DeleteItem(test.testID, test.testPathID, test.testPathName, TestPort)
+			url:="http://localhost:2222/api/v1/testurl"
+			actual, err := DeleteItemByIdOrName(test.testID, test.testPathID, test.testPathName, url)
 
 			if test.expectedError && err == nil {
 				t.Error("Expected an error")

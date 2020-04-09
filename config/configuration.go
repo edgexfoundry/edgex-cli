@@ -24,6 +24,9 @@ import (
 	"github.com/spf13/viper"
 )
 
+const PathId ="/id/"
+const PathName ="/name/"
+
 var confDir = ".edgex-cli"
 var fileName = "configuration.toml"
 var Conf Configuration

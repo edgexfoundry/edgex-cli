@@ -29,10 +29,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-type addressableList struct {
-	rd []models.Addressable
-}
-
 // NewCommand returns the list device command
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
@@ -44,20 +40,19 @@ func NewCommand() *cobra.Command {
 			url := config.Conf.Clients["Metadata"].Url() + clients.ApiAddressableRoute
 			data, err := client.GetAllItems(url)
 
-			if data == nil {
-				return
-			}
-
 			if err != nil {
 				fmt.Println(err)
 				return
 			}
 
-			addressableList1 := addressableList{}
+			if data == nil {
+				return
+			}
 
-			errjson := json.Unmarshal(data, &addressableList1.rd)
-			if errjson != nil {
-				fmt.Println(errjson)
+			var addr []models.Addressable
+			err = json.Unmarshal(data, &addr)
+			if err != nil {
+				fmt.Println(err)
 			}
 
 			pw := viper.Get("writer").(io.Writer)
@@ -67,7 +62,7 @@ func NewCommand() *cobra.Command {
 			if err != nil {
 				fmt.Println(err.Error())
 			}
-			for _, addressable := range addressableList1.rd {
+			for _, addressable := range addr {
 				fmt.Fprintf(w, "%s\t%s\t%v\t\n",
 					addressable.Id,
 					addressable.Name,

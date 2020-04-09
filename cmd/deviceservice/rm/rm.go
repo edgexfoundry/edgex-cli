@@ -18,8 +18,10 @@ import (
 	"fmt"
 
 	"github.com/edgexfoundry-holding/edgex-cli/config"
-
 	client "github.com/edgexfoundry-holding/edgex-cli/pkg"
+
+	"github.com/edgexfoundry/go-mod-core-contracts/clients"
+
 	"github.com/spf13/cobra"
 )
 
@@ -38,10 +40,11 @@ func NewCommand() *cobra.Command {
 			}
 
 			deviceID := args[0]
-			respBody, err := client.DeleteItem(deviceID,
-				"deviceservice/id/",
-				"deviceservice/name/",
-				config.Conf.Clients["Metadata"].Port)
+			url:=config.Conf.Clients["Metadata"].Url()+ clients.ApiDeviceServiceRoute
+			respBody, err := client.DeleteItemByIdOrName(deviceID,
+				config.PathId,
+			    config.PathName,
+				 url)
 
 			if err != nil {
 				fmt.Println(err)
