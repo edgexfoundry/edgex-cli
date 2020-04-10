@@ -14,9 +14,7 @@
 
 package main
 
-
 import "github.com/edgexfoundry-holding/edgex-cli/cmd"
-
 
 func main() {
 	cmd.Execute()

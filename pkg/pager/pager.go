@@ -33,7 +33,7 @@ type Writer struct {
 
 // getPagerCommand inspects the PAGER environment variable for a pager command,
 // otherwise returns a reasonable default ("less -FRX")
-func getPagerCommand() (string, []string){
+func getPagerCommand() (string, []string) {
 	fromEnv := os.Getenv("PAGER")
 	if fromEnv == "" {
 		return "less", []string{"-FRX"}
@@ -70,7 +70,7 @@ func NewWriter() (*Writer, error) {
 
 	// run pager in goroutine
 	go func() {
-		defer func(){
+		defer func() {
 			close(c)
 			// Defer a close on the writer so potentially blocked clients will
 			// become unblocked.  w has potentially already been closed by the

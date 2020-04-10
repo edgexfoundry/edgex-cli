@@ -22,6 +22,8 @@ import (
 	"net/http/httptest"
 	"reflect"
 	"testing"
+
+	"github.com/edgexfoundry-holding/edgex-cli/config"
 )
 
 var TestID = "testid"
@@ -33,7 +35,7 @@ var TestInvalidPathName = []rune{
 	0x7f,
 }
 var TestPathName = "name/"
-var TestPort = "1234"
+var TestPort = 1234
 var TestVerboseTrue = true
 var TestVerboseFalse = false
 
@@ -65,7 +67,8 @@ func TestGetAllItems(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			client = test.mockClient
-			actual, err := GetAllItems("blabla", "1312")
+			unexistingClient := config.Client{Host:"localhost",Port:1312, Protocol:"http"}
+			actual, err := GetAllItems(unexistingClient.Url()+"/blabla")
 
 			if test.expectedError && err == nil {
 				t.Error("Expected an error")
@@ -209,7 +212,8 @@ func TestDeleteItemByID(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			client = test.mockClient
-			actual, err := DeleteItemByID(test.testID, test.testPathID, TestPort)
+			url:="http://localhost:2222/api/v1/testurl"
+			actual, err := DeleteItemByIdOrName(test.testID, test.testPathID, "/name/", url)
 
 			if test.expectedError && err == nil {
 				t.Error("Expected an error")
@@ -254,6 +258,8 @@ func mockClientDeleteByNameErr() *http.Client {
 	return httpclient
 }
 
+//TODO both `TestDeleteItemByName` and 'TestDeleteItemByID' now call one and the same method DeleteItem(url)
+//no need to have two tests
 func TestDeleteItemByName(t *testing.T) {
 	tests := []struct {
 		name           string
@@ -300,7 +306,8 @@ func TestDeleteItemByName(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			client = test.mockClient
-			actual, err := DeleteItemByName(test.testID, test.testPathName, TestPort)
+			url:="http://localhost:2222/api/v1/testurl/"+ test.testPathName+ test.testID
+			actual, err := DeleteItem(url)
 
 			if test.expectedError && err == nil {
 				t.Error("Expected an error")
@@ -365,7 +372,8 @@ func TestDeleteItem(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			client = test.mockClient
-			actual, err := DeleteItem(test.testID, test.testPathID, test.testPathName, TestPort)
+			url:="http://localhost:2222/api/v1/testurl"
+			actual, err := DeleteItemByIdOrName(test.testID, test.testPathID, test.testPathName, url)
 
 			if test.expectedError && err == nil {
 				t.Error("Expected an error")

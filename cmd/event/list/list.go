@@ -24,11 +24,14 @@ import (
 	"text/tabwriter"
 	"time"
 
+	"github.com/edgexfoundry-holding/edgex-cli/config"
+	"github.com/edgexfoundry-holding/edgex-cli/pkg/utils"
+
+	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 	"github.com/edgexfoundry/go-mod-core-contracts/models"
+
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-
-	"github.com/edgexfoundry-holding/edgex-cli/pkg/utils"
 )
 
 // var rd []models.Device
@@ -56,9 +59,9 @@ func NewCommand() *cobra.Command {
 				} else {
 					limitUrl = strconv.FormatInt(int64(50), 10)
 				}
-				url = "http://" + viper.GetString("Host") + ":48080/api/v1/event/device/" + device + "/" + limitUrl
+				url = config.Conf.Clients["CoreData"].Url() + clients.ApiEventRoute + "/device/" + device + "/" + limitUrl
 			} else {
-				url = "http://" + viper.GetString("Host") + ":48080/api/v1/event"
+				url = config.Conf.Clients["CoreData"].Url() + clients.ApiEventRoute
 			}
 			resp, err := http.Get(url)
 			if err != nil {

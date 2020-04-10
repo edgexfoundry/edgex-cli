@@ -55,10 +55,7 @@ func NewCommand() *cobra.Command {
 func addDevice(dev models.Device) (string, error) {
 
 	ctx, _ := context.WithCancel(context.Background())
-
-	url := config.Conf.MetadataService.Protocol + "://" +
-		config.Conf.MetadataService.Host + ":" +
-		config.Conf.MetadataService.Port
+	url := config.Conf.Clients["Metadata"].Url()
 
 	mdc := metadata.NewDeviceClient(
 		urlclient.New(

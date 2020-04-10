@@ -17,20 +17,17 @@ package list
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/edgexfoundry/go-mod-core-contracts/models"
 	"io"
 	"text/tabwriter"
 
-	"github.com/edgexfoundry/go-mod-core-contracts/models"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
-
 	"github.com/edgexfoundry-holding/edgex-cli/config"
 	client "github.com/edgexfoundry-holding/edgex-cli/pkg"
-)
 
-type subscriptionList struct {
-	rd []models.Subscription
-}
+	"github.com/edgexfoundry/go-mod-core-contracts/clients"
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+)
 
 // NewCommand returns the list device command
 func NewCommand() *cobra.Command {
@@ -39,25 +36,24 @@ func NewCommand() *cobra.Command {
 		Short: "A list of all device services",
 		Long:  `Return all device services sorted by id.`,
 		Run: func(cmd *cobra.Command, args []string) {
-
-			data, err := client.GetAllItems(
-				"subscription",
-				config.Conf.NotificationService.Port)
-
-			if data == nil {
-				return
-			}
-
+			url:=config.Conf.Clients["Notification"].Url()+clients.ApiSubscriptionRoute
+			data, err := client.GetAllItems(url)
 			if err != nil {
 				fmt.Println(err)
 				return
 			}
 
-			subscriptionList1 := subscriptionList{}
+			if data == nil {
+				return
+			}
 
-			errjson := json.Unmarshal(data, &subscriptionList1.rd)
-			if errjson != nil {
-				fmt.Println(errjson)
+
+			var subscriptions []models.Subscription
+
+			err = json.Unmarshal(data, &subscriptions)
+			if err != nil {
+				fmt.Println(err)
+				return
 			}
 
 			pw := viper.Get("writer").(io.Writer)
@@ -67,7 +63,7 @@ func NewCommand() *cobra.Command {
 			if err != nil {
 				fmt.Println(err.Error())
 			}
-			for _, subscription := range subscriptionList1.rd {
+			for _, subscription := range subscriptions {
 				fmt.Fprintf(w, "%s\t%s\t%v\t\n",
 					subscription.ID,
 					subscription.Slug,

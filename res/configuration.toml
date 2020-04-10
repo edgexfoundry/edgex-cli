@@ -1,0 +1,21 @@
+[Clients]
+    [Clients.Metadata]
+        Host = 'localhost'
+        Protocol = 'http'
+        Port = 48081
+    [Clients.CoreData]
+        Host = 'localhost'
+        Protocol = 'http'
+        Port = 48080
+    [Clients.Scheduler]
+        Host = 'localhost'
+        Protocol = 'http'
+        Port = 48085
+    [Clients.Notification]
+        Host = 'localhost'
+        Protocol = 'http'
+        Port = 48060
+    [Clients.Logging]
+      Host = 'localhost'
+      Protocol = 'http'
+      Port = 48061

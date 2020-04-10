@@ -17,6 +17,7 @@ package rm
 import (
 	"context"
 	"fmt"
+
 	"github.com/edgexfoundry-holding/edgex-cli/pkg/urlclient"
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 	"github.com/edgexfoundry/go-mod-core-contracts/clients/metadata"
@@ -43,18 +44,13 @@ You can use: '$ edgex device list' to find a device's name and ID.`,
 			deviceID := args[0]
 
 			ctx, _ := context.WithCancel(context.Background())
-
-			url := config.Conf.MetadataService.Protocol + "://" +
-				config.Conf.MetadataService.Host + ":" +
-				config.Conf.MetadataService.Port
-
 			mdc := metadata.NewDeviceClient(
 				urlclient.New(
 					ctx,
 					clients.CoreMetaDataServiceKey,
 					clients.ApiDeviceRoute,
 					15000,
-					url +  clients.ApiDeviceRoute,
+					config.Conf.Clients["Metadata"].Url()+clients.ApiDeviceRoute,
 				),
 			)
 

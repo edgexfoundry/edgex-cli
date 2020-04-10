@@ -15,7 +15,7 @@ func NewCommand() *cobra.Command {
 		Long:  `Outputs the current versions of EdgeX CLI and EdgeX Foundry.`,
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			cmd.Println("EdgeX CLI version: ", Version)
-			edgeXVersion, err := version.GetEdgeXVersion("48080")
+			edgeXVersion, err := version.GetEdgeXVersion()
 			if err != nil {
 				return err
 			}

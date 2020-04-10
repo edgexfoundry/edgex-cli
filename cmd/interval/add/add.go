@@ -22,10 +22,13 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"github.com/edgexfoundry-holding/edgex-cli/config"
+
+	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 	"github.com/edgexfoundry/go-mod-core-contracts/models"
+
 	"github.com/pelletier/go-toml"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 type IntervalFile struct {
@@ -56,7 +59,7 @@ func addInterval(n *models.Interval) (string, error) {
 		return "", err
 	}
 	client := &http.Client{}
-	req, err := http.NewRequest("POST", "http://" + viper.GetString("Host") + ":48085/api/v1/interval", bytes.NewBuffer(jsonStr))
+	req, err := http.NewRequest("POST", config.Conf.Clients["Scheduler"].Url()+clients.ApiIntervalRoute, bytes.NewBuffer(jsonStr))
 	if err != nil {
 		return "", err
 	}

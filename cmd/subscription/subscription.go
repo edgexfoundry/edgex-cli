@@ -18,6 +18,7 @@ import (
 	addsubscription "github.com/edgexfoundry-holding/edgex-cli/cmd/subscription/add"
 	listsubscription "github.com/edgexfoundry-holding/edgex-cli/cmd/subscription/list"
 	rmsubscription "github.com/edgexfoundry-holding/edgex-cli/cmd/subscription/rm"
+
 	"github.com/spf13/cobra"
 )
 

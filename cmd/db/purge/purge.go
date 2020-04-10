@@ -19,6 +19,7 @@
 package purgedb
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -27,12 +28,15 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
-
 	"github.com/edgexfoundry-holding/edgex-cli/config"
 	client "github.com/edgexfoundry-holding/edgex-cli/pkg"
+
+	"github.com/edgexfoundry/go-mod-core-contracts/clients"
+	"github.com/edgexfoundry/go-mod-core-contracts/clients/metadata"
+	"github.com/edgexfoundry/go-mod-core-contracts/clients/urlclient/local"
 	"github.com/edgexfoundry/go-mod-core-contracts/models"
+
+	"github.com/spf13/cobra"
 )
 
 // NewCommand returns the db command
@@ -115,31 +119,21 @@ func purge() {
 	//////////////////////////////////////////////////////
 	// DEVICE
 	//////////////////////////////////////////////////////
-	type deviceList struct {
-		list []models.Device
-	}
+	ctx, _ := context.WithCancel(context.Background())
 
-	deviceData, err := client.GetAllItems("device", "48081")
+	url := config.Conf.Clients["Metadata"].Url() + clients.ApiDeviceRoute
+	mdc := metadata.NewDeviceClient(local.New(url))
 
+	devices, err := mdc.Devices(ctx)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	devices := deviceList{}
-	deviceerrjson := json.Unmarshal(deviceData, &devices.list)
-	if deviceerrjson != nil {
-		fmt.Println(deviceerrjson)
-	}
-
-	numberDevices := len(devices.list)
-
-	for _, object := range devices.list {
+	numberDevices := len(devices)
+	for _, device := range devices {
 		// call delete function here
-		_, err = client.DeleteItem(object.Id,
-			"device/id/",
-			"device/name/",
-			config.Conf.MetadataService.Port)
+		_, err = client.DeleteItem(url + config.PathId + device.Id)
 
 		if err != nil {
 			fmt.Println(err)
@@ -151,30 +145,25 @@ func purge() {
 	//////////////////////////////////////////////////////
 	// DS
 	//////////////////////////////////////////////////////
-	type deviceServiceList struct {
-		list []models.DeviceService
-	}
 
-	deviceServiceData, err := client.GetAllItems("deviceservice", "48081")
+	url = config.Conf.Clients["Metadata"].Url() + clients.ApiDeviceServiceRoute
+	deviceServiceData, err := client.GetAllItems(url)
 
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	deviceservices := deviceServiceList{}
+	var deviceServices []models.DeviceService
 
-	deviceserviceerrjson := json.Unmarshal(deviceServiceData, &deviceservices.list)
-	if deviceserviceerrjson != nil {
-		fmt.Println(deviceserviceerrjson)
+	err = json.Unmarshal(deviceServiceData, &deviceServices)
+	if err != nil {
+		fmt.Println(err)
 	}
 
-	numberDSs := len(deviceservices.list)
-	for _, object := range deviceservices.list {
+	numberDSs := len(deviceServices)
+	for _, deviceService := range deviceServices {
 		// call delete function here
-		_, err = client.DeleteItem(object.Id,
-			"deviceservice/id/",
-			"deviceservice/name/",
-			config.Conf.MetadataService.Port)
+		_, err = client.DeleteItem(url + config.PathId + deviceService.Id)
 
 		if err != nil {
 			fmt.Println(err)
@@ -187,31 +176,25 @@ func purge() {
 	//////////////////////////////////////////////////////
 	// DP
 	//////////////////////////////////////////////////////
-	type deviceProfileList struct {
-		list []models.DeviceProfile
-	}
-
-	DeviceProfileData, err := client.GetAllItems("deviceprofile", "48081")
+	url = config.Conf.Clients["Metadata"].Url() + clients.ApiDeviceProfileRoute
+	deviceProfileData, err := client.GetAllItems(url)
 
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	deviceprofiles := deviceProfileList{}
+	var deviceProfiles []models.DeviceProfile
 
-	deviceprofileerrjson := json.Unmarshal(DeviceProfileData, &deviceprofiles.list)
-	if deviceprofileerrjson != nil {
-		fmt.Println(deviceprofileerrjson)
+	err = json.Unmarshal(deviceProfileData, &deviceProfiles)
+	if err != nil {
+		fmt.Println(err)
 	}
 
-	numberProfiles := len(deviceprofiles.list)
-	for _, object := range deviceprofiles.list {
+	numberProfiles := len(deviceProfiles)
+	for _, deviceProfile := range deviceProfiles {
 		// call delete function here
-		_, err = client.DeleteItem(object.Id,
-			"deviceprofile/id/",
-			"deviceprofile/name/",
-			config.Conf.MetadataService.Port)
+		_, err = client.DeleteItem(url + config.PathId + deviceProfile.Id)
 
 		if err != nil {
 			fmt.Println(err)
@@ -223,14 +206,10 @@ func purge() {
 	//////////////////////////////////////////////////////
 	// ADDRESSABLES
 	//////////////////////////////////////////////////////
-
-	type addressableList struct {
-		list []models.Addressable
-	}
-
 	// Calling GetAllItems function, which
 	// makes API call to get all items of given typ
-	data, err := client.GetAllItems("addressable", "48081")
+	url = config.Conf.Clients["Metadata"].Url() + clients.ApiAddressableRoute
+	data, err := client.GetAllItems(url)
 
 	if err != nil {
 		fmt.Println(err)
@@ -238,22 +217,19 @@ func purge() {
 	}
 
 	// unmarshalling the json response
-	list := addressableList{}
-	errjson := json.Unmarshal(data, &list.list)
-	if errjson != nil {
-		fmt.Println(errjson)
+	var addressables []models.Addressable
+	err = json.Unmarshal(data, &addressables)
+	if err != nil {
+		fmt.Println(err)
 	}
 
 	// Looping over the list of items and calling
 	// DeleteItem for each
 
-	numberItems := len(list.list)
-	for _, addr := range list.list {
+	numberItems := len(addressables)
+	for _, addr := range addressables {
 		// call delete function here
-		_, err = client.DeleteItem(addr.Id,
-			"addressable/id/",
-			"addressable/name/",
-			config.Conf.MetadataService.Port)
+		_, err = client.DeleteItem(url + config.PathId + addr.Id)
 
 		if err != nil {
 			fmt.Println(err)
@@ -268,39 +244,30 @@ func purge() {
 	// Events and Readings
 	//////////////////////////////////////////////////////
 
-	removeEventsAndReadings()
+	removeEvents()
 
 	//////////////////////////////////////////////////////
 	// reading
 	//////////////////////////////////////////////////////
-
-	type readingList struct {
-		list []models.Reading
-	}
-
-	readingData, err := client.GetAllItems("reading", "48080")
+	url = config.Conf.Clients["CoreData"].Url() + clients.ApiReadingRoute
+	readingData, err := client.GetAllItems(url)
 
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	readings := readingList{}
+	var readings []models.Reading
 
-	readingerrjson := json.Unmarshal(readingData, &readings.list)
-	if readingerrjson != nil {
-		fmt.Println(readingerrjson)
+	err = json.Unmarshal(readingData, &readings)
+	if err != nil {
+		fmt.Println(err)
 	}
 
-	numberRs := len(readings.list)
-	for _, object := range readings.list {
-
+	numberRs := len(readings)
+	for _, reading := range readings {
 		// call delete function here
-
-		_, err = client.DeleteItem(object.Id,
-			"reading/id/",
-			"",
-			config.Conf.DataService.Port)
+		_, err = client.DeleteItem(url + config.PathId + reading.Id)
 
 		if err != nil {
 			fmt.Println(err)
@@ -313,33 +280,25 @@ func purge() {
 	//////////////////////////////////////////////////////
 	// value descriptors
 	//////////////////////////////////////////////////////
-
-	type valueDescriptorList struct {
-		list []models.ValueDescriptor
-	}
-
-	valueDescriptorData, err := client.GetAllItems("valuedescriptor", "48080")
+	url = config.Conf.Clients["CoreData"].Url() + clients.ApiValueDescriptorRoute
+	valueDescriptorData, err := client.GetAllItems(url)
 
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	valuedescriptors := valueDescriptorList{}
+	var valueDescriptors []models.ValueDescriptor
 
-	valuedescriptorerrjson := json.Unmarshal(valueDescriptorData, &valuedescriptors.list)
-	if valuedescriptorerrjson != nil {
-		fmt.Println(valuedescriptorerrjson)
+	err = json.Unmarshal(valueDescriptorData, &valueDescriptors)
+	if err != nil {
+		fmt.Println(err)
 	}
 
-	numberVDs := len(valuedescriptors.list)
-	for _, object := range valuedescriptors.list {
-
+	numberVDs := len(valueDescriptors)
+	for _, valueDescriptor := range valueDescriptors {
 		// call delete function here
-		_, err = client.DeleteItem(object.Id,
-			"valuedescriptor/id/",
-			"valuedescriptor/name/",
-			config.Conf.DataService.Port)
+		_, err = client.DeleteItem(url + config.PathId + valueDescriptor.Id)
 
 		if err != nil {
 			fmt.Println(err)
@@ -364,32 +323,27 @@ func purge() {
 	//////////////////////////////////////////////////////
 	// Interval
 	//////////////////////////////////////////////////////
-	type intervalList struct {
-		list []models.Interval
-	}
-
-	intervalData, err := client.GetAllItems("interval", "48085")
+	url = config.Conf.Clients["Scheduler"].Url() + clients.ApiIntervalRoute
+	intervalData, err := client.GetAllItems(url)
 
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	intervals := intervalList{}
+	var intervals []models.Interval
 
-	intervalerrjson := json.Unmarshal(intervalData, &intervals.list)
-	if intervalerrjson != nil {
-		fmt.Println(intervalerrjson)
+	err = json.Unmarshal(intervalData, &intervals)
+	if err != nil {
+		fmt.Println(err)
+		return
 	}
 
-	numberIs := len(intervals.list)
-	for _, object := range intervals.list {
+	numberIs := len(intervals)
+	for _, interval := range intervals {
 
 		// call delete function here
-		_, err = client.DeleteItem(object.ID,
-			"interval",
-			"interval/name/",
-			config.Conf.SchedulerService.Port)
+		_, err = client.DeleteItem(url + "/" + interval.ID)
 
 		if err != nil {
 			fmt.Println(err)
@@ -402,35 +356,30 @@ func purge() {
 	//////////////////////////////////////////////////////
 	// Interval Action
 	//////////////////////////////////////////////////////
-	type intervalactionList struct {
-		list []models.IntervalAction
-	}
 
-	intervalactionData, err := client.GetAllItems("intervalaction", "48085")
+	url = config.Conf.Clients["Scheduler"].Url() + clients.ApiIntervalActionRoute
+	intervalActionData, err := client.GetAllItems(url)
 
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	intervalactions := intervalactionList{}
+	var intervalActions []models.IntervalAction
 
-	intervalactionerrjson := json.Unmarshal(intervalactionData, &intervalactions.list)
-	if intervalactionerrjson != nil {
-		fmt.Println(intervalactionerrjson)
+	err = json.Unmarshal(intervalActionData, &intervalActions)
+	if err != nil {
+		fmt.Println(err)
 	}
 
-	numberIAs := len(intervalactions.list)
-	for _, object := range intervalactions.list {
-
+	numberIAs := len(intervalActions)
+	for _, intervalAction := range intervalActions {
 		// call delete function here
-		_, err = client.DeleteItem(object.ID,
-			"intervalaction/",
-			"intervalaction/name/",
-			config.Conf.SchedulerService.Port)
+		_, err = client.DeleteItem(url + "/" + intervalAction.ID)
 
 		if err != nil {
 			fmt.Println(err)
+			//TODO should we stop the execution of the purge command. Anywhy previous successful request cannot be reverted?
 			return
 		}
 	}
@@ -451,7 +400,7 @@ func purge() {
 	//	list []models.Registration
 	//}
 	//
-	//registrationData, err := client.GetAllItems("registration", "48071")
+	//registrationData, err := client.GetAllItemsDepricated("registration", "48071")
 	//
 	//if err != nil {
 	//	fmt.Println(err)
@@ -469,7 +418,7 @@ func purge() {
 	//for _, object := range registrations.list {
 	//
 	//	// call delete function here
-	//	_, err = client.DeleteItem(object.ID,
+	//	_, err = client.DeleteItemByIdOrName(object.ID,
 	//		config.Conf.ExportService.RegistrationByIDRoute,
 	//		config.Conf.ExportService.RegistrationByNameRoute,
 	//		config.Conf.ExportService.Port)
@@ -483,12 +432,12 @@ func purge() {
 	//fmt.Println("Removed ", numberRegs, " registrations.")
 }
 
-func removeEventsAndReadings() {
-	host := viper.GetString("Host")
+func removeEvents() {
 
 	// Create client
 	client := &http.Client{}
-	req, err := http.NewRequest("DELETE", "http://"+host+":48080/api/v1/event/scruball", nil)
+	url := config.Conf.Clients["CoreData"].Url()+clients.ApiEventRoute+"/scruball"
+	req, err := http.NewRequest("DELETE", url, nil)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -512,13 +461,12 @@ func removeEventsAndReadings() {
 }
 
 func removeLogs() {
-	host := viper.GetString("Host")
-
 	ts := time.Now().Unix() * 1000
 
 	// Create client
 	client := &http.Client{}
-	req, err := http.NewRequest("DELETE", "http://"+host+":48061/api/v1/logs/0/"+strconv.FormatInt(ts, 10), nil)
+	url:=config.Conf.Clients["Logging"].Url()+clients.ApiLoggingRoute+"/0"
+	req, err := http.NewRequest("DELETE", url+strconv.FormatInt(ts, 10), nil)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -543,11 +491,9 @@ func removeLogs() {
 }
 
 func removeNotifications() {
-	host := viper.GetString("Host")
-
 	// Create client
 	client := &http.Client{}
-	req, err := http.NewRequest("DELETE", "http://"+host+":48060/api/v1/cleanup", nil)
+	req, err := http.NewRequest("DELETE", config.Conf.Clients["Notification"].Url()+"/api/v1/cleanup", nil)
 	if err != nil {
 		fmt.Println(err)
 		return

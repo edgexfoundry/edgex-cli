@@ -17,18 +17,19 @@ package list
 import (
 	"context"
 	"fmt"
-	"github.com/edgexfoundry-holding/edgex-cli/config"
-	"github.com/edgexfoundry-holding/edgex-cli/pkg/urlclient"
-	"github.com/edgexfoundry/go-mod-core-contracts/clients"
-	"github.com/edgexfoundry/go-mod-core-contracts/clients/metadata"
 	"io"
 	"text/tabwriter"
 	"time"
 
+	"github.com/edgexfoundry-holding/edgex-cli/config"
+	"github.com/edgexfoundry-holding/edgex-cli/pkg/urlclient"
+	"github.com/edgexfoundry-holding/edgex-cli/pkg/utils"
+
+	"github.com/edgexfoundry/go-mod-core-contracts/clients"
+	"github.com/edgexfoundry/go-mod-core-contracts/clients/metadata"
+
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-
-	"github.com/edgexfoundry-holding/edgex-cli/pkg/utils"
 )
 
 //type deviceProfileList struct {
@@ -44,10 +45,7 @@ func NewCommand() *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 
 			ctx, _ := context.WithCancel(context.Background())
-
-			url := config.Conf.MetadataService.Protocol + "://" +
-				config.Conf.MetadataService.Host + ":" +
-				config.Conf.MetadataService.Port
+			url := config.Conf.Clients["Metadata"].Url()
 
 			mdc := metadata.NewDeviceProfileClient(
 				urlclient.New(
@@ -55,7 +53,7 @@ func NewCommand() *cobra.Command {
 					clients.CoreMetaDataServiceKey,
 					clients.ApiDeviceProfileRoute,
 					15000,
-					url +  clients.ApiDeviceProfileRoute,
+					url+clients.ApiDeviceProfileRoute,
 				),
 			)
 

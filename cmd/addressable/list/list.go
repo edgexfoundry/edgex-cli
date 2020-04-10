@@ -23,14 +23,11 @@ import (
 	"github.com/edgexfoundry-holding/edgex-cli/config"
 	client "github.com/edgexfoundry-holding/edgex-cli/pkg"
 
+	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 	"github.com/edgexfoundry/go-mod-core-contracts/models"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
-
-type addressableList struct {
-	rd []models.Addressable
-}
 
 // NewCommand returns the list device command
 func NewCommand() *cobra.Command {
@@ -39,25 +36,23 @@ func NewCommand() *cobra.Command {
 		Short: "A list of all device services",
 		Long:  `Return all device services sorted by id.`,
 		Run: func(cmd *cobra.Command, args []string) {
-
-			data, err := client.GetAllItems(
-				"addressable",
-				config.Conf.MetadataService.Port)
-
-			if data == nil {
-				return
-			}
+			//TODO Open issue in go-mod-contracts to extend the AddressableClient interface to support getAll Addressable
+			url := config.Conf.Clients["Metadata"].Url() + clients.ApiAddressableRoute
+			data, err := client.GetAllItems(url)
 
 			if err != nil {
 				fmt.Println(err)
 				return
 			}
 
-			addressableList1 := addressableList{}
+			if data == nil {
+				return
+			}
 
-			errjson := json.Unmarshal(data, &addressableList1.rd)
-			if errjson != nil {
-				fmt.Println(errjson)
+			var addr []models.Addressable
+			err = json.Unmarshal(data, &addr)
+			if err != nil {
+				fmt.Println(err)
 			}
 
 			pw := viper.Get("writer").(io.Writer)
@@ -67,7 +62,7 @@ func NewCommand() *cobra.Command {
 			if err != nil {
 				fmt.Println(err.Error())
 			}
-			for _, addressable := range addressableList1.rd {
+			for _, addressable := range addr {
 				fmt.Fprintf(w, "%s\t%s\t%v\t\n",
 					addressable.Id,
 					addressable.Name,
