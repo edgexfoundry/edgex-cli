@@ -30,6 +30,8 @@ test:
 install:
 	echo "GOBIN=$(GOBIN)"
 	$(GO) install $(GOFLAGS)
+	mkdir -p $(HOME)/.edgex-cli
+	cp ./res/configuration.toml $(HOME)/.edgex-cli/configuration.toml 
 
 clean:
 	-rm $(BINARY)
