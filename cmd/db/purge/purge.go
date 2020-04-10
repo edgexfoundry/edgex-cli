@@ -391,13 +391,13 @@ func purge() {
 	//////////////////////////////////////////////////////
 	fmt.Println("* Notifications")
 	removeNotifications()
-
+}
 
 func removeEvents() {
 
 	// Create client
 	client := &http.Client{}
-	url := config.Conf.Clients["CoreData"].Url()+clients.ApiEventRoute+"/scruball"
+	url := config.Conf.Clients["CoreData"].Url() + clients.ApiEventRoute + "/scruball"
 	req, err := http.NewRequest("DELETE", url, nil)
 	if err != nil {
 		fmt.Println(err)
@@ -426,7 +426,7 @@ func removeLogs() {
 
 	// Create client
 	client := &http.Client{}
-	url:=config.Conf.Clients["Logging"].Url()+clients.ApiLoggingRoute+"/0"
+	url := config.Conf.Clients["Logging"].Url() + clients.ApiLoggingRoute + "/0"
 	req, err := http.NewRequest("DELETE", url+strconv.FormatInt(ts, 10), nil)
 	if err != nil {
 		fmt.Println(err)
