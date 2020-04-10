@@ -392,45 +392,6 @@ func purge() {
 	fmt.Println("* Notifications")
 	removeNotifications()
 
-	////////////////////////////////////////////////////////
-	//// exportclient
-	////////////////////////////////////////////////////////
-	//
-	//type registrationList struct {
-	//	list []models.Registration
-	//}
-	//
-	//registrationData, err := client.GetAllItemsDepricated("registration", "48071")
-	//
-	//if err != nil {
-	//	fmt.Println(err)
-	//	return
-	//}
-	//
-	//registrations := registrationList{}
-	//
-	//registrationerrjson := json.Unmarshal(registrationData, &registrations.list)
-	//if registrationerrjson != nil {
-	//	fmt.Println(registrationerrjson)
-	//}
-	//
-	//numberRegs := len(registrations.list)
-	//for _, object := range registrations.list {
-	//
-	//	// call delete function here
-	//	_, err = client.DeleteItemByIdOrName(object.ID,
-	//		config.Conf.ExportService.RegistrationByIDRoute,
-	//		config.Conf.ExportService.RegistrationByNameRoute,
-	//		config.Conf.ExportService.Port)
-	//
-	//	if err != nil {
-	//		fmt.Println(err)
-	//		return
-	//	}
-	//}
-	//
-	//fmt.Println("Removed ", numberRegs, " registrations.")
-}
 
 func removeEvents() {
 

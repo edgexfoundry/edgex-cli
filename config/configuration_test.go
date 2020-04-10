@@ -64,11 +64,6 @@ var TestConf = Configuration{
 		VDescriptorByNameRoute:     "valuedescriptor/name/",
 		DeleteEventByDeviceIDRoute: "event/device/",
 	},
-	ExportService: ExportService{
-		Port:                    "48071",
-		RegistrationByIDRoute:   "registration/",
-		RegistrationByNameRoute: "registration/name/",
-	},
 }
 
 func TestSetConfig(t *testing.T) {

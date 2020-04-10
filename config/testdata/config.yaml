@@ -5,10 +5,6 @@ dataservice:
   vdescriptorbyidroute: valuedescriptor/id/
   vdescriptorbynameroute: valuedescriptor/name/
 enabled: false
-exportservice:
-  port: "48071"
-  registrationbyidroute: registration/
-  registrationbynameroute: registration/name/
 host: localhost
 metadataservice:
   addressablelist: addressable
