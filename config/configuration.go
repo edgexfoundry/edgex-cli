@@ -63,6 +63,6 @@ func LoadConfig() {
 	}
 
 	if _, err := toml.DecodeFile(configFile, &Conf); err != nil {
-		log.Fatal("Error occured while parsing %s:%s", configFile, err)
+		log.Fatalf("Error occured while parsing %s: %s", configFile, err)
 	}
 }
