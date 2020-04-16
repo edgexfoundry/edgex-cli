@@ -16,19 +16,14 @@ package config
 
 import (
 	"fmt"
-	"log"
-	"os"
-	"strings"
-
 	"github.com/BurntSushi/toml"
-	"github.com/spf13/viper"
+	"os"
+	"path/filepath"
 )
 
 const PathId ="/id/"
 const PathName ="/name/"
-
-var confDir = ".edgex-cli"
-var fileName = "configuration.toml"
+var  DefaultConfigFile = filepath.Join(os.Getenv("HOME"), ".edgex-cli", "configuration.toml")
 var Conf Configuration
 
 // Configuration struct will use this to write config file eventually
@@ -55,14 +50,18 @@ type Security struct {
 	Token   string
 }
 
-func LoadConfig() {
-	//TODO make it work for Windows
-	configFile := strings.Join([]string{os.Getenv("HOME"), confDir, fileName}, "/")
-	if len(viper.GetString("config-file")) > 0 {
-		configFile = viper.GetString("config-file")
+func LoadConfig(env Environment) error {
+	var configFilePath string
+	if env.IsSet("config-file") {
+		configFilePath = env.GetString("config-file")
+	} else {
+		configFilePath = DefaultConfigFile
 	}
-
-	if _, err := toml.DecodeFile(configFile, &Conf); err != nil {
-		log.Fatalf("Error occured while parsing %s: %s", configFile, err)
+	if _, err := toml.DecodeFile(configFilePath, &Conf); err != nil {
+		fmt.Printf("Error occured while parsing %s: %s", configFilePath, err)
+		//log.Fatalf("Error occured while parsing %s: %s", configFilePath, err)
+		return err
 	}
+	return nil
 }
+
