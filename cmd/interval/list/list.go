@@ -15,11 +15,9 @@
 package list
 
 import (
-	"encoding/json"
 	"fmt"
+	"github.com/edgexfoundry-holding/edgex-cli/pkg/utils"
 	"io"
-	"io/ioutil"
-	"net/http"
 	"text/tabwriter"
 
 	"github.com/edgexfoundry-holding/edgex-cli/config"
@@ -44,28 +42,9 @@ func listHandler(cmd *cobra.Command, args []string) {
 		}
 
 	}
-	fmt.Println(url)
-	resp, err := http.Get(url)
-	if err != nil {
-		// handle error
-		fmt.Println("An error occurred. Is EdgeX running?")
-		fmt.Println(err)
-	}
-	defer resp.Body.Close()
-
-	data, _ := ioutil.ReadAll(resp.Body)
-
 	var intervals []models.Interval
-	var interval models.Interval
-	if len(args) > 0 {
-		err = json.Unmarshal(data, &interval)
-	} else {
-		err = json.Unmarshal(data, &intervals)
-	}
+	err := utils.ListHelper(url, intervals)
 	if err != nil {
-		if string(data) == "Error, exceeded the max limit as defined in config" {
-			fmt.Println("The number of intervals to be returned exceeds the MaxResultCount limit defined in configuration.toml")
-		}
 		fmt.Println(err)
 		return
 	}
@@ -75,29 +54,20 @@ func listHandler(cmd *cobra.Command, args []string) {
 	w.Init(pw, 0, 8, 1, '\t', 0)
 	fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t%s\t%s\t\n", "Interval ID", "Name", "Start",
 		"End", "Frequency", "Cron", "RunOnce")
-	if len(args) > 0 {
-
-		printIntervalDetails(w, &interval)
-	} else {
-		for _, interval := range intervals {
-			printIntervalDetails(w, &interval)
-		}
+	for _, interval := range intervals {
+		fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t%s\t%t\t\n",
+			interval.ID,
+			interval.Name,
+			interval.Start,
+			interval.End,
+			interval.Frequency,
+			interval.Cron,
+			interval.RunOnce,
+		)
 	}
-
 	w.Flush()
 }
 
-func printIntervalDetails(w *tabwriter.Writer, interval *models.Interval) {
-	fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t%s\t%t\t\n",
-		interval.ID,
-		interval.Name,
-		interval.Start,
-		interval.End,
-		interval.Frequency,
-		interval.Cron,
-		interval.RunOnce,
-	)
-}
 
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{

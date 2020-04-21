@@ -32,6 +32,8 @@ import (
 	"github.com/spf13/viper"
 )
 
+
+
 // NewCommand returns the list device services command
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
