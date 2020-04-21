@@ -15,11 +15,8 @@
 package list
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
-	"net/http"
 	"strconv"
 	"text/tabwriter"
 	"time"
@@ -63,27 +60,12 @@ func NewCommand() *cobra.Command {
 			} else {
 				url = config.Conf.Clients["CoreData"].Url() + clients.ApiEventRoute
 			}
-			resp, err := http.Get(url)
-			if err != nil {
-				// handle error
-				fmt.Println("An error occurred. Is EdgeX running?")
-				fmt.Println(err)
-			}
-			defer resp.Body.Close()
-
-			data, _ := ioutil.ReadAll(resp.Body)
-
 			eventList := eventList{}
-
-			errjson := json.Unmarshal(data, &eventList.rd)
-			if errjson != nil {
-				if string(data) == "Error, exceeded the max limit as defined in config" {
-					fmt.Println("The number of events to be returned exceeds the MaxResultCount limit defined in configuration.toml")
-				}
-				fmt.Println(errjson)
+			err := utils.ListHelper(url,eventList)
+			if err != nil {
+				fmt.Println(err)
 				return
 			}
-
 			pw := viper.Get("writer").(io.WriteCloser)
 			w := new(tabwriter.Writer)
 			w.Init(pw, 0, 8, 1, '\t', 0)
