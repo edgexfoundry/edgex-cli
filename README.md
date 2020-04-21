@@ -46,7 +46,7 @@ Use "edgex [command] --help" for more information about a command.
 
 ## Installation
 
-In order to run this tool, you will need a **running EdgeX instance** and Go 1.12 or higher installed on your machine.
+In order to run this tool, you will need an accessible **running EdgeX instance** somewhere and Go 1.12 or higher installed on your machine.
 
 * Clone the git repo:
 
@@ -65,13 +65,15 @@ $ cd edgex-cli
 ```
 $ make install
 ```
-
-You can now use the CLI by entering `edgex-cli` anywhere on your machine. 
+Install also makes a copy of the default configuration and copies it to $HOME/.edgex-cli/configuration.toml.
+If your EdgeX instance is not running on localhost, minimally you will need to replace localhost with the correct IP address.
+You can now use the CLI by entering `edgex-cli` anywhere on your machine provided your $GOBIN is on your $PATH.
 
 
 ### Developers
 
-To try out your changes, you can either build the binary or calling `go run`.
+Follow the installation instructions to create a configuration file and edit as necessary.
+To try out your changes, you can either build the binary and execute or by calling `go run`.
 
 * Build and run:
 
