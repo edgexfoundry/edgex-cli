@@ -15,7 +15,6 @@
 package list
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/edgexfoundry/go-mod-core-contracts/models"
 	"io"
@@ -35,24 +34,11 @@ func NewCommand() *cobra.Command {
 		Use:   "list",
 		Short: "A list of all device services",
 		Long:  `Return all device services sorted by id.`,
-		Run: func(cmd *cobra.Command, args []string) {
+		RunE: func(cmd *cobra.Command, args []string) (err error){
 			url:=config.Conf.Clients["Notification"].Url()+clients.ApiSubscriptionRoute
-			data, err := client.GetAllItems(url)
-			if err != nil {
-				fmt.Println(err)
-				return
-			}
-
-			if data == nil {
-				return
-			}
-
-
 			var subscriptions []models.Subscription
-
-			err = json.Unmarshal(data, &subscriptions)
+			err = client.ListHelper(url, &subscriptions)
 			if err != nil {
-				fmt.Println(err)
 				return
 			}
 
@@ -61,7 +47,7 @@ func NewCommand() *cobra.Command {
 			w.Init(pw, 0, 8, 1, '\t', 0)
 			_, err = fmt.Fprintf(w, "%s\t%s\t%s\t\n", "Subscription ID", "Subscription Slug", "Origin")
 			if err != nil {
-				fmt.Println(err.Error())
+				return
 			}
 			for _, subscription := range subscriptions {
 				fmt.Fprintf(w, "%s\t%s\t%v\t\n",
@@ -70,14 +56,12 @@ func NewCommand() *cobra.Command {
 					subscription.Origin,
 				)
 			}
-			if err != nil {
-				fmt.Errorf(err.Error())
-				return
-			}
+
 			err = w.Flush()
 			if err != nil {
-				fmt.Println(err.Error())
+				return
 			}
+			return
 		},
 	}
 	return cmd

@@ -22,6 +22,7 @@ import (
 	"time"
 
 	"github.com/edgexfoundry-holding/edgex-cli/config"
+	client "github.com/edgexfoundry-holding/edgex-cli/pkg"
 	"github.com/edgexfoundry-holding/edgex-cli/pkg/utils"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
@@ -30,11 +31,6 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
-
-// var rd []models.Device
-type eventList struct {
-	rd []models.Event
-}
 
 var limit int32
 
@@ -45,7 +41,7 @@ func NewCommand() *cobra.Command {
 		Short: "A list of all device services",
 		Long:  `Return all device services sorted by id.`,
 		Args:  cobra.MaximumNArgs(1),
-		Run: func(cmd *cobra.Command, args []string) {
+		RunE: func(cmd *cobra.Command, args []string) (err error){
 
 			var url string
 			if len(args) > 0 {
@@ -60,17 +56,16 @@ func NewCommand() *cobra.Command {
 			} else {
 				url = config.Conf.Clients["CoreData"].Url() + clients.ApiEventRoute
 			}
-			eventList := eventList{}
-			err := utils.ListHelper(url,eventList)
+			var events []models.Event
+			err = client.ListHelper(url, &events)
 			if err != nil {
-				fmt.Println(err)
 				return
 			}
 			pw := viper.Get("writer").(io.WriteCloser)
 			w := new(tabwriter.Writer)
 			w.Init(pw, 0, 8, 1, '\t', 0)
 			fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t\n", "Event ID", "Device", "Origin", "Created", "Modified")
-			for _, event := range eventList.rd {
+			for _, event := range events {
 				tCreated := time.Unix(event.Created/1000, 0)
 				tModified := time.Unix(event.Modified/1000, 0)
 				fmt.Fprintf(w, "%s\t%s\t%v\t%v\t%s\t\n",
@@ -82,6 +77,7 @@ func NewCommand() *cobra.Command {
 				)
 			}
 			w.Flush()
+			return
 		},
 	}
 	cmd.Flags().Int32VarP(&limit, "limit", "l", 0, "Limit number of results")
