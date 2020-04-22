@@ -15,11 +15,8 @@
 package list
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
-	"net/http"
 	"strconv"
 	"text/tabwriter"
 	"time"
@@ -38,11 +35,26 @@ var limit int32
 // NewCommand returns the list device command
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "list",
-		Short: "A list of all device readings",
-		Long:  `Return all device readings.`,
-		Args:  cobra.MaximumNArgs(1),
-		Run: func(cmd *cobra.Command, args []string) {
+		Use:                    "list",
+		Aliases:                nil,
+		SuggestFor:             nil,
+		Short:                  "A list of all device readings",
+		Long:                   `Return all device readings.`,
+		Example:                "",
+		ValidArgs:              nil,
+		Args:                   cobra.MaximumNArgs(1),
+		ArgAliases:             nil,
+		BashCompletionFunction: "",
+		Deprecated:             "",
+		Hidden:                 false,
+		Annotations:            nil,
+		Version:                "",
+		PersistentPreRun:       nil,
+		PersistentPreRunE:      nil,
+		PreRun:                 nil,
+		PreRunE:                nil,
+		Run:                    nil,
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
 
 			var url string
 			if len(args) > 0 {
@@ -57,23 +69,9 @@ func NewCommand() *cobra.Command {
 			} else {
 				url = config.Conf.Clients["CoreData"].Url() + clients.ApiReadingRoute
 			}
-
-			resp, err := http.Get(url)
-			if err != nil {
-				// handle error
-				fmt.Println("An error occurred. Is EdgeX running?")
-				fmt.Println(err)
-			}
-			defer resp.Body.Close()
-
-			data, _ := ioutil.ReadAll(resp.Body)
-
 			var readings []models.Reading
-			err = json.Unmarshal(data, &readings)
+			err = utils.ListHelper(url, readings)
 			if err != nil {
-				if string(data) == "Error, exceeded the max limit as defined in config" {
-					fmt.Println("The number of readings to be returned exceeds the MaxResultCount limit defined in configuration.toml")
-				}
 				fmt.Println(err)
 				return
 			}
@@ -102,7 +100,21 @@ func NewCommand() *cobra.Command {
 				}
 			}
 			w.Flush()
+			return
 		},
+		PostRun:                    nil,
+		PostRunE:                   nil,
+		PersistentPostRun:          nil,
+		PersistentPostRunE:         nil,
+		SilenceErrors:              false,
+		SilenceUsage:               false,
+		DisableFlagParsing:         false,
+		DisableAutoGenTag:          false,
+		DisableFlagsInUseLine:      false,
+		DisableSuggestions:         false,
+		SuggestionsMinimumDistance: 0,
+		TraverseChildren:           false,
+		FParseErrWhitelist:         cobra.FParseErrWhitelist{},
 	}
 	cmd.Flags().Int32VarP(&limit, "limit", "l", 0, "Limit number of results")
 	return cmd
