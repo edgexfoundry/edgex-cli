@@ -16,13 +16,11 @@ package list
 
 import (
 	"fmt"
+	"github.com/edgexfoundry-holding/edgex-cli/config"
+	"github.com/edgexfoundry-holding/edgex-cli/pkg/utils"
 	"io"
 	"strconv"
 	"text/tabwriter"
-	"time"
-
-	"github.com/edgexfoundry-holding/edgex-cli/config"
-	"github.com/edgexfoundry-holding/edgex-cli/pkg/utils"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 	"github.com/edgexfoundry/go-mod-core-contracts/models"
@@ -71,14 +69,12 @@ func NewCommand() *cobra.Command {
 			w.Init(pw, 0, 8, 1, '\t', 0)
 			fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t\n", "Event ID", "Device", "Origin", "Created", "Modified")
 			for _, event := range eventList.rd {
-				tCreated := time.Unix(event.Created/1000, 0)
-				tModified := time.Unix(event.Modified/1000, 0)
 				fmt.Fprintf(w, "%s\t%s\t%v\t%v\t%s\t\n",
 					event.ID,
 					event.Device,
 					event.Origin,
-					utils.HumanDuration(time.Since(tCreated)),
-					utils.HumanDuration(time.Since(tModified)),
+					utils.DisplayDuration(event.Created),
+					utils.DisplayDuration(event.Modified),
 				)
 			}
 			w.Flush()

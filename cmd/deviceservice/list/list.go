@@ -17,13 +17,11 @@ package list
 import (
 	"encoding/json"
 	"fmt"
-	"io"
-	"text/tabwriter"
-	"time"
-
 	"github.com/edgexfoundry-holding/edgex-cli/config"
 	client "github.com/edgexfoundry-holding/edgex-cli/pkg"
 	"github.com/edgexfoundry-holding/edgex-cli/pkg/utils"
+	"io"
+	"text/tabwriter"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 	"github.com/edgexfoundry/go-mod-core-contracts/models"
@@ -59,11 +57,10 @@ func NewCommand() *cobra.Command {
 			w.Init(pw, 0, 8, 1, '\t', 0)
 			fmt.Fprintf(w, "%s\t%s\t%s\t%s\t\n", "Service ID", "Service Name", "Created", "Operating State")
 			for _, deviceService := range deviceServices {
-				tCreated := time.Unix(deviceService.Created/1000, 0)
 				fmt.Fprintf(w, "%s\t%s\t%v\t%v\t\n",
 					deviceService.Id,
 					deviceService.Name,
-					utils.HumanDuration(time.Since(tCreated)),
+					utils.DisplayDuration(deviceService.Created),
 					deviceService.OperatingState,
 				)
 			}

@@ -16,13 +16,11 @@ package list
 
 import (
 	"fmt"
+	"github.com/edgexfoundry-holding/edgex-cli/config"
+	"github.com/edgexfoundry-holding/edgex-cli/pkg/utils"
 	"io"
 	"strconv"
 	"text/tabwriter"
-	"time"
-
-	"github.com/edgexfoundry-holding/edgex-cli/config"
-	"github.com/edgexfoundry-holding/edgex-cli/pkg/utils"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 	"github.com/edgexfoundry/go-mod-core-contracts/models"
@@ -70,7 +68,7 @@ func NewCommand() *cobra.Command {
 				url = config.Conf.Clients["CoreData"].Url() + clients.ApiReadingRoute
 			}
 			var readings []models.Reading
-			err = utils.ListHelper(url, readings)
+			err = utils.ListHelper(url, &readings)
 			if err != nil {
 				fmt.Println(err)
 				return
@@ -82,18 +80,15 @@ func NewCommand() *cobra.Command {
 			fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t\n", "Reading ID", "Name", "Device",
 				"Origin", "Value", "Created", "Modified", "Pushed")
 			for _, reading := range readings {
-				tCreated := time.Unix(reading.Created/1000, 0)
-				tModified := time.Unix(reading.Modified/1000, 0)
-				tPushed := time.Unix(reading.Pushed/1000, 0)
 				_, err = fmt.Fprintf(w, "%s\t%s\t%s\t%d\t%s\t%s\t%s\t%s\t\n",
 					reading.Id,
 					reading.Name,
 					reading.Device,
 					reading.Origin,
 					reading.Value,
-					utils.HumanDuration(time.Since(tCreated)),
-					utils.HumanDuration(time.Since(tModified)),
-					utils.HumanDuration(time.Since(tPushed)),
+					utils.DisplayDuration(reading.Created),
+					utils.DisplayDuration(reading.Modified),
+					utils.DisplayDuration(reading.Pushed),
 				)
 				if err != nil {
 					return
