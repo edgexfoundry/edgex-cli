@@ -16,12 +16,9 @@ package list
 
 import (
 	"fmt"
-	"github.com/edgexfoundry-holding/edgex-cli/config"
-	"github.com/edgexfoundry-holding/edgex-cli/pkg/utils"
 	"io"
 	"strconv"
 	"text/tabwriter"
-	"time"
 
 	"github.com/edgexfoundry-holding/edgex-cli/config"
 	client "github.com/edgexfoundry-holding/edgex-cli/pkg"
