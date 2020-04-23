@@ -16,11 +16,10 @@ package cmd
 
 import (
 	"fmt"
-	"io"
-	"os"
-
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"io"
+	"os"
 
 	"github.com/edgexfoundry-holding/edgex-cli/cmd/addressable"
 	"github.com/edgexfoundry-holding/edgex-cli/cmd/db"
@@ -132,20 +131,25 @@ https://www.edgexfoundry.org/
 	URL := false
 	NoPager := false
 	Configfile := ""
-
 	// get flags values
 	cmd.PersistentFlags().BoolVarP(&URL, "url", "u", false, "Print URL(s) used by the entered command.")
 	cmd.PersistentFlags().BoolVarP(&Verbose, "verbose", "v", false, "Print entire HTTP response.")
 	cmd.PersistentFlags().BoolVarP(&NoPager, "no-pager", "", false, "Do not pipe output into a pager.")
 	cmd.PersistentFlags().StringVar(&Configfile, "config-file", "", "configuration file")
-
 	return cmd
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
-	config.LoadConfig()
+	//var ConfigFile string
+	//flag.StringVar(&ConfigFile, "config-file", config.DefaultConfigFile, "Specify local configuration directory")
+	var env = config.NewViperEnv()
+	// should we really be reading config file later? when does the cmd persistent flags get read .. after that to pull in any config-file flag argument?
+	env.SetConfigFile(config.DefaultConfigFile)
+	if err := config.LoadConfig(env); err != nil {
+		os.Exit(1)
+	}
 	if err := NewCommand().Execute(); err != nil {
 		os.Exit(1)
 	}
