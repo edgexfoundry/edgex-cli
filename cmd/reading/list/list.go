@@ -22,6 +22,7 @@ import (
 	"time"
 
 	"github.com/edgexfoundry-holding/edgex-cli/config"
+	client "github.com/edgexfoundry-holding/edgex-cli/pkg"
 	"github.com/edgexfoundry-holding/edgex-cli/pkg/utils"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
@@ -36,24 +37,9 @@ var limit int32
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:                    "list",
-		Aliases:                nil,
-		SuggestFor:             nil,
 		Short:                  "A list of all device readings",
 		Long:                   `Return all device readings.`,
-		Example:                "",
-		ValidArgs:              nil,
 		Args:                   cobra.MaximumNArgs(1),
-		ArgAliases:             nil,
-		BashCompletionFunction: "",
-		Deprecated:             "",
-		Hidden:                 false,
-		Annotations:            nil,
-		Version:                "",
-		PersistentPreRun:       nil,
-		PersistentPreRunE:      nil,
-		PreRun:                 nil,
-		PreRunE:                nil,
-		Run:                    nil,
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 
 			var url string
@@ -70,9 +56,8 @@ func NewCommand() *cobra.Command {
 				url = config.Conf.Clients["CoreData"].Url() + clients.ApiReadingRoute
 			}
 			var readings []models.Reading
-			err = utils.ListHelper(url, readings)
+			err = client.ListHelper(url, &readings)
 			if err != nil {
-				fmt.Println(err)
 				return
 			}
 

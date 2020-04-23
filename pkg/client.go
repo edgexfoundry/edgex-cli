@@ -1,6 +1,7 @@
 package client
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -11,7 +12,30 @@ import (
 
 var client = &http.Client{}
 
+func ListHelper(url string, readings interface{}) (err error) {
+	resp, err := http.Get(url)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+
+	data, err1 := ioutil.ReadAll(resp.Body)
+	if err1 != nil {
+		return err1
+	} else if !(resp.StatusCode >= 200 && resp.StatusCode <= 299) {
+		return fmt.Errorf("Server error: %d %s \n", resp.StatusCode, string(data))
+	}
+
+	err = json.Unmarshal(data, &readings)
+	if err != nil {
+		return
+	}
+	return
+}
+
 // GetAllItemsDepricated returns a list of all Items in the DB
+
+// deprecated
 func GetAllItems(url string) ([]byte, error) {
 
 	// Get URL and VERBOSE from viper
@@ -51,7 +75,6 @@ func GetAllItems(url string) ([]byte, error) {
 }
 
 func DeleteItem(url string) ([]byte, error) {
-
 	urlFlag := viper.GetBool("url")
 	verboseFlag := viper.GetBool("verbose")
 
@@ -74,8 +97,10 @@ func DeleteItem(url string) ([]byte, error) {
 	defer resp.Body.Close()
 
 	respBody, errBody := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
+	if errBody != nil {
+		return nil, errBody
+	} else if !(resp.StatusCode >= 200 && resp.StatusCode <= 299) {
+		return nil, fmt.Errorf("Server error: %d %s \n", resp.StatusCode, string(respBody))
 	}
 
 	// If verbose is enabled, print Header and Body + errors if any

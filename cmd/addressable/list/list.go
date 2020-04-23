@@ -15,7 +15,6 @@
 package list
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
 	"text/tabwriter"
@@ -35,24 +34,13 @@ func NewCommand() *cobra.Command {
 		Use:   "list",
 		Short: "A list of all device services",
 		Long:  `Return all device services sorted by id.`,
-		Run: func(cmd *cobra.Command, args []string) {
+		RunE: func(cmd *cobra.Command, args []string) (err error){
 			//TODO Open issue in go-mod-contracts to extend the AddressableClient interface to support getAll Addressable
 			url := config.Conf.Clients["Metadata"].Url() + clients.ApiAddressableRoute
-			data, err := client.GetAllItems(url)
-
-			if err != nil {
-				fmt.Println(err)
-				return
-			}
-
-			if data == nil {
-				return
-			}
-
 			var addr []models.Addressable
-			err = json.Unmarshal(data, &addr)
+			err = client.ListHelper(url, &addr)
 			if err != nil {
-				fmt.Println(err)
+				return
 			}
 
 			pw := viper.Get("writer").(io.Writer)
@@ -77,6 +65,7 @@ func NewCommand() *cobra.Command {
 			if err != nil {
 				fmt.Println(err.Error())
 			}
+			return 
 		},
 	}
 	return cmd

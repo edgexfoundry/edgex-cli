@@ -19,22 +19,16 @@
 package purgedb
 
 import (
-	"context"
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
-	"net/http"
 	"strconv"
 	"time"
 
 	"github.com/edgexfoundry-holding/edgex-cli/config"
 	client "github.com/edgexfoundry-holding/edgex-cli/pkg"
+	cleaners "github.com/edgexfoundry-holding/edgex-cli/pkg/cmd/purge"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
-	"github.com/edgexfoundry/go-mod-core-contracts/clients/metadata"
-	"github.com/edgexfoundry/go-mod-core-contracts/clients/urlclient/local"
-	"github.com/edgexfoundry/go-mod-core-contracts/models"
 
 	"github.com/spf13/cobra"
 )
@@ -53,8 +47,7 @@ database. Currently, it only cleans up core-metadata.
 
 
 `,
-		Run: func(cmd *cobra.Command, args []string) {
-
+		RunE: func(cmd *cobra.Command, args []string) (err error){
 			// asking for user input
 			fmt.Println("Are you sure? This cannot be undone: [y/n]")
 			if askForConfirmation() {
@@ -65,6 +58,7 @@ database. Currently, it only cleans up core-metadata.
 				return
 			}
 
+			return
 		},
 	}
 	return cmd
@@ -114,366 +108,34 @@ func containsString(slice []string, element string) bool {
 }
 
 func purge() {
-	fmt.Println("* core-metadata")
-
-	//////////////////////////////////////////////////////
-	// DEVICE
-	//////////////////////////////////////////////////////
-	ctx, _ := context.WithCancel(context.Background())
-
-	url := config.Conf.Clients["Metadata"].Url() + clients.ApiDeviceRoute
-	mdc := metadata.NewDeviceClient(local.New(url))
-
-	devices, err := mdc.Devices(ctx)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	numberDevices := len(devices)
-	for _, device := range devices {
-		// call delete function here
-		_, err = client.DeleteItem(url + config.PathId + device.Id)
-
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-	}
-	fmt.Println("Removed ", numberDevices, " devices.")
-
-	//////////////////////////////////////////////////////
-	// DS
-	//////////////////////////////////////////////////////
-
-	url = config.Conf.Clients["Metadata"].Url() + clients.ApiDeviceServiceRoute
-	deviceServiceData, err := client.GetAllItems(url)
-
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	var deviceServices []models.DeviceService
-
-	err = json.Unmarshal(deviceServiceData, &deviceServices)
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	numberDSs := len(deviceServices)
-	for _, deviceService := range deviceServices {
-		// call delete function here
-		_, err = client.DeleteItem(url + config.PathId + deviceService.Id)
-
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-	}
-
-	fmt.Println("Removed ", numberDSs, " device services.")
-
-	//////////////////////////////////////////////////////
-	// DP
-	//////////////////////////////////////////////////////
-	url = config.Conf.Clients["Metadata"].Url() + clients.ApiDeviceProfileRoute
-	deviceProfileData, err := client.GetAllItems(url)
-
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	var deviceProfiles []models.DeviceProfile
-
-	err = json.Unmarshal(deviceProfileData, &deviceProfiles)
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	numberProfiles := len(deviceProfiles)
-	for _, deviceProfile := range deviceProfiles {
-		// call delete function here
-		_, err = client.DeleteItem(url + config.PathId + deviceProfile.Id)
-
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-	}
-	fmt.Println("Removed ", numberProfiles, " device profiles.")
-
-	//////////////////////////////////////////////////////
-	// ADDRESSABLES
-	//////////////////////////////////////////////////////
-	// Calling GetAllItems function, which
-	// makes API call to get all items of given typ
-	url = config.Conf.Clients["Metadata"].Url() + clients.ApiAddressableRoute
-	data, err := client.GetAllItems(url)
-
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	// unmarshalling the json response
-	var addressables []models.Addressable
-	err = json.Unmarshal(data, &addressables)
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	// Looping over the list of items and calling
-	// DeleteItem for each
-
-	numberItems := len(addressables)
-	for _, addr := range addressables {
-		// call delete function here
-		_, err = client.DeleteItem(url + config.PathId + addr.Id)
-
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-	}
-	fmt.Println("Removed ", numberItems, " addressables.")
-
-	// CORE-DATA:
-	fmt.Println("* core-data")
-	//////////////////////////////////////////////////////
-	// Events and Readings
-	//////////////////////////////////////////////////////
-
-	removeEvents()
-
-	//////////////////////////////////////////////////////
-	// reading
-	//////////////////////////////////////////////////////
-	url = config.Conf.Clients["CoreData"].Url() + clients.ApiReadingRoute
-	readingData, err := client.GetAllItems(url)
-
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	var readings []models.Reading
-
-	err = json.Unmarshal(readingData, &readings)
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	numberRs := len(readings)
-	for _, reading := range readings {
-		// call delete function here
-		_, err = client.DeleteItem(url + config.PathId + reading.Id)
-
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-	}
-
-	fmt.Println("Removed ", numberRs, " readings.")
-
-	//////////////////////////////////////////////////////
-	// value descriptors
-	//////////////////////////////////////////////////////
-	url = config.Conf.Clients["CoreData"].Url() + clients.ApiValueDescriptorRoute
-	valueDescriptorData, err := client.GetAllItems(url)
-
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	var valueDescriptors []models.ValueDescriptor
-
-	err = json.Unmarshal(valueDescriptorData, &valueDescriptors)
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	numberVDs := len(valueDescriptors)
-	for _, valueDescriptor := range valueDescriptors {
-		// call delete function here
-		_, err = client.DeleteItem(url + config.PathId + valueDescriptor.Id)
-
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-	}
-
-	fmt.Println("Removed ", numberVDs, " value descriptors.")
-
-	//////////////////////////////////////////////////////
-	// Logs
-	//////////////////////////////////////////////////////
-
-	fmt.Println("* Logs")
+	cleaners.NewMetadataCleaner().Purge()
+	cleaners.NewCoredataCleaner().Purge()
 	removeLogs()
-
-	//////////////////////////////////////////////////////
-	// Scheduler
-	//////////////////////////////////////////////////////
-	fmt.Println("* Scheduler")
-
-	//////////////////////////////////////////////////////
-	// Interval
-	//////////////////////////////////////////////////////
-	url = config.Conf.Clients["Scheduler"].Url() + clients.ApiIntervalRoute
-	intervalData, err := client.GetAllItems(url)
-
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	var intervals []models.Interval
-
-	err = json.Unmarshal(intervalData, &intervals)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	numberIs := len(intervals)
-	for _, interval := range intervals {
-
-		// call delete function here
-		_, err = client.DeleteItem(url + "/" + interval.ID)
-
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-	}
-
-	fmt.Println("Removed ", numberIs, " interval.")
-
-	//////////////////////////////////////////////////////
-	// Interval Action
-	//////////////////////////////////////////////////////
-
-	url = config.Conf.Clients["Scheduler"].Url() + clients.ApiIntervalActionRoute
-	intervalActionData, err := client.GetAllItems(url)
-
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	var intervalActions []models.IntervalAction
-
-	err = json.Unmarshal(intervalActionData, &intervalActions)
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	numberIAs := len(intervalActions)
-	for _, intervalAction := range intervalActions {
-		// call delete function here
-		_, err = client.DeleteItem(url + "/" + intervalAction.ID)
-
-		if err != nil {
-			fmt.Println(err)
-			//TODO should we stop the execution of the purge command. Anywhy previous successful request cannot be reverted?
-			return
-		}
-	}
-
-	fmt.Println("Removed ", numberIAs, " interval action.")
-
-	//////////////////////////////////////////////////////
-	// notifications
-	//////////////////////////////////////////////////////
-	fmt.Println("* Notifications")
+	cleaners.NewSchedulerCleaner().Purge()
 	removeNotifications()
 }
 
-func removeEvents() {
-
-	// Create client
-	client := &http.Client{}
-	url := config.Conf.Clients["CoreData"].Url() + clients.ApiEventRoute + "/scruball"
-	req, err := http.NewRequest("DELETE", url, nil)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	// Fetch Request
-	resp, errResp := client.Do(req)
-	if errResp != nil {
-		fmt.Println(errResp)
-		return
-	}
-
-	defer resp.Body.Close()
-
-	respBody, errBody := ioutil.ReadAll(resp.Body)
-	if errBody != nil {
-		fmt.Println(errBody)
-		return
-	}
-	fmt.Printf("Removed %v events\n", string(respBody))
-}
-
 func removeLogs() {
+	fmt.Println("\n * Logs")
 	ts := time.Now().Unix() * 1000
-
-	// Create client
-	client := &http.Client{}
-	url := config.Conf.Clients["Logging"].Url() + clients.ApiLoggingRoute + "/0"
-	req, err := http.NewRequest("DELETE", url+strconv.FormatInt(ts, 10), nil)
+	url := config.Conf.Clients["Logging"].Url() + clients.ApiLoggingRoute + "/0" + strconv.FormatInt(ts, 10)
+	_, err := client.DeleteItem(url)
 	if err != nil {
 		fmt.Println(err)
-		return
+	} else {
+		//TODO fix the message
+		fmt.Print("Logs removed\n")
 	}
-
-	// Fetch Request
-	resp, errResp := client.Do(req)
-	if errResp != nil {
-		fmt.Println(errResp)
-		return
-	}
-
-	respBody, errBody := ioutil.ReadAll(resp.Body)
-	if errBody != nil {
-		fmt.Println(errBody)
-		return
-	}
-
-	defer resp.Body.Close()
-
-	fmt.Printf("Removed %v logs\n", string(respBody))
 }
 
-func removeNotifications() {
-	// Create client
-	client := &http.Client{}
-	req, err := http.NewRequest("DELETE", config.Conf.Clients["Notification"].Url()+"/api/v1/cleanup", nil)
+func removeNotifications(){
+	fmt.Println("\n * Notifications")
+	url := config.Conf.Clients["Notification"].Url()+"/api/v1/cleanup"
+	_, err := client.DeleteItem(url)
 	if err != nil {
 		fmt.Println(err)
-		return
+	} else {
+		//TODO fix the message
+		fmt.Println("All Notification have been removed")
 	}
-
-	// Fetch Request
-	resp, errResp := client.Do(req)
-	if errResp != nil {
-		fmt.Println(errResp)
-		return
-	}
-
-	respBody, errBody := ioutil.ReadAll(resp.Body)
-	if errBody != nil {
-		fmt.Println(errBody)
-		return
-	}
-
-	defer resp.Body.Close()
-
-	fmt.Printf("Removed notifications %v\n", string(respBody))
 }
