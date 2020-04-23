@@ -15,6 +15,7 @@
 package config
 
 import (
+	"errors"
 	"fmt"
 	"github.com/BurntSushi/toml"
 	"os"
@@ -57,11 +58,9 @@ func LoadConfig(env Environment) error {
 	} else {
 		configFilePath = DefaultConfigFile
 	}
-	fmt.Printf("***** loading config file: %s\n", configFilePath)
 	if _, err := toml.DecodeFile(configFilePath, &Conf); err != nil {
 		fmt.Printf("Error occurred while parsing %s: %s", configFilePath, err)
-		//log.Fatalf("Error occured while parsing %s: %s", configFilePath, err)
-		return err
+		return errors.New(err.Error())
 	}
 	return nil
 }

@@ -20,6 +20,7 @@ import (
 	"github.com/stretchr/testify/mock"
 	"os"
 	"path/filepath"
+	"reflect"
 	"testing"
 
 	"github.com/edgexfoundry-holding/edgex-cli/config/mocks"
@@ -48,35 +49,35 @@ func TestGetConfig(t *testing.T) {
 		configFilePath    string
 		result            Configuration
 		expectError       bool
-		//expectedErrorType  *os.PathError
+		expectedErrorType  error
 	}{
 		{
 			name:              "Successful GetDefaultConfig",
 			env:               getDefaultConfigFileMockEnvSuccess(),
 			configFilePath:    DefaultConfigFile,
 			expectError:       false,
-			//expectedErrorType: nil,
+			expectedErrorType: nil,
 		},
 		{
 			name:              "Successful GetConfig",
 			env:               getConfigFileMockEnvSuccess(),
 			configFilePath:    ValidConfigFile,
 			expectError:       false,
-			//expectedErrorType: nil,
+			expectedErrorType: nil,
 		},
 		{
 			name:              "Unsuccessful decode Config",
 			env:               getConfigFileMockDecodeError(),
 			configFilePath:    InvalidTomlConfigFile,
 			expectError:       true,
-			//expectedErrorType: toml.parseError,
+			expectedErrorType: Error,
 		},
 		{
 			name:              "Unsuccessful GetConfig",
 			env:               getConfigFileMockEnvError(),
 			configFilePath:    NonExistentConfigFile,
 			expectError:       true,
-			//expectedErrorType: &os.PathError{"stat", NonExistentConfigFile, syscall.Errno(2)},
+			expectedErrorType: Error, //&os.PathError{"stat", NonExistentConfigFile, syscall.Errno(2)},
 		},
 	}
 
@@ -92,14 +93,13 @@ func TestGetConfig(t *testing.T) {
 				t.Errorf("We did not expect an error but got one. %s", err.Error())
 			}
 
-			// TODO fix error type checking
-			/*if test.expectError {
+			if test.expectError {
 				eet := reflect.TypeOf(test.expectedErrorType)
 				aet := reflect.TypeOf(err)
 				if !aet.AssignableTo(eet) {
 					t.Errorf("Expected error of type %v, but got an error of type %v", eet, aet)
 				}
-			}*/
+			}
 
 			return
 		})
