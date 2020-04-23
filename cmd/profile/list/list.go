@@ -17,13 +17,11 @@ package list
 import (
 	"context"
 	"fmt"
-	"io"
-	"text/tabwriter"
-	"time"
-
 	"github.com/edgexfoundry-holding/edgex-cli/config"
 	"github.com/edgexfoundry-holding/edgex-cli/pkg/urlclient"
 	"github.com/edgexfoundry-holding/edgex-cli/pkg/utils"
+	"io"
+	"text/tabwriter"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 	"github.com/edgexfoundry/go-mod-core-contracts/clients/metadata"
@@ -65,13 +63,11 @@ func NewCommand() *cobra.Command {
 			w.Init(pw, 0, 8, 1, '\t', 0)
 			fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t%s\t\n", "Profile ID", "Profile Name", "Created", "Modified", "Manufacturer", "Model")
 			for _, device := range profiles {
-				tCreated := time.Unix(device.Created/1000, 0)
-				tModified := time.Unix(device.Modified/1000, 0)
 				fmt.Fprintf(w, "%s\t%s\t%v\t%v\t%v\t%v\t\n",
 					device.Id,
 					device.Name,
-					utils.HumanDuration(time.Since(tCreated)),
-					utils.HumanDuration(time.Since(tModified)),
+					utils.DisplayDuration(device.Created),
+					utils.DisplayDuration(device.Modified),
 					device.Manufacturer,
 					device.Model,
 				)

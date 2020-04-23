@@ -16,6 +16,7 @@ package list
 
 import (
 	"fmt"
+	"github.com/edgexfoundry-holding/edgex-cli/pkg/utils"
 	"io"
 	"text/tabwriter"
 
