@@ -36,7 +36,7 @@ func NewCommand() *cobra.Command {
 		Use:   "list",
 		Short: "A list of all device services",
 		Long:  `Return all device services sorted by id.`,
-		Run: func(cmd *cobra.Command, args []string) {
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
 
 			ctx, _ := context.WithCancel(context.Background())
 
@@ -53,13 +53,13 @@ func NewCommand() *cobra.Command {
 
 			devices, err := mdc.Devices(ctx)
 			if err != nil {
-				fmt.Errorf(err.Error())
 				return
 			}
 
 			pw := viper.Get("writer").(io.Writer)
 			w := new(tabwriter.Writer)
 			w.Init(pw, 0, 8, 3, ' ', 0)
+			//TODO should we always check for err retuinred from fmt.Fprintf ?
 			_, err = fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t\n", "Device ID", "Device Name", "Operating State", "Device Service", "Device Profile")
 			if err != nil {
 				fmt.Println(err.Error())
@@ -73,14 +73,12 @@ func NewCommand() *cobra.Command {
 					device.Profile.Name,
 				)
 			}
-			if err != nil {
-				fmt.Errorf(err.Error())
-				return
-			}
+			//TODO we do not constantly check for errors returned by w.Flush(). SHould we do it in the entire project ?
 			err = w.Flush()
 			if err != nil {
-				fmt.Println(err.Error())
+				return
 			}
+			return
 		},
 	}
 	return cmd

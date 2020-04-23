@@ -16,109 +16,81 @@ package config
 
 import (
 	"errors"
+	"fmt"
+	"github.com/stretchr/testify/mock"
+	"os"
+	"path/filepath"
 	"reflect"
 	"testing"
-
-	"github.com/spf13/afero"
-	"github.com/stretchr/testify/mock"
 
 	"github.com/edgexfoundry-holding/edgex-cli/config/mocks"
 )
 
-var TestConfigFilePath = "config.yaml"
-var TestConfigDirPath = "testdata/"
-var TestCompletePath = TestConfigDirPath + TestConfigFilePath
-var TestInvalidConfigFilePath = ""
+var workDir, _ = os.Getwd()
+var ValidConfigFile = filepath.Join(workDir,  "..", "res", "configuration.toml")
+var NonExistentConfigFile = filepath.Join(workDir, "testdata", "nonExistentConfig.toml")
+var InvalidTomlConfigFile = filepath.Join(workDir, "testdata", "invalidConfig.toml")
 var Error = errors.New("test error")
 
 var TestConf = Configuration{
-	Host: "localhost",
-	SchedulerService: SchedulerService{
-		Port:                          "48085",
-		IntervalByIDRoute:             "interval",
-		IntervalByNameSlugRoute:       "interval/name/",
-		IntervalActionByIDRoute:       "intervalaction/",
-		IntervalActionByNameSlugRoute: "intervalaction/name/",
-	},
-	NotificationService: NotificationService{
-		Port:                        "48060",
-		SubscriptionByIDRoute:       "subscription",
-		SubscriptionByNameSlugRoute: "subscription/name/",
-		NotificationByAgeRoute:      "notification/age/",
-		NotificationByNameSlugRoute: "notification/slug/",
-	},
-	MetadataService: MetadataService{
-		Port:                         "48081",
-		DeviceServiceByIDRoute:       "deviceservice/id/",
-		DeviceServiceBySlugNameRoute: "deviceservice/name/",
-		DeviceByIDRoute:              "device/id/",
-		DeviceBySlugNameRoute:        "device/name/",
-		DeviceProfileByIDRoute:       "deviceprofile/id/",
-		DeviceProfileBySlugNameRoute: "deviceprofile/name/",
-		AddressableList:              "addressable",
-	},
-	DataService: DataService{
-		Port:                       "48080",
-		ReadingByIDRoute:           "reading/id/",
-		VDescriptorByIDRoute:       "valuedescriptor/id/",
-		VDescriptorByNameRoute:     "valuedescriptor/name/",
-		DeleteEventByDeviceIDRoute: "event/device/",
+	Clients: ClientInfo{
+		"Clients.Metadata": Client{Host: "localhost", Protocol: "http", Port: 48081},
+		"Clients.CoreData": Client{Host: "localhost", Protocol: "http", Port: 48080},
+		"Clients.Scheduler": Client{Host: "localhost", Protocol: "http", Port: 48085},
+		"Clients.Notification": Client{Host: "localhost", Protocol: "http", Port: 48060},
+		"Clients.Logging": Client{Host: "localhost", Protocol: "http", Port: 48061},
 	},
 }
 
-func TestSetConfig(t *testing.T) {
+func TestGetConfig(t *testing.T) {
 	tests := []struct {
 		name              string
 		env               Environment
 		configFilePath    string
-		configDirPath     string
+		result            Configuration
 		expectError       bool
-		expectedErrorType error
+		expectedErrorType  error
 	}{
 		{
-			name:              "Error ReadInConfig",
-			env:               createMockEnvReadInConfigErr(),
-			configFilePath:    TestConfigFilePath,
-			configDirPath:     TestConfigDirPath,
-			expectError:       true,
-			expectedErrorType: Error,
-		},
-		{
-			name:              "Successful SetConfig",
-			env:               createMockEnvSuccess(),
-			configFilePath:    TestConfigFilePath,
-			configDirPath:     TestConfigDirPath,
+			name:              "Successful GetDefaultConfig",
+			env:               getDefaultConfigFileMockEnvSuccess(),
+			configFilePath:    DefaultConfigFile,
 			expectError:       false,
 			expectedErrorType: nil,
 		},
-
 		{
-			name:              "Error Unmarshal",
-			env:               createMockEnvUnmarshalErr(),
-			configFilePath:    TestConfigFilePath,
-			configDirPath:     TestConfigDirPath,
+			name:              "Successful GetConfig",
+			env:               getConfigFileMockEnvSuccess(),
+			configFilePath:    ValidConfigFile,
+			expectError:       false,
+			expectedErrorType: nil,
+		},
+		{
+			name:              "Unsuccessful decode Config",
+			env:               getConfigFileMockDecodeError(),
+			configFilePath:    InvalidTomlConfigFile,
 			expectError:       true,
 			expectedErrorType: Error,
 		},
 		{
-			name:              "Error WriteConfig",
-			env:               createMockEnvWriteConfigErr(),
-			configFilePath:    TestConfigFilePath,
-			configDirPath:     TestConfigDirPath,
+			name:              "Unsuccessful GetConfig",
+			env:               getConfigFileMockEnvError(),
+			configFilePath:    NonExistentConfigFile,
 			expectError:       true,
-			expectedErrorType: Error,
+			expectedErrorType: Error, //&os.PathError{"stat", NonExistentConfigFile, syscall.Errno(2)},
 		},
 	}
+
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			err := SetConfig(test.env, test.configDirPath, test.configFilePath)
-
+			var err = LoadConfig(test.env)
+			fmt.Println(err)
 			if test.expectError && err == nil {
 				t.Error("We expected an error but did not get one")
 			}
 
 			if !test.expectError && err != nil {
-				t.Errorf("We do not expected an error but got one. %s", err.Error())
+				t.Errorf("We did not expect an error but got one. %s", err.Error())
 			}
 
 			if test.expectError {
@@ -134,141 +106,36 @@ func TestSetConfig(t *testing.T) {
 	}
 }
 
-func createMockEnvSuccess() Environment {
+func getDefaultConfigFileMockEnvSuccess() Environment {
 	dbMock := mocks.Environment{}
-	dbMock.On("SetConfigFile", TestCompletePath).Return(nil)
-	dbMock.On("ReadInConfig").Return(nil)
-	dbMock.On("Unmarshal", &TestConf).Return(nil)
-	dbMock.On("WriteConfig").Return(nil)
+	dbMock.On("SetConfigFile", DefaultConfigFile).Return(nil)
+	dbMock.On("GetString", "config-file").Return(DefaultConfigFile)
+	dbMock.On("IsSet", mock.Anything).Return(false)
+	return &dbMock
+}
+func getConfigFileMockEnvSuccess() Environment {
+	dbMock := mocks.Environment{}
+
+	dbMock.On("SetConfigFile", ValidConfigFile).Return(nil)
+	dbMock.On("GetString", "config-file").Return(ValidConfigFile)
+	dbMock.On("IsSet", mock.Anything).Return(true)
 	return &dbMock
 }
 
-func createMockEnvReadInConfigErr() Environment {
+func getConfigFileMockEnvError() Environment {
 	dbMock := mocks.Environment{}
-	dbMock.On("SetConfigFile", TestCompletePath).Return(nil)
-	dbMock.On("ReadInConfig").Return(Error)
-	dbMock.On("Unmarshal", &TestConf).Return(nil)
-	dbMock.On("WriteConfig").Return(nil)
+
+	dbMock.On("SetConfigFile", NonExistentConfigFile).Return(nil)
+	dbMock.On("GetString", "config-file").Return(NonExistentConfigFile)
+	dbMock.On("IsSet",mock.Anything).Return(true)
 	return &dbMock
 }
 
-func createMockEnvUnmarshalErr() Environment {
+func getConfigFileMockDecodeError() Environment {
 	dbMock := mocks.Environment{}
-	dbMock.On("SetConfigFile", TestCompletePath).Return(nil)
-	dbMock.On("ReadInConfig").Return(nil)
-	dbMock.On("Unmarshal", &TestConf).Return(Error)
-	dbMock.On("WriteConfig").Return(nil)
+
+	dbMock.On("SetConfigFile", InvalidTomlConfigFile).Return(nil)
+	dbMock.On("GetString", "config-file").Return(InvalidTomlConfigFile)
+	dbMock.On("IsSet",mock.Anything).Return(true)
 	return &dbMock
-}
-
-func createMockEnvWriteConfigErr() Environment {
-	dbMock := mocks.Environment{}
-	dbMock.On("SetConfigFile", TestCompletePath).Return(nil)
-	dbMock.On("ReadInConfig").Return(nil)
-	dbMock.On("Unmarshal", &TestConf).Return(nil)
-	dbMock.On("WriteConfig").Return(Error)
-	return &dbMock
-}
-
-func createFsMockSuccess() afero.Fs {
-	fsMock := mocks.Fs{}
-	fileMock := mocks.File{}
-	fileMock.On("Write", mock.Anything).Return(0, nil)
-	fileMock.On("Close").Return(nil)
-	fsMock.On("Create", TestConfigFilePath).Return(&fileMock, nil)
-	return &fsMock
-}
-
-func createFsMockErr() afero.Fs {
-	fsMock := mocks.Fs{}
-	fileMock := mocks.File{}
-	fileMock.On("Write", mock.Anything).Return(0, nil)
-	fileMock.On("Close").Return(nil)
-	fsMock.On("Create", TestConfigFilePath).Return(&fileMock, Error)
-	return &fsMock
-}
-
-func createFsMockFileCloseErr() afero.Fs {
-	fsMock := mocks.Fs{}
-	fileMock := mocks.File{}
-	fileMock.On("Write", mock.Anything).Return(0, nil)
-	fileMock.On("Close").Return(Error)
-	fsMock.On("Create", TestConfigFilePath).Return(&fileMock, nil)
-	return &fsMock
-}
-
-func createFsMockFileWriteErr() afero.Fs {
-	fsMock := mocks.Fs{}
-	fileMock := mocks.File{}
-	fileMock.On("Write", mock.Anything).Return(0, Error)
-	fileMock.On("Close").Return(Error)
-	fsMock.On("Create", TestConfigFilePath).Return(&fileMock, nil)
-	return &fsMock
-}
-
-func TestCreateDefaultFile(t *testing.T) {
-	tests := []struct {
-		name              string
-		fsMock            afero.Fs
-		configFilePath    string
-		configuration     *Configuration
-		expectError       bool
-		expectedErrorType error
-	}{
-		{
-			name:              "Successful creation",
-			fsMock:            createFsMockSuccess(),
-			configFilePath:    TestConfigFilePath,
-			configuration:     &TestConf,
-			expectError:       false,
-			expectedErrorType: nil,
-		},
-		{
-			name:              "Error Create",
-			fsMock:            createFsMockErr(),
-			configFilePath:    TestConfigFilePath,
-			configuration:     &TestConf,
-			expectError:       true,
-			expectedErrorType: Error,
-		},
-		{
-			name:              "Error File Write",
-			fsMock:            createFsMockFileWriteErr(),
-			configFilePath:    TestConfigFilePath,
-			configuration:     &TestConf,
-			expectError:       true,
-			expectedErrorType: Error,
-		},
-		{
-			name:              "Error File Close",
-			fsMock:            createFsMockFileCloseErr(),
-			configFilePath:    TestConfigFilePath,
-			configuration:     &TestConf,
-			expectError:       true,
-			expectedErrorType: Error,
-		},
-	}
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			err := createDefaultFile(test.configFilePath, test.configuration, test.fsMock)
-
-			if test.expectError && err == nil {
-				t.Error("We expected an error but did not get one")
-			}
-
-			if !test.expectError && err != nil {
-				t.Errorf("We do not expected an error but got one. %s", err.Error())
-			}
-
-			if test.expectError {
-				eet := reflect.TypeOf(test.expectedErrorType)
-				aet := reflect.TypeOf(err)
-				if !aet.AssignableTo(eet) {
-					t.Errorf("Expected error of type %v, but got an error of type %v", eet, aet)
-				}
-			}
-
-			return
-		})
-	}
 }

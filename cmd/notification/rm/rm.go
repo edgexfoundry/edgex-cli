@@ -28,8 +28,8 @@ import (
 // NewCommand returns the rm command of type cobra.Command
 var byAge bool
 
-func removeNotificationHandler(cmd *cobra.Command, args []string) {
-
+//TODO need revisit
+func removeNotificationHandler(cmd *cobra.Command, args []string) (err error){
 	// Checking for args
 	if len(args) == 0 {
 		fmt.Printf("Error: No profile ID/Name provided.\n")
@@ -44,9 +44,7 @@ func removeNotificationHandler(cmd *cobra.Command, args []string) {
 	}
 
 	respBody, err := client.DeleteItem(url)
-
 	if err != nil {
-		fmt.Println(err)
 		return
 	}
 
@@ -56,6 +54,7 @@ func removeNotificationHandler(cmd *cobra.Command, args []string) {
 	} else {
 		fmt.Printf("Remove Unsuccessful: %s\n", respBody)
 	}
+	return
 }
 
 func NewCommand() *cobra.Command {
@@ -64,7 +63,7 @@ func NewCommand() *cobra.Command {
 		Short: "Removes notification by slug or age",
 		Long:  `Removes a notification given its slug or age timestamp.`,
 		Args:  cobra.ExactValidArgs(1),
-		Run:   removeNotificationHandler,
+		RunE:   removeNotificationHandler,
 	}
 	cmd.Flags().BoolVar(&byAge, "age", false, "Remove by age")
 	return cmd

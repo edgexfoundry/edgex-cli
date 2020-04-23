@@ -9,15 +9,29 @@ type Environment struct {
 	mock.Mock
 }
 
-// ReadInConfig provides a mock function with given fields:
-func (_m *Environment) ReadInConfig() error {
-	ret := _m.Called()
+// GetString provides a mock function with given fields: _a0
+func (_m *Environment) GetString(_a0 string) string {
+	ret := _m.Called(_a0)
 
-	var r0 error
-	if rf, ok := ret.Get(0).(func() error); ok {
-		r0 = rf()
+	var r0 string
+	if rf, ok := ret.Get(0).(func(string) string); ok {
+		r0 = rf(_a0)
 	} else {
-		r0 = ret.Error(0)
+		r0 = ret.Get(0).(string)
+	}
+
+	return r0
+}
+
+// IsSet provides a mock function with given fields: _a0
+func (_m *Environment) IsSet(_a0 string) bool {
+	ret := _m.Called(_a0)
+
+	var r0 bool
+	if rf, ok := ret.Get(0).(func(string) bool); ok {
+		r0 = rf(_a0)
+	} else {
+		r0 = ret.Get(0).(bool)
 	}
 
 	return r0
@@ -26,32 +40,4 @@ func (_m *Environment) ReadInConfig() error {
 // SetConfigFile provides a mock function with given fields: _a0
 func (_m *Environment) SetConfigFile(_a0 string) {
 	_m.Called(_a0)
-}
-
-// Unmarshal provides a mock function with given fields: _a0
-func (_m *Environment) Unmarshal(_a0 interface{}) error {
-	ret := _m.Called(_a0)
-
-	var r0 error
-	if rf, ok := ret.Get(0).(func(interface{}) error); ok {
-		r0 = rf(_a0)
-	} else {
-		r0 = ret.Error(0)
-	}
-
-	return r0
-}
-
-// WriteConfig provides a mock function with given fields:
-func (_m *Environment) WriteConfig() error {
-	ret := _m.Called()
-
-	var r0 error
-	if rf, ok := ret.Get(0).(func() error); ok {
-		r0 = rf()
-	} else {
-		r0 = ret.Error(0)
-	}
-
-	return r0
 }

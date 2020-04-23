@@ -20,9 +20,8 @@ import (
 
 type Environment interface {
 	SetConfigFile(string)
-	ReadInConfig() error
-	Unmarshal(interface{}) error
-	WriteConfig() error
+	GetString(string) string
+	IsSet(string) bool
 }
 
 type ViperEnv struct{}
@@ -31,18 +30,15 @@ func (ViperEnv) SetConfigFile(configFilePath string) {
 	viper.SetConfigFile(configFilePath)
 }
 
-func (ViperEnv) ReadInConfig() error {
-	return viper.ReadInConfig()
+func (ViperEnv) IsSet(aStr string) bool {
+	return viper.IsSet(aStr)
 }
 
-func (ViperEnv) Unmarshal(conf interface{}) error {
-	return viper.Unmarshal(conf)
-}
-
-func (ViperEnv) WriteConfig() error {
-	return viper.WriteConfig()
+func (ViperEnv) GetString(key string) string {
+	return viper.GetString(key)
 }
 
 func NewViperEnv() Environment {
 	return ViperEnv{}
 }
+

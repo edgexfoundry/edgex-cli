@@ -30,17 +30,13 @@ import (
 	"github.com/spf13/viper"
 )
 
-//type deviceProfileList struct {
-//	rd []models.DeviceProfile
-//}
-
 // NewCommand return the list profiles command
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "list",
 		Short: "Returns a list of device profiles",
 		Long:  `Returns the list of device profiles currently in the core-metadata database.`,
-		Run: func(cmd *cobra.Command, args []string) {
+		RunE: func(cmd *cobra.Command, args []string) (err error){
 
 			ctx, _ := context.WithCancel(context.Background())
 			url := config.Conf.Clients["Metadata"].Url()
@@ -56,9 +52,7 @@ func NewCommand() *cobra.Command {
 			)
 
 			profiles, err := mdc.DeviceProfiles(ctx)
-
 			if err != nil {
-				fmt.Println(err)
 				return
 			}
 
@@ -79,6 +73,7 @@ func NewCommand() *cobra.Command {
 				)
 			}
 			w.Flush()
+			return
 		},
 	}
 	return cmd

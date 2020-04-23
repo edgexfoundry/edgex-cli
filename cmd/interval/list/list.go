@@ -21,6 +21,7 @@ import (
 	"text/tabwriter"
 
 	"github.com/edgexfoundry-holding/edgex-cli/config"
+	client "github.com/edgexfoundry-holding/edgex-cli/pkg"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 	"github.com/edgexfoundry/go-mod-core-contracts/models"
@@ -32,8 +33,8 @@ import (
 var limit int32
 var byID bool
 
-func listHandler(cmd *cobra.Command, args []string) {
-	var url string = config.Conf.Clients["Scheduler"].Url() + clients.ApiIntervalRoute
+func listHandler(cmd *cobra.Command, args []string) (err error){
+	var url = config.Conf.Clients["Scheduler"].Url() + clients.ApiIntervalRoute
 	if len(args) > 0 {
 		if byID {
 			url += "/" + args[0]
@@ -43,9 +44,8 @@ func listHandler(cmd *cobra.Command, args []string) {
 
 	}
 	var intervals []models.Interval
-	err := utils.ListHelper(url, intervals)
+	err = client.ListHelper(url, &intervals)
 	if err != nil {
-		fmt.Println(err)
 		return
 	}
 
@@ -66,8 +66,8 @@ func listHandler(cmd *cobra.Command, args []string) {
 		)
 	}
 	w.Flush()
+	return
 }
-
 
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
@@ -75,7 +75,7 @@ func NewCommand() *cobra.Command {
 		Short: "A list of all intervals",
 		Long:  `Return a list of all intervals.`,
 		Args:  cobra.MaximumNArgs(1),
-		Run:   listHandler,
+		RunE:   listHandler,
 	}
 	cmd.Flags().BoolVar(&byID, "id", false, "By ID")
 	return cmd

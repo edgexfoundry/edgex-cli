@@ -15,7 +15,6 @@
 package list
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/edgexfoundry-holding/edgex-cli/config"
 	client "github.com/edgexfoundry-holding/edgex-cli/pkg"
@@ -36,19 +35,11 @@ func NewCommand() *cobra.Command {
 		Use:   "list",
 		Short: "Lists existing devices services",
 		Long:  `Return the list fo current device services.`,
-		Run: func(cmd *cobra.Command, args []string) {
-			data, err := client.GetAllItems(config.Conf.Clients["Metadata"].Url() + clients.ApiDeviceServiceRoute)
-
+		RunE: func(cmd *cobra.Command, args []string) (err error){
+			url := config.Conf.Clients["Metadata"].Url() + clients.ApiDeviceServiceRoute
+			var deviceServices []models.DeviceService
+			err = client.ListHelper(url, &deviceServices)
 			if err != nil {
-				fmt.Println(err)
-				return
-			}
-
-			deviceServices := []models.DeviceService{}
-
-			err = json.Unmarshal(data, &deviceServices)
-			if err != nil {
-				fmt.Println(err)
 				return
 			}
 
@@ -65,6 +56,7 @@ func NewCommand() *cobra.Command {
 				)
 			}
 			w.Flush()
+			return
 		},
 	}
 	return cmd
