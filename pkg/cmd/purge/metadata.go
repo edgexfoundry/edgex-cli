@@ -57,10 +57,10 @@ func (d *metadataCleaner) cleanDevices() {
 		if err != nil {
 			fmt.Printf("Failed to delete Device with id %s because of error: %s", device.Id, err)
 		} else {
-			count = count +1
+			count = count + 1
 		}
 	}
-	fmt.Sprintf("Removed %d Devices from %d \n", count, len(devices))
+	fmt.Printf("Removed %d Devices from %d \n", count, len(devices))
 }
 
 func (d *metadataCleaner) cleanDeviceServices() {
@@ -78,7 +78,7 @@ func (d *metadataCleaner) cleanDeviceServices() {
 		if err != nil {
 			fmt.Printf("Failed to delete Device Service with id %s because of error: %s", deviceService.Id, err)
 		} else {
-			count = count +1
+			count = count + 1
 		}
 	}
 
@@ -100,7 +100,7 @@ func (d *metadataCleaner) cleanDeviceProfiles() {
 		if err != nil {
 			fmt.Printf("Failed to delete Device Profile with id %s because of error: %s", deviceProfile.Id, err)
 		} else {
-			count = count +1
+			count = count + 1
 		}
 	}
 	fmt.Printf("Removed %d Device Profile from %d \n", count, len(deviceProfiles))
@@ -121,7 +121,7 @@ func (d *metadataCleaner) cleanAddressables() {
 		if err != nil {
 			fmt.Printf("Failed to delete Addressable with id %s because of error: %s", addr.Id, err)
 		} else {
-			count = count +1
+			count = count + 1
 		}
 	}
 	fmt.Printf("Removed %d Addressable from %d \n", count, len(addressables))

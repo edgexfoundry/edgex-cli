@@ -109,13 +109,8 @@ func DeleteItem(url string) ([]byte, error) {
 		for k, v := range resp.Header {
 			fmt.Printf("%v : %v\n", k, v)
 		}
-
-		if errBody != nil {
-			fmt.Println(errBody)
-		} else {
-			fmt.Println("BODY")
-			fmt.Println(string(respBody))
-		}
+		fmt.Println("BODY")
+		fmt.Println(string(respBody))
 	}
 
 	return respBody, nil

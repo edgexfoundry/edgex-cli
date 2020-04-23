@@ -38,9 +38,9 @@ func removeNotificationHandler(cmd *cobra.Command, args []string) (err error){
 
 	url := config.Conf.Clients["Notification"].Url() + clients.ApiNotificationRoute
 	if byAge {
-		url = "/age/" + args[0]
+		url += "/age/" + args[0]
 	} else {
-		url = "/slug/" + args[0]
+		url += "/slug/" + args[0]
 	}
 
 	respBody, err := client.DeleteItem(url)

@@ -47,7 +47,7 @@ func TestGetConfig(t *testing.T) {
 		name              string
 		env               Environment
 		configFilePath    string
-		result            Configuration
+		//result            Configuration
 		expectError       bool
 		expectedErrorType  error
 	}{
@@ -100,8 +100,6 @@ func TestGetConfig(t *testing.T) {
 					t.Errorf("Expected error of type %v, but got an error of type %v", eet, aet)
 				}
 			}
-
-			return
 		})
 	}
 }
