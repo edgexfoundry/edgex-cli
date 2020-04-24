@@ -3,7 +3,7 @@ package purge
 import (
 	"fmt"
 	"github.com/edgexfoundry-holding/edgex-cli/config"
-	client "github.com/edgexfoundry-holding/edgex-cli/pkg"
+	request "github.com/edgexfoundry-holding/edgex-cli/pkg"
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 	"github.com/edgexfoundry/go-mod-core-contracts/models"
 )
@@ -34,7 +34,7 @@ func (d *schedulerCleaner) Purge() {
 func (d *schedulerCleaner) cleanIntervals(){
 	url := d.baseUrl + clients.ApiIntervalRoute
 	var intervals []models.Interval
-	err := client.ListHelper(url, &intervals)
+	err := request.Get(url, &intervals)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -42,7 +42,7 @@ func (d *schedulerCleaner) cleanIntervals(){
 
 	var count int
 	for _, interval := range intervals {
-		_, err = client.DeleteItem(url + "/" + interval.ID)
+		err = request.Delete(url + "/" + interval.ID)
 		if err != nil {
 			fmt.Printf("Failed to delete Internals with id %s because of error: %s", interval.ID, err)
 		} else {
@@ -55,7 +55,7 @@ func (d *schedulerCleaner) cleanIntervals(){
 func (d *schedulerCleaner) cleanIntervalActions() {
 	url := d.baseUrl + clients.ApiIntervalActionRoute
 	var intervalActions []models.IntervalAction
-	err := client.ListHelper(url, &intervalActions)
+	err := request.Get(url, &intervalActions)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -63,7 +63,7 @@ func (d *schedulerCleaner) cleanIntervalActions() {
 
 	var count int
 	for _, intervalAction := range intervalActions {
-		_, err = client.DeleteItem(url + "/" + intervalAction.ID)
+		err = request.Delete(url + "/" + intervalAction.ID)
 
 		if err != nil {
 			fmt.Printf("Failed to delete Internal Actions with id %s because of error: %s", intervalAction.ID, err)

@@ -25,7 +25,7 @@ import (
 	"time"
 
 	"github.com/edgexfoundry-holding/edgex-cli/config"
-	client "github.com/edgexfoundry-holding/edgex-cli/pkg"
+	request "github.com/edgexfoundry-holding/edgex-cli/pkg"
 	cleaners "github.com/edgexfoundry-holding/edgex-cli/pkg/cmd/purge"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
@@ -119,23 +119,23 @@ func removeLogs() {
 	fmt.Println("\n * Logs")
 	ts := time.Now().Unix() * 1000
 	url := config.Conf.Clients["Logging"].Url() + clients.ApiLoggingRoute + "/0/" + strconv.FormatInt(ts, 10)
-	_, err := client.DeleteItem(url)
+	err := request.Delete(url)
 	if err != nil {
 		fmt.Println(err)
 	} else {
 		//TODO fix the message
-		fmt.Print("Logs removed\n")
+		fmt.Print("Logs have been removed\n")
 	}
 }
 
 func removeNotifications(){
 	fmt.Println("\n * Notifications")
 	url := config.Conf.Clients["Notification"].Url()+"/api/v1/cleanup"
-	_, err := client.DeleteItem(url)
+	err := request.Delete(url)
 	if err != nil {
 		fmt.Println(err)
 	} else {
 		//TODO fix the message
-		fmt.Println("All Notification have been removed")
+		fmt.Println("Notifications have been removed")
 	}
 }

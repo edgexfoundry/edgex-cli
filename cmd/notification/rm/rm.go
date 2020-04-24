@@ -18,7 +18,7 @@ import (
 	"fmt"
 
 	"github.com/edgexfoundry-holding/edgex-cli/config"
-	client "github.com/edgexfoundry-holding/edgex-cli/pkg"
+	request "github.com/edgexfoundry-holding/edgex-cli/pkg"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 
@@ -43,17 +43,12 @@ func removeNotificationHandler(cmd *cobra.Command, args []string) (err error){
 		url += "/slug/" + args[0]
 	}
 
-	respBody, err := client.DeleteItem(url)
+	err = request.Delete(url)
 	if err != nil {
+		fmt.Printf("Failed to remove Notification `%s`: %s\n", args[0], err)
 		return
 	}
-
-	// Display Results
-	if string(respBody) == "true" {
-		fmt.Printf("Removed: %s\n", args[0])
-	} else {
-		fmt.Printf("Remove Unsuccessful: %s\n", respBody)
-	}
+	fmt.Printf("Removed: %s\n",  args[0])
 	return
 }
 

@@ -20,7 +20,7 @@ import (
 	"text/tabwriter"
 
 	"github.com/edgexfoundry-holding/edgex-cli/config"
-	client "github.com/edgexfoundry-holding/edgex-cli/pkg"
+	request "github.com/edgexfoundry-holding/edgex-cli/pkg"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 	"github.com/edgexfoundry/go-mod-core-contracts/models"
@@ -38,7 +38,7 @@ func NewCommand() *cobra.Command {
 			//TODO Open issue in go-mod-contracts to extend the AddressableClient interface to support getAll Addressable
 			url := config.Conf.Clients["Metadata"].Url() + clients.ApiAddressableRoute
 			var addr []models.Addressable
-			err = client.ListHelper(url, &addr)
+			err = request.Get(url, &addr)
 			if err != nil {
 				return
 			}

@@ -20,7 +20,7 @@ import (
 	"text/tabwriter"
 
 	"github.com/edgexfoundry-holding/edgex-cli/config"
-	client "github.com/edgexfoundry-holding/edgex-cli/pkg"
+	request "github.com/edgexfoundry-holding/edgex-cli/pkg"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 	"github.com/edgexfoundry/go-mod-core-contracts/models"
@@ -42,7 +42,7 @@ func listHandler(cmd *cobra.Command, args []string) (err error){
 
 	}
 	var intervals []models.Interval
-	err = client.ListHelper(url, &intervals)
+	err = request.Get(url, &intervals)
 	if err != nil {
 		return
 	}

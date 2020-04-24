@@ -17,7 +17,7 @@ package list
 import (
 	"fmt"
 	"github.com/edgexfoundry-holding/edgex-cli/config"
-	client "github.com/edgexfoundry-holding/edgex-cli/pkg"
+	request "github.com/edgexfoundry-holding/edgex-cli/pkg"
 	"github.com/edgexfoundry-holding/edgex-cli/pkg/utils"
 	"io"
 	"text/tabwriter"
@@ -38,7 +38,7 @@ func NewCommand() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) (err error){
 			url := config.Conf.Clients["Metadata"].Url() + clients.ApiDeviceServiceRoute
 			var deviceServices []models.DeviceService
-			err = client.ListHelper(url, &deviceServices)
+			err = request.Get(url, &deviceServices)
 			if err != nil {
 				return
 			}

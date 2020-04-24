@@ -18,7 +18,7 @@ import (
 	"fmt"
 
 	"github.com/edgexfoundry-holding/edgex-cli/config"
-	client "github.com/edgexfoundry-holding/edgex-cli/pkg"
+	request "github.com/edgexfoundry-holding/edgex-cli/pkg"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 
@@ -38,23 +38,16 @@ func removeSubscriptionHandler(cmd *cobra.Command, args []string) {
 	// Create request
 	subscriptionlID := args[0]
 	url:=config.Conf.Clients["Notification"].Url() + clients.ApiSubscriptionRoute
-	respBody, err := client.DeleteItemByIdOrName(subscriptionlID,
+	err := request.DeleteItemByIdOrName(subscriptionlID,
 		"/",
 		config.PathName,
 		url)
 
 	if err != nil {
-		fmt.Println(err)
+		fmt.Printf("Failed to remove substcription `%s`: %s\n", subscriptionlID, err)
 		return
 	}
-
-	// Display Results
-	//TODO should check if the http.status code 200 , but if the body is true +
-	if string(respBody) == "true" {
-		fmt.Printf("Removed: %s\n", subscriptionlID)
-	} else {
-		fmt.Printf("Remove Unsuccessful!\n")
-	}
+	fmt.Printf("Subscription Removed: %s\n", subscriptionlID)
 }
 
 // NewCommand returns remove subscription command

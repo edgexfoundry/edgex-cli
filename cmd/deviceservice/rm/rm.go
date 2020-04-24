@@ -18,7 +18,7 @@ import (
 	"fmt"
 
 	"github.com/edgexfoundry-holding/edgex-cli/config"
-	client "github.com/edgexfoundry-holding/edgex-cli/pkg"
+	request "github.com/edgexfoundry-holding/edgex-cli/pkg"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 
@@ -39,24 +39,18 @@ func NewCommand() *cobra.Command {
 				return
 			}
 
-			deviceID := args[0]
+			dsId := args[0]
 			url:=config.Conf.Clients["Metadata"].Url()+ clients.ApiDeviceServiceRoute
-			respBody, err := client.DeleteItemByIdOrName(deviceID,
+			err := request.DeleteItemByIdOrName(dsId,
 				config.PathId,
 			    config.PathName,
-				 url)
+			    url)
 
 			if err != nil {
-				fmt.Println(err)
+				fmt.Printf("Failed to remove Device service `%s`.\nError: %s\n", dsId, err )
 				return
 			}
-
-			// Display Results
-			if string(respBody) == "true" {
-				fmt.Printf("Removed: %s\n", deviceID)
-			} else {
-				fmt.Printf("Remove Unsuccessful: %s\n", string(respBody))
-			}
+			fmt.Printf("Removed: %s\n", dsId)
 		},
 	}
 	return cmd

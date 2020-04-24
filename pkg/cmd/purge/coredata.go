@@ -3,7 +3,7 @@ package purge
 import (
 	"fmt"
 	"github.com/edgexfoundry-holding/edgex-cli/config"
-	client "github.com/edgexfoundry-holding/edgex-cli/pkg"
+	request "github.com/edgexfoundry-holding/edgex-cli/pkg"
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 	"github.com/edgexfoundry/go-mod-core-contracts/models"
 )
@@ -35,7 +35,7 @@ func (d *coredataCleaner) Purge() {
 func (d *coredataCleaner) cleanReadings() {
 	url := d.baseUrl + clients.ApiReadingRoute
 	var readings []models.Reading
-	err := client.ListHelper(url, readings)
+	err := request.Get(url, readings)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -44,7 +44,7 @@ func (d *coredataCleaner) cleanReadings() {
 	var count int
 	for _, reading := range readings {
 		// call delete function here
-		_, err = client.DeleteItem(url + config.PathId + reading.Id)
+		err = request.Delete(url + config.PathId + reading.Id)
 		if err != nil {
 			fmt.Printf("Failed to delete Reading with id %s because of error: %s", reading.Id, err)
 		} else {
@@ -57,7 +57,7 @@ func (d *coredataCleaner) cleanReadings() {
 func (d *coredataCleaner) cleanValueDescriptors() {
 	url := d.baseUrl + clients.ApiValueDescriptorRoute
 	var valueDescriptors []models.ValueDescriptor
-	err := client.ListHelper(url, valueDescriptors)
+	err := request.Get(url, valueDescriptors)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -65,7 +65,7 @@ func (d *coredataCleaner) cleanValueDescriptors() {
 
 	var count int
 	for _, valueDescriptor := range valueDescriptors {
-		_, err = client.DeleteItem(url + config.PathId + valueDescriptor.Id)
+		err = request.Delete(url + config.PathId + valueDescriptor.Id)
 		if err != nil {
 			fmt.Printf("Failed to delete Value Descriptor with id %s because of error: %s", valueDescriptor.Id, err)
 		} else {
@@ -77,7 +77,7 @@ func (d *coredataCleaner) cleanValueDescriptors() {
 
 func (d *coredataCleaner) cleanEvents() {
 	url := d.baseUrl + clients.ApiEventRoute + "/scruball"
-	_, err := client.DeleteItem(url)
+	err := request.Delete(url)
 	if err != nil {
 		fmt.Println(err)
 	} else {
