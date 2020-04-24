@@ -118,7 +118,7 @@ func purge() {
 func removeLogs() {
 	fmt.Println("\n * Logs")
 	ts := time.Now().Unix() * 1000
-	url := config.Conf.Clients["Logging"].Url() + clients.ApiLoggingRoute + "/0" + strconv.FormatInt(ts, 10)
+	url := config.Conf.Clients["Logging"].Url() + clients.ApiLoggingRoute + "/0/" + strconv.FormatInt(ts, 10)
 	_, err := client.DeleteItem(url)
 	if err != nil {
 		fmt.Println(err)
