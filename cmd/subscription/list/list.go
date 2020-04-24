@@ -21,7 +21,7 @@ import (
 	"text/tabwriter"
 
 	"github.com/edgexfoundry-holding/edgex-cli/config"
-	client "github.com/edgexfoundry-holding/edgex-cli/pkg"
+	request "github.com/edgexfoundry-holding/edgex-cli/pkg"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 	"github.com/spf13/cobra"
@@ -37,7 +37,7 @@ func NewCommand() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) (err error){
 			url:=config.Conf.Clients["Notification"].Url()+clients.ApiSubscriptionRoute
 			var subscriptions []models.Subscription
-			err = client.ListHelper(url, &subscriptions)
+			err = request.Get(url, &subscriptions)
 			if err != nil {
 				return
 			}

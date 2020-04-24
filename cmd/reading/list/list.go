@@ -21,7 +21,7 @@ import (
 	"text/tabwriter"
 
 	"github.com/edgexfoundry-holding/edgex-cli/config"
-	client "github.com/edgexfoundry-holding/edgex-cli/pkg"
+	request "github.com/edgexfoundry-holding/edgex-cli/pkg"
 	"github.com/edgexfoundry-holding/edgex-cli/pkg/utils"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
@@ -57,7 +57,7 @@ func NewCommand() *cobra.Command {
 			}
 			var readings []models.Reading
 
-			err = client.ListHelper(url, &readings)
+			err = request.Get(url, &readings)
 			if err != nil {
 
 				return

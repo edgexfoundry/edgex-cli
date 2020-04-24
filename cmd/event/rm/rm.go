@@ -62,25 +62,6 @@ func NewCommand() *cobra.Command {
 
 			fmt.Println("Removing events for device:")
 			fmt.Println(deviceID)
-
-			//respBody, err := client.DeleteItemByName(deviceID,
-			//	config.Conf.CoreData.DeleteEventByDeviceIDRoute,
-			//	config.Conf.CoreData.Port)
-			//
-			//if err != nil {
-			//	fmt.Println(err)
-			//	return
-			//}
-			//
-			//// Display Results
-			//if string(respBody) == "0" {
-			//	fmt.Printf("Removed events for device: %s\n", deviceID)
-			//} else {
-			//	fmt.Printf("Remove Unsuccessful!\n")
-			//}
-			//
-			//fmt.Println("Removing events for device:")
-			//fmt.Println(deviceID)
 		},
 	}
 	return cmd

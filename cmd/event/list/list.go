@@ -23,7 +23,7 @@ import (
 
 
 	"github.com/edgexfoundry-holding/edgex-cli/config"
-	 client "github.com/edgexfoundry-holding/edgex-cli/pkg"
+	 request "github.com/edgexfoundry-holding/edgex-cli/pkg"
 	"github.com/edgexfoundry-holding/edgex-cli/pkg/utils"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
@@ -59,7 +59,7 @@ func NewCommand() *cobra.Command {
 			}
 
 			var events []models.Event
-			err = client.ListHelper(url, &events)
+			err = request.Get(url, &events)
 			if err != nil {
 				return
 			}

@@ -23,6 +23,8 @@ import (
 )
 
 // New is a factory function that uses parameters defined in edgex-go to decide which implementation of URLClient to use
+
+//deprecated
 func New(
 	ctx context.Context,
 	serviceKey string,
@@ -30,5 +32,10 @@ func New(
 	interval int,
 	url string) interfaces.URLClient {
 
+	return local.New(url)
+}
+
+//TODO Should contain context.
+func NewA(url string) interfaces.URLClient {
 	return local.New(url)
 }

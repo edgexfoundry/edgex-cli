@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/edgexfoundry-holding/edgex-cli/config"
-	client "github.com/edgexfoundry-holding/edgex-cli/pkg"
+	request "github.com/edgexfoundry-holding/edgex-cli/pkg"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 	"github.com/edgexfoundry/go-mod-core-contracts/clients/metadata"
@@ -53,7 +53,7 @@ func (d *metadataCleaner) cleanDevices() {
 
 	var count int
 	for _, device := range devices {
-		_, err = client.DeleteItem(url + config.PathId + device.Id)
+		err = request.Delete(url + config.PathId + device.Id)
 		if err != nil {
 			fmt.Printf("Failed to delete Device with id %s because of error: %s", device.Id, err)
 		} else {
@@ -66,7 +66,7 @@ func (d *metadataCleaner) cleanDevices() {
 func (d *metadataCleaner) cleanDeviceServices() {
 	url := d.baseUrl + clients.ApiDeviceServiceRoute
 	var deviceServices []models.DeviceService
-	err := client.ListHelper(url, &deviceServices)
+	err := request.Get(url, &deviceServices)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -74,7 +74,7 @@ func (d *metadataCleaner) cleanDeviceServices() {
 
 	var count int
 	for _, deviceService := range deviceServices {
-		_, err = client.DeleteItem(url + config.PathId + deviceService.Id)
+		err = request.Delete(url + config.PathId + deviceService.Id)
 		if err != nil {
 			fmt.Printf("Failed to delete Device Service with id %s because of error: %s", deviceService.Id, err)
 		} else {
@@ -88,7 +88,7 @@ func (d *metadataCleaner) cleanDeviceServices() {
 func (d *metadataCleaner) cleanDeviceProfiles() {
 	url := d.baseUrl + clients.ApiDeviceProfileRoute
 	var deviceProfiles []models.DeviceProfile
-	err := client.ListHelper(url, &deviceProfiles)
+	err := request.Get(url, &deviceProfiles)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -96,7 +96,7 @@ func (d *metadataCleaner) cleanDeviceProfiles() {
 
 	var count int
 	for _, deviceProfile := range deviceProfiles {
-		_, err = client.DeleteItem(url + config.PathId + deviceProfile.Id)
+		err = request.Delete(url + config.PathId + deviceProfile.Id)
 		if err != nil {
 			fmt.Printf("Failed to delete Device Profile with id %s because of error: %s", deviceProfile.Id, err)
 		} else {
@@ -109,7 +109,7 @@ func (d *metadataCleaner) cleanDeviceProfiles() {
 func (d *metadataCleaner) cleanAddressables() {
 	url := d.baseUrl + clients.ApiAddressableRoute
 	var addressables []models.Addressable
-	err := client.ListHelper(url, &addressables)
+	err := request.Get(url, &addressables)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -117,7 +117,7 @@ func (d *metadataCleaner) cleanAddressables() {
 
 	var count int
 	for _, addr := range addressables {
-		_, err = client.DeleteItem(url + config.PathId + addr.Id)
+		err = request.Delete(url + config.PathId + addr.Id)
 		if err != nil {
 			fmt.Printf("Failed to delete Addressable with id %s because of error: %s", addr.Id, err)
 		} else {
