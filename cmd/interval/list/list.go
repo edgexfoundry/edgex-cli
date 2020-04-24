@@ -29,7 +29,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-var limit int32
 var byID bool
 
 func listHandler(cmd *cobra.Command, args []string) (err error){

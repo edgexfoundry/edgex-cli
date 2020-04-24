@@ -10,8 +10,8 @@ import (
 
 type SchedulerCleaner interface {
 	Purge()
-	cleanIntervals() error
-	cleanIntervalActions() error
+	cleanIntervals()
+	cleanIntervalActions()
 }
 
 type schedulerCleaner struct {
@@ -31,11 +31,12 @@ func (d *schedulerCleaner) Purge() {
 	d.cleanIntervalActions()
 }
 
-func (d *schedulerCleaner) cleanIntervals() (err error) {
+func (d *schedulerCleaner) cleanIntervals(){
 	url := d.baseUrl + clients.ApiIntervalRoute
 	var intervals []models.Interval
-	err = client.ListHelper(url, &intervals)
+	err := client.ListHelper(url, &intervals)
 	if err != nil {
+		fmt.Println(err)
 		return
 	}
 
@@ -49,14 +50,14 @@ func (d *schedulerCleaner) cleanIntervals() (err error) {
 		}
 	}
 	fmt.Printf("Removed %d Intervals from %d \n", count, len(intervals))
-	return
 }
 
-func (d *schedulerCleaner) cleanIntervalActions() (err error) {
+func (d *schedulerCleaner) cleanIntervalActions() {
 	url := d.baseUrl + clients.ApiIntervalActionRoute
 	var intervalActions []models.IntervalAction
-	err = client.ListHelper(url, &intervalActions)
+	err := client.ListHelper(url, &intervalActions)
 	if err != nil {
+		fmt.Println(err)
 		return
 	}
 
@@ -71,5 +72,4 @@ func (d *schedulerCleaner) cleanIntervalActions() (err error) {
 		}
 	}
 	fmt.Printf("Removed %d Interval Actions from %d \n", count, len(intervalActions))
-	return
 }
