@@ -90,7 +90,7 @@ func NewCommand() *cobra.Command {
 				}
 			}
 		},
-		Use:   "edgex",
+		Use:   "edgex-cli",
 		Short: "EdgeX command line interface",
 		Long: "\n" +
 
