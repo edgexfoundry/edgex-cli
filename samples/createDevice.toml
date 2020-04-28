@@ -1,0 +1,24 @@
+[[DeviceList]]
+Name = "Car-001"
+Profile = "car tachometer profile"
+Description = "my test"
+Service = "car tachometer device service"
+AddressableName = "TestAddressable"
+Labels = [
+  "car",
+  "rev-counter",
+  "tachometer"
+]
+AutoEvents = []
+
+  [DeviceList.Protocols]
+
+    [DeviceList.Protocols.modbus-tcp]
+    host = "localhost"
+    port = "1029"
+    unitID = "1"
+
+    [DeviceList.Protocols.modbus-http]
+    host = "localhost"
+    port = "1029"
+    unitID = "1"
