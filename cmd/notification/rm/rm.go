@@ -44,11 +44,9 @@ func removeNotificationHandler(cmd *cobra.Command, args []string) (err error){
 	}
 
 	err = request.Delete(url)
-	if err != nil {
-		fmt.Printf("Failed to remove Notification `%s`: %s\n", args[0], err)
-		return
+	if err == nil {
+		fmt.Printf("Removed: %s\n",  args[0])
 	}
-	fmt.Printf("Removed: %s\n",  args[0])
 	return
 }
 

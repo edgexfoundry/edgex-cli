@@ -59,7 +59,6 @@ func NewCommand() *cobra.Command {
 
 			err = request.Get(url, &readings)
 			if err != nil {
-
 				return
 			}
 

@@ -36,16 +36,13 @@ func (d *schedulerCleaner) cleanIntervals(){
 	var intervals []models.Interval
 	err := request.Get(url, &intervals)
 	if err != nil {
-		fmt.Println(err)
 		return
 	}
 
 	var count int
 	for _, interval := range intervals {
 		err = request.Delete(url + "/" + interval.ID)
-		if err != nil {
-			fmt.Printf("Failed to delete Internals with id %s because of error: %s", interval.ID, err)
-		} else {
+		if err == nil {
 			count = count +1
 		}
 	}
@@ -57,17 +54,13 @@ func (d *schedulerCleaner) cleanIntervalActions() {
 	var intervalActions []models.IntervalAction
 	err := request.Get(url, &intervalActions)
 	if err != nil {
-		fmt.Println(err)
 		return
 	}
 
 	var count int
 	for _, intervalAction := range intervalActions {
 		err = request.Delete(url + "/" + intervalAction.ID)
-
-		if err != nil {
-			fmt.Printf("Failed to delete Internal Actions with id %s because of error: %s", intervalAction.ID, err)
-		} else {
+		if err == nil {
 			count = count +1
 		}
 	}

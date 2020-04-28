@@ -22,6 +22,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+//deprecated
 func NewCommand() *cobra.Command {
 	var cmd = &cobra.Command{
 		Use:   "subscription",

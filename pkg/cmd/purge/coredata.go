@@ -37,7 +37,6 @@ func (d *coredataCleaner) cleanReadings() {
 	var readings []models.Reading
 	err := request.Get(url, readings)
 	if err != nil {
-		fmt.Println(err)
 		return
 	}
 
@@ -45,9 +44,7 @@ func (d *coredataCleaner) cleanReadings() {
 	for _, reading := range readings {
 		// call delete function here
 		err = request.Delete(url + config.PathId + reading.Id)
-		if err != nil {
-			fmt.Printf("Failed to delete Reading with id %s because of error: %s", reading.Id, err)
-		} else {
+		if err == nil {
 			count = count +1
 		}
 	}
@@ -59,16 +56,13 @@ func (d *coredataCleaner) cleanValueDescriptors() {
 	var valueDescriptors []models.ValueDescriptor
 	err := request.Get(url, valueDescriptors)
 	if err != nil {
-		fmt.Println(err)
 		return
 	}
 
 	var count int
 	for _, valueDescriptor := range valueDescriptors {
 		err = request.Delete(url + config.PathId + valueDescriptor.Id)
-		if err != nil {
-			fmt.Printf("Failed to delete Value Descriptor with id %s because of error: %s", valueDescriptor.Id, err)
-		} else {
+		if err == nil {
 			count = count +1
 		}
 	}
