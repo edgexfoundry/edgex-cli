@@ -5,18 +5,18 @@
 package add
 
 import (
-	"bytes"
+	"context"
 	"fmt"
-	"io"
+	"gopkg.in/yaml.v2"
 	"io/ioutil"
-	"mime/multipart"
-	"net/http"
-	"os"
-	"path/filepath"
+
+	"github.com/edgexfoundry-holding/edgex-cli/pkg/urlclient"
+	"github.com/edgexfoundry/go-mod-core-contracts/clients/metadata"
 
 	"github.com/edgexfoundry-holding/edgex-cli/config"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
+	"github.com/edgexfoundry/go-mod-core-contracts/models"
 
 	"github.com/spf13/cobra"
 )
@@ -28,66 +28,51 @@ func NewCommand() *cobra.Command {
 		Short: "Add device profiles",
 		Long:  `Upload the given YAML files to core-metadata for device profile creation.`,
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Println("Add Device Profiles:")
-			client := &http.Client{}
-			for _, val := range args {
-				fmt.Print(val, "... ")
-				// Open file
-				data, err := os.Open(val)
+			for _, fname := range args {
+				dp, err := parseYaml(fname)
 				if err != nil {
-					fmt.Println(err)
-					return
+					fmt.Println("Error occur: ", err.Error())
 				}
-				defer data.Close()
-
-				body := &bytes.Buffer{}
-				writer := multipart.NewWriter(body)
-				part, err := writer.CreateFormFile("file", filepath.Base(val))
-				if err != nil {
-					fmt.Println(err)
-					return
-				}
-				_, err = io.Copy(part, data)
-				if err != nil {
-					fmt.Println(err)
-					return
-				}
-				err = writer.Close()
-				if err != nil {
-					fmt.Println(err)
-					return
-				}
-				// Create request
-				//DOTO create actions list. Add /uploadfile
-				req, err := http.NewRequest("POST", config.Conf.Clients["Metadata"].Url()+clients.ApiDeviceProfileRoute + "/uploadfile", body)
-				if err != nil {
-					fmt.Println(err)
-					return
-				}
-				req.Header.Add("Content-Type", writer.FormDataContentType())
-
-				// Fetch Request
-				resp, err := client.Do(req)
-				if err != nil {
-					fmt.Println(err)
-					return
-				}
-				defer resp.Body.Close()
-
-				respBody, err := ioutil.ReadAll(resp.Body)
-				if err != nil {
-					fmt.Println(err)
-					return
-				}
-
-				// Display Results
-				if resp.StatusCode == 200 {
-					fmt.Println("OK, new profile ID is", string(respBody))
-				} else {
-					fmt.Print(resp.Status, ": ", string(respBody))
-				}
+				addDeviceProfile(dp)
 			}
 		},
 	}
 	return cmd
+}
+
+func addDeviceProfile(dp *models.DeviceProfile) {
+	ctx, _ := context.WithCancel(context.Background())
+	url := config.Conf.Clients["Metadata"].Url()
+
+	mdc := metadata.NewDeviceProfileClient(
+		urlclient.New(
+			ctx,
+			clients.CoreMetaDataServiceKey,
+			clients.ApiDeviceProfileRoute,
+			15000,
+			url+clients.ApiDeviceProfileRoute,
+		),
+	)
+
+	dpId, err := mdc.Add(ctx, dp)
+	if err != nil {
+		fmt.Printf("Failed to create Device Profile `%s` because of error: %s\n", dp.Name, err)
+	} else {
+		fmt.Printf("Device Profile successfully created: %s\n", dpId)
+	}
+}
+
+func parseYaml(fname string) (*models.DeviceProfile, error) {
+	var dp = &models.DeviceProfile{}
+	file, err := ioutil.ReadFile(fname)
+	if err != nil {
+		return nil, err
+	}
+
+	err = yaml.Unmarshal(file, dp)
+	if err != nil {
+		return nil, err
+	}
+
+	return dp, nil
 }

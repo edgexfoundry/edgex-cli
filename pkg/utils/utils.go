@@ -1,10 +1,7 @@
 package utils
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"net/http"
 	"time"
 )
 
@@ -42,33 +39,4 @@ func DisplayDuration(tt int64) string {
 		ttTime := time.Unix(tt/1000, 0)
 		return humanDuration(time.Since(ttTime))
 	}
-}
-
-func ListHelper(url string, readings interface{}) (err error) {
-	resp, err := http.Get(url)
-	if err != nil  {
-		// handle error
-		fmt.Println("An error occurred. Is EdgeX running?")
-		fmt.Println(err)
-		return
-	}
-	defer resp.Body.Close()
-
-	data, err1 := ioutil.ReadAll(resp.Body)
-	if err1 != nil {
-		fmt.Println(err1)
-		return err1
-	} else if !(resp.StatusCode >= 200 && resp.StatusCode < 300) {
-		return fmt.Errorf("Server error: %d %s \n", resp.StatusCode, string(data))
-	}
-
-	err = json.Unmarshal(data, &readings)
-	if err != nil {
-		if string(data) == "Error, exceeded the max limit as defined in config" {
-			fmt.Println("The number of readings to be returned exceeds the MaxResultCount limit defined in configuration.toml")
-		}
-		fmt.Println(err)
-		return
-	}
-	return
 }

@@ -120,9 +120,7 @@ func removeLogs() {
 	ts := time.Now().Unix() * 1000
 	url := config.Conf.Clients["Logging"].Url() + clients.ApiLoggingRoute + "/0/" + strconv.FormatInt(ts, 10)
 	err := request.Delete(url)
-	if err != nil {
-		fmt.Println(err)
-	} else {
+	if err == nil {
 		//TODO fix the message
 		fmt.Print("Logs have been removed\n")
 	}
@@ -132,9 +130,7 @@ func removeNotifications(){
 	fmt.Println("\n * Notifications")
 	url := config.Conf.Clients["Notification"].Url()+"/api/v1/cleanup"
 	err := request.Delete(url)
-	if err != nil {
-		fmt.Println(err)
-	} else {
+	if err == nil {
 		//TODO fix the message
 		fmt.Println("Notifications have been removed")
 	}

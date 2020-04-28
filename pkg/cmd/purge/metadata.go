@@ -54,9 +54,7 @@ func (d *metadataCleaner) cleanDevices() {
 	var count int
 	for _, device := range devices {
 		err = request.Delete(url + config.PathId + device.Id)
-		if err != nil {
-			fmt.Printf("Failed to delete Device with id %s because of error: %s", device.Id, err)
-		} else {
+		if err == nil {
 			count = count + 1
 		}
 	}
@@ -68,16 +66,13 @@ func (d *metadataCleaner) cleanDeviceServices() {
 	var deviceServices []models.DeviceService
 	err := request.Get(url, &deviceServices)
 	if err != nil {
-		fmt.Println(err)
 		return
 	}
 
 	var count int
 	for _, deviceService := range deviceServices {
 		err = request.Delete(url + config.PathId + deviceService.Id)
-		if err != nil {
-			fmt.Printf("Failed to delete Device Service with id %s because of error: %s", deviceService.Id, err)
-		} else {
+		if err == nil {
 			count = count + 1
 		}
 	}
@@ -90,16 +85,13 @@ func (d *metadataCleaner) cleanDeviceProfiles() {
 	var deviceProfiles []models.DeviceProfile
 	err := request.Get(url, &deviceProfiles)
 	if err != nil {
-		fmt.Println(err)
 		return
 	}
 
 	var count int
 	for _, deviceProfile := range deviceProfiles {
 		err = request.Delete(url + config.PathId + deviceProfile.Id)
-		if err != nil {
-			fmt.Printf("Failed to delete Device Profile with id %s because of error: %s", deviceProfile.Id, err)
-		} else {
+		if err == nil {
 			count = count + 1
 		}
 	}
@@ -111,16 +103,13 @@ func (d *metadataCleaner) cleanAddressables() {
 	var addressables []models.Addressable
 	err := request.Get(url, &addressables)
 	if err != nil {
-		fmt.Println(err)
 		return
 	}
 
 	var count int
 	for _, addr := range addressables {
 		err = request.Delete(url + config.PathId + addr.Id)
-		if err != nil {
-			fmt.Printf("Failed to delete Addressable with id %s because of error: %s", addr.Id, err)
-		} else {
+		if err == nil {
 			count = count + 1
 		}
 	}

@@ -15,14 +15,11 @@
 package add
 
 import (
-	"bytes"
-	"encoding/json"
-	"errors"
 	"fmt"
 	"io/ioutil"
-	"net/http"
 
 	"github.com/edgexfoundry-holding/edgex-cli/config"
+	request "github.com/edgexfoundry-holding/edgex-cli/pkg"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 	"github.com/edgexfoundry/go-mod-core-contracts/models"
@@ -46,69 +43,31 @@ func NewCommand() *cobra.Command {
 }
 
 func addSubscriptionHandler(cmd *cobra.Command, args []string) {
-	fmt.Println("Add Notification:")
-	for _, val := range args {
-		fmt.Println(val, "... ")
-		processFile(val)
+	for _, fname := range args {
+		subscriptions, err := parseToml(fname)
+		if err != nil {
+			fmt.Println("Error occur: ", err.Error())
+		}
+		for _, s := range subscriptions {
+			request.Post(config.Conf.Clients["Notification"].Url()+clients.ApiSubscriptionRoute, &s)
+		}
 	}
 }
 
-func addSubscription(n *models.Subscription) (string, error) {
-	jsonStr, err := json.Marshal(n)
-	if err != nil {
-		return "", err
-	}
-	client := &http.Client{}
-	req, err := http.NewRequest("POST", config.Conf.Clients["Notification"].Url()+clients.ApiSubscriptionRoute, bytes.NewBuffer(jsonStr))
-	if err != nil {
-		return "", err
-	}
-	req.Header.Add("Content-Type", "application/json")
-
-	resp, err := client.Do(req)
-	if err != nil {
-		return "", err
-	}
-	defer resp.Body.Close()
-
-	respBody, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return "", err
-	}
-
-	if resp.StatusCode == 201 {
-		return string(respBody), nil
-	} else {
-		return "", errors.New(string(respBody))
-	}
-}
-
-func processFile(fname string) {
+func parseToml(fname string) ([]models.Subscription, error) {
 	defer func() {
 		if r := recover(); r != nil {
-			fmt.Println("...Invalid TOML")
+			fmt.Println("Error: Invalid TOML")
 		}
 	}()
-
-	var content = &SubscriptionFile{}
+	var subscriptionFile = &SubscriptionFile{}
 	file, err := ioutil.ReadFile(fname)
 	if err != nil {
-		fmt.Println("...Error loading file: ", err.Error())
-		return
+		return nil, err
 	}
-
-	err = toml.Unmarshal(file, content)
+	err = toml.Unmarshal(file, subscriptionFile)
 	if err != nil {
-		fmt.Println("...Error parsing file: ", err.Error())
-		return
+		return nil, err
 	}
-	for _, s := range content.Subscriptions {
-		fmt.Println("...Create subscription ", s.Slug)
-		id, err := addSubscription(&s)
-		if err != nil {
-			fmt.Println("......Error: ", err.Error())
-		} else {
-			fmt.Println("......Created with slug ", id)
-		}
-	}
+	return subscriptionFile.Subscriptions, nil
 }
