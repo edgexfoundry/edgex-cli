@@ -1,0 +1,11 @@
+[[Intervals]]
+name = 'noon'
+start = '20180101T000000'
+frequency = 'P1D'
+origin = 0
+
+[[Intervals]]
+name = 'fourteen-hundrend-hours'
+start = '20180101T000000'
+frequency = 'P1D'
+origin = 0
