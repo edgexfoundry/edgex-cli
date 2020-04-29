@@ -47,6 +47,7 @@ func addNotificationHandler(cmd *cobra.Command, args []string) {
 		notifications, err := parseToml(fname)
 		if err != nil {
 			fmt.Println("Error occur: ", err.Error())
+			continue
 		}
 		for _, n := range notifications {
 			request.Post(config.Conf.Clients["Notification"].Url()+clients.ApiNotificationRoute, &n)

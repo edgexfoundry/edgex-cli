@@ -1,0 +1,16 @@
+{
+  "Intervals": [
+    {
+      "frequency": "P4D",
+      "name": "noon",
+      "origin": 0,
+      "start": "20180101T000000"
+    },
+    {
+      "frequency": "P4D",
+      "name": "fourteen-hundrend-hours",
+      "origin": 0,
+      "start": "20180101T000000"
+    }
+  ]
+}

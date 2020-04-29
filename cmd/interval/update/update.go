@@ -15,19 +15,19 @@
 package update
 
 import (
-	"bytes"
+	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io/ioutil"
-	"net/http"
+	"os"
 
 	"github.com/edgexfoundry-holding/edgex-cli/config"
+	"github.com/edgexfoundry-holding/edgex-cli/pkg/urlclient"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
+	"github.com/edgexfoundry/go-mod-core-contracts/clients/scheduler"
 	"github.com/edgexfoundry/go-mod-core-contracts/models"
 
-	"github.com/pelletier/go-toml"
 	"github.com/spf13/cobra"
 )
 
@@ -46,69 +46,52 @@ func NewCommand() *cobra.Command {
 }
 
 func updateIntervalHandler(cmd *cobra.Command, args []string) {
-	fmt.Println("Update Interval:")
-	for _, val := range args {
-		fmt.Println(val, "... ")
-		processFile(val)
-	}
-}
-
-func updateInterval(n *models.Interval) (string, error) {
-	jsonStr, err := json.Marshal(n)
-	if err != nil {
-		return "", err
-	}
-	client := &http.Client{}
-	req, err := http.NewRequest("PUT", config.Conf.Clients["Scheduler"].Url()+clients.ApiIntervalRoute, bytes.NewBuffer(jsonStr))
-	if err != nil {
-		return "", err
-	}
-	req.Header.Add("Content-Type", "application/json")
-
-	resp, err := client.Do(req)
-	if err != nil {
-		return "", err
-	}
-	defer resp.Body.Close()
-
-	respBody, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return "", err
-	}
-
-	if resp.StatusCode == 200 {
-		return string(respBody), nil
-	} else {
-		return "", errors.New(string(respBody))
-	}
-}
-
-func processFile(fname string) {
-	defer func() {
-		if r := recover(); r != nil {
-			fmt.Println("...Invalid TOML")
-		}
-	}()
-
-	var content = &IntervalFile{}
-	file, err := ioutil.ReadFile(fname)
-	if err != nil {
-		fmt.Println("...Error loading file: ", err.Error())
-		return
-	}
-
-	err = toml.Unmarshal(file, content)
-	if err != nil {
-		fmt.Println("...Error parsing file: ", err.Error())
-		return
-	}
-	for _, i := range content.Intervals {
-		fmt.Println("...Update interval ", i.Frequency)
-		id, err := updateInterval(&i)
+	for _, fname := range args {
+		intervals, err := parseJson(fname)
 		if err != nil {
-			fmt.Println("......Error: ", err.Error())
-		} else {
-			fmt.Println("......Updated id ", id)
+			fmt.Println("Error occur: ", err.Error())
+			continue
+		}
+
+		for _, i := range intervals {
+			updateInterval(i)
 		}
 	}
+}
+
+func updateInterval(n models.Interval) {
+	ctx, _ := context.WithCancel(context.Background())
+	url := config.Conf.Clients["Scheduler"].Url()
+	client := scheduler.NewIntervalClient(
+		urlclient.New(
+			ctx,
+			clients.SupportSchedulerServiceKey,
+			clients.ApiIntervalRoute,
+			15000,
+			url+clients.ApiIntervalRoute,
+		),
+	)
+
+	err := client.Update(ctx, n)
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Printf("Interval successfully created: %s\n", n.Name)
+	}
+}
+
+func parseJson(fname string) ([]models.Interval, error) {
+	file, err := os.Open(fname)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+	byteValue, _ := ioutil.ReadAll(file)
+
+	fileContent := &IntervalFile{}
+	err = json.Unmarshal([]byte(byteValue), &fileContent)
+	if err != nil{
+		return nil, err
+	}
+	return fileContent.Intervals, nil
 }
