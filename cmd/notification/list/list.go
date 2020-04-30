@@ -16,6 +16,7 @@ package list
 
 import (
 	"fmt"
+	"github.com/edgexfoundry-holding/edgex-cli/pkg/utils"
 	"io"
 	"strconv"
 	"strings"
@@ -76,23 +77,24 @@ func NewCommand() *cobra.Command {
 
 func listHandler(cmd *cobra.Command, args []string) (err error){
 	var url string
-	// what determines the argument order?
-	//limit could be skipped, both end and start could be specified, so max args == 3
-
-	var startStr = cmd.Flag("start").Value.String()
-	fmt.Println(startStr)
+	multi := true
 	url = config.Conf.Clients["Notification"].Url() + clients.ApiNotificationRoute + "/"
 
-	if onlyNew {
-		url += "new"
-	} else if slug != "" {
+	// For slug and id based retrieval, response will be a single item at most
+	 if slug != "" {
 		url += "slug/" + slug
-		limit = -1 // no limit with slug
+		multi = false // no limit with slug
+	} else if len(args) == 1 {
+		 // notification id provided
+		 multi = false
+		 url += args[0]
+	} else if onlyNew {
+		url += "new"
 	} else if labels != "" {
 		url += "labels/" + labels
 	} else if sender != "" {
 		url += "sender/" + sender
-	} else {
+	}  else {
 		if start != "" {
 			url += "start/" + start
 		}
@@ -105,32 +107,40 @@ func listHandler(cmd *cobra.Command, args []string) (err error){
 		}
 	}
 
-	if limit > 0 {
+	if multi {
 		url = url + "/" + strconv.FormatInt(int64(limit), 10)
 	}
 	fmt.Printf ("*** URL ==  %s *** \n", url)
 	var notifications []models.Notification
-	err = request.Get(url, &notifications)
+	var aNotification models.Notification
+	if !multi {
+		err = request.Get(url, &aNotification)
+	} else {
+		err = request.Get(url, &notifications)
+	}
 	if err != nil {
 		return
 	}
-
+    if !multi { // to use the same display code
+    	notifications = []models.Notification{aNotification}
+	}
 	pw := viper.Get("writer").(io.WriteCloser)
 	w := new(tabwriter.Writer)
 	w.Init(pw, 0, 8, 1, '\t', 0)
-	//fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t%s\t%s\t\n", "Interval ID", "Name", "Start",
-	//	"End", "Frequency", "Cron", "RunOnce")
+	fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t\n", "Notification ID", "Slug", "Sender",  "Status", "Severity", "Category", "Content", "Labels", "Created", "Modified")
 	for _, notification := range notifications {
-		/*fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t%s\t%t\t\n",
-			interval.ID,
-			interval.Name,
-			interval.Start,
-			interval.End,
-			interval.Frequency,
-			interval.Cron,
-			interval.RunOnce,
-		)*/
-		fmt.Fprintf(w, "%s\n", notification)
+		fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t\n",
+			notification.ID,
+			notification.Slug,
+			notification.Sender,
+			notification.Status,
+			notification.Severity,
+			notification.Category,
+			notification.Content,
+			notification.Labels,
+			utils.DisplayDuration(notification.Created),
+			utils.DisplayDuration(notification.Modified),
+		)
 	}
 	w.Flush()
 	return
