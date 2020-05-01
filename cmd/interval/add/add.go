@@ -47,6 +47,7 @@ func addIntervalHandler(cmd *cobra.Command, args []string) {
 		intervals, err := parseToml(fname)
 		if err != nil {
 			fmt.Println("Error occur: ", err.Error())
+			continue
 		}
 		for _, i := range intervals {
 			request.Post(config.Conf.Clients["Scheduler"].Url()+clients.ApiIntervalRoute, &i)
