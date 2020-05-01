@@ -15,6 +15,7 @@
 package event
 
 import (
+	addevent "github.com/edgexfoundry-holding/edgex-cli/cmd/event/add"
 	listevent "github.com/edgexfoundry-holding/edgex-cli/cmd/event/list"
 	rmevent "github.com/edgexfoundry-holding/edgex-cli/cmd/event/rm"
 
@@ -29,6 +30,7 @@ func NewCommand() *cobra.Command {
 		Long:  `Actions related to device-generated events.`,
 	}
 	cmd.AddCommand(rmevent.NewCommand())
+	cmd.AddCommand(addevent.NewCommand())
 	cmd.AddCommand(listevent.NewCommand())
 	return cmd
 }

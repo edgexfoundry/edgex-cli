@@ -16,8 +16,6 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	"io"
 	"os"
 
@@ -35,6 +33,9 @@ import (
 	"github.com/edgexfoundry-holding/edgex-cli/cmd/version"
 	"github.com/edgexfoundry-holding/edgex-cli/config"
 	"github.com/edgexfoundry-holding/edgex-cli/pkg/pager"
+
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 // NewCommand returns rootCmd which represents the base command when called without any subcommands

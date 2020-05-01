@@ -70,6 +70,23 @@ If your EdgeX instance is not running on localhost, minimally you will need to r
 You can now use the CLI by entering `edgex-cli` anywhere on your machine provided your $GOBIN is on your $PATH.
 
 
+#### Interactive Mode
+
+Some commands leverage interactive-mode which opens an editor and allows you to provide information that would 
+normally be difficult with just command line arguments. For example, creating an Event requires a lot of information,
+also Events contain zero or more readings. Using interactive mode, you can easily create an Event with many readings and 
+customize each reading. You can choose the editor that is used by setting the environment variable `EDITOR`. The default
+editor is `Vi` for `Unix` operating systems(MacOS, Linux, etc), `Notepad` for Windows OS. The default editor is used if 
+no `EDITOR` is specified. Some examples of editors:
+
+- vi
+- vim
+- nano
+- emacs
+- notepad
+- vscode
+- atom
+
 ### Developers
 
 Follow the installation instructions to create a configuration file and edit as necessary.
