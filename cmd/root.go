@@ -78,18 +78,6 @@ func NewCommand() *cobra.Command {
 			}
 
 		},
-		PersistentPostRun: func(cmd *cobra.Command, args []string) {
-			shouldClose := viper.GetBool("writerShouldClose")
-			if shouldClose {
-				pw := viper.Get("writer").(io.Closer)
-				if pw != os.Stdout {
-					err := pw.Close()
-					if err != nil {
-						_ = fmt.Errorf(err.Error())
-					}
-				}
-			}
-		},
 		SilenceUsage: true,
 		Use:   "edgex-cli",
 		Short: "EdgeX command line interface",
@@ -152,6 +140,20 @@ func Execute() {
 		os.Exit(1)
 	}
 	if err := NewCommand().Execute(); err != nil {
-		os.Exit(1)
+		defer os.Exit(1)
+	}
+	defer closeWriter()
+}
+//closeWriter function will be executed first and then os.Exit(1) will be executed in case of err
+func closeWriter() {
+	shouldClose := viper.GetBool("writerShouldClose")
+	if shouldClose {
+		pw := viper.Get("writer").(io.Closer)
+		if pw != os.Stdout {
+			err := pw.Close()
+			if err != nil {
+				_ = fmt.Errorf(err.Error())
+			}
+		}
 	}
 }
