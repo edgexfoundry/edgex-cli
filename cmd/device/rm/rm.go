@@ -18,11 +18,11 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/edgexfoundry-holding/edgex-cli/pkg/urlclient"
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 	"github.com/edgexfoundry/go-mod-core-contracts/clients/metadata"
 
 	"github.com/edgexfoundry-holding/edgex-cli/config"
+	"github.com/edgexfoundry/go-mod-core-contracts/clients/urlclient/local"
 	"github.com/spf13/cobra"
 )
 
@@ -43,21 +43,12 @@ You can use: '$ edgex device list' to find a device's name and ID.`,
 
 			deviceID := args[0]
 
-			ctx, _ := context.WithCancel(context.Background())
 			mdc := metadata.NewDeviceClient(
-				urlclient.New(
-					ctx,
-					clients.CoreMetaDataServiceKey,
-					clients.ApiDeviceRoute,
-					15000,
-					config.Conf.Clients["Metadata"].Url()+clients.ApiDeviceRoute,
-				),
+				local.New(config.Conf.Clients["Metadata"].Url()+clients.ApiDeviceRoute),
 			)
 
-			//devices, err := mdc.Devices(ctx)
-
+			ctx := context.Background()
 			err := mdc.DeleteByName(ctx, deviceID)
-
 			if err != nil {
 				fmt.Printf("Removed: %s\n", deviceID)
 				return

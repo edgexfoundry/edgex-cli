@@ -18,13 +18,14 @@ import (
 	"context"
 	"fmt"
 	"github.com/edgexfoundry-holding/edgex-cli/config"
-	"github.com/edgexfoundry-holding/edgex-cli/pkg/urlclient"
 	"github.com/edgexfoundry-holding/edgex-cli/pkg/utils"
 	"io"
 	"text/tabwriter"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 	"github.com/edgexfoundry/go-mod-core-contracts/clients/metadata"
+	"github.com/edgexfoundry/go-mod-core-contracts/clients/urlclient/local"
+
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -38,20 +39,12 @@ func NewCommand() *cobra.Command {
 		Long:  `Returns the list of device profiles currently in the core-metadata database.`,
 		RunE: func(cmd *cobra.Command, args []string) (err error){
 
-			ctx, _ := context.WithCancel(context.Background())
 			url := config.Conf.Clients["Metadata"].Url()
-
 			mdc := metadata.NewDeviceProfileClient(
-				urlclient.New(
-					ctx,
-					clients.CoreMetaDataServiceKey,
-					clients.ApiDeviceProfileRoute,
-					15000,
-					url+clients.ApiDeviceProfileRoute,
-				),
+				local.New(url+clients.ApiDeviceProfileRoute),
 			)
 
-			profiles, err := mdc.DeviceProfiles(ctx)
+			profiles, err := mdc.DeviceProfiles(context.Background())
 			if err != nil {
 				return
 			}

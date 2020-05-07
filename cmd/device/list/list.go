@@ -21,10 +21,10 @@ import (
 	"text/tabwriter"
 
 	"github.com/edgexfoundry-holding/edgex-cli/config"
-	"github.com/edgexfoundry-holding/edgex-cli/pkg/urlclient"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 	"github.com/edgexfoundry/go-mod-core-contracts/clients/metadata"
+	"github.com/edgexfoundry/go-mod-core-contracts/clients/urlclient/local"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -37,21 +37,12 @@ func NewCommand() *cobra.Command {
 		Short: "A list of all device services",
 		Long:  `Return all device services sorted by id.`,
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-
-			ctx, _ := context.WithCancel(context.Background())
-
 			url := config.Conf.Clients["Metadata"].Url() + clients.ApiDeviceRoute
 			mdc := metadata.NewDeviceClient(
-				urlclient.New(
-					ctx,
-					clients.CoreMetaDataServiceKey,
-					clients.ApiDeviceRoute,
-					15000,
-					url,
-				),
+				local.New(url),
 			)
 
-			devices, err := mdc.Devices(ctx)
+			devices, err := mdc.Devices(context.Background())
 			if err != nil {
 				return
 			}

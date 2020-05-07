@@ -41,11 +41,10 @@ func (d *metadataCleaner) Purge() {
 }
 
 func (d *metadataCleaner) cleanDevices() {
-	ctx, _ := context.WithCancel(context.Background())
 	url := d.baseUrl + clients.ApiDeviceRoute
 	mdc := metadata.NewDeviceClient(local.New(url))
 
-	devices, err := mdc.Devices(ctx)
+	devices, err := mdc.Devices(context.Background())
 	if err != nil {
 		fmt.Println(err)
 		return
