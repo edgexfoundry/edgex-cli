@@ -19,7 +19,6 @@ import (
 	"github.com/edgexfoundry-holding/edgex-cli/pkg/utils"
 	"io"
 	"strconv"
-	"strings"
 	"text/tabwriter"
 
 	"github.com/edgexfoundry-holding/edgex-cli/config"
@@ -45,7 +44,8 @@ func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "list",
 		Short: "A list of all notifications",
-		Long:  `Return a list of all notifications filtered by slug/sender/labels/start/end and limited by limit.`,
+		Long:  `Return a list of all notifications filtered by slug/sender/labels/start/end and limited by limit.
+		        When no flags or argument provided, the default is to provide only new notifications`,
 		Args:  cobra.MaximumNArgs(3),
 		RunE:   listHandler,
 		PostRun:                    nil,
@@ -78,36 +78,36 @@ func NewCommand() *cobra.Command {
 func listHandler(cmd *cobra.Command, args []string) (err error){
 	var url string
 	multi := true
-	url = config.Conf.Clients["Notification"].Url() + clients.ApiNotificationRoute + "/"
+	url = config.Conf.Clients["Notification"].Url() + clients.ApiNotificationRoute
 
 	// For slug and id based retrieval, response will be a single item at most
 	 if slug != "" {
-		url += "slug/" + slug
+		url += "/slug/" + slug
 		multi = false // no limit with slug
 	} else if len(args) == 1 {
 		 // notification id provided
 		 multi = false
-		 url += args[0]
+		 url = url + "/" + args[0]
 	} else if onlyNew {
-		url += "new"
+		url += "/new"
 	} else if labels != "" {
-		url += "labels/" + labels
+		url += "/labels/" + labels
 	} else if sender != "" {
-		url += "sender/" + sender
-	}  else {
-		if start != "" {
-			url += "start/" + start
-		}
-		if end != "" {
-			if strings.HasSuffix(url, "/") {
-				url += "end/" + end
-			} else { // start also specified?
-				url += "/end/" + end
-			}
-		}
+		url += "/sender/" + sender
+	}  else if start != "" {
+		url += "/start/" + start
+		// end could also be specified
+		 if end != "" {
+			 url += "/end/" + end
+		 }
+	} else if end != "" {
+		url += "/end/" + end
+	} else {
+		//Default Behavior
+		 url += "/new"
 	}
 
-	if multi {
+	if multi  {
 		url = url + "/" + strconv.FormatInt(int64(limit), 10)
 	}
 	fmt.Printf ("*** URL ==  %s *** \n", url)
