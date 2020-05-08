@@ -43,7 +43,6 @@ func NewCommand() *cobra.Command {
 		Long:  `Return all device services sorted by id.`,
 		Args:  cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error){
-
 			var url string
 			if len(args) > 0 {
 				var limitUrl string

@@ -10,12 +10,12 @@ import (
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 
-	"github.com/edgexfoundry-holding/edgex-cli/pkg/urlclient"
 	"github.com/edgexfoundry/go-mod-core-contracts/clients/metadata"
 
 	"github.com/edgexfoundry-holding/edgex-cli/config"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
+	"github.com/edgexfoundry/go-mod-core-contracts/clients/urlclient/local"
 	"github.com/edgexfoundry/go-mod-core-contracts/models"
 
 	"github.com/spf13/cobra"
@@ -41,20 +41,12 @@ func NewCommand() *cobra.Command {
 }
 
 func addDeviceProfile(dp *models.DeviceProfile) {
-	ctx, _ := context.WithCancel(context.Background())
 	url := config.Conf.Clients["Metadata"].Url()
-
 	mdc := metadata.NewDeviceProfileClient(
-		urlclient.New(
-			ctx,
-			clients.CoreMetaDataServiceKey,
-			clients.ApiDeviceProfileRoute,
-			15000,
-			url+clients.ApiDeviceProfileRoute,
-		),
+		local.New(url+clients.ApiDeviceProfileRoute),
 	)
 
-	dpId, err := mdc.Add(ctx, dp)
+	dpId, err := mdc.Add(context.Background(), dp)
 	if err != nil {
 		fmt.Printf("Failed to create Device Profile `%s` because of error: %s\n", dp.Name, err)
 	} else {

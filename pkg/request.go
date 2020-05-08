@@ -8,16 +8,15 @@ import (
 	"net/http"
 	"reflect"
 
-	"github.com/edgexfoundry-holding/edgex-cli/pkg/urlclient"
-
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
+	"github.com/edgexfoundry/go-mod-core-contracts/clients/urlclient/local"
+
 	"github.com/spf13/viper"
 )
 
 func Get(url string, items interface{}) (err error) {
-	ctx, _ := context.WithCancel(context.Background())
 	printURL(url)
-	resp, err := clients.GetRequest(ctx, "", urlclient.NewA(url))
+	resp, err := clients.GetRequest(context.Background(), "", local.New(url))
 	if err != nil {
 		fmt.Printf("Error: %s\n", err.Error())
 		return err
@@ -31,9 +30,8 @@ func Get(url string, items interface{}) (err error) {
 }
 
 func Delete(url string) error {
-	ctx, _ := context.WithCancel(context.Background())
 	printURL(url)
-	err :=  clients.DeleteRequest(ctx, "", urlclient.NewA(url))
+	err :=  clients.DeleteRequest(context.Background(), "", local.New(url))
 	if err != nil {
 		fmt.Printf("Error: %s\n", err.Error())
 	}
@@ -42,10 +40,9 @@ func Delete(url string) error {
 
 //TODO handle errors
 func Post(url string, item interface{}) {
-	ctx, _ := context.WithCancel(context.Background())
 	printURL(url)
 	printData(item)
-	resp, err := clients.PostJSONRequest(ctx, "", item, urlclient.NewA(url))
+	resp, err := clients.PostJSONRequest(context.Background(), "", item, local.New(url))
 	name := getType(item)
 	if err != nil {
 		fmt.Printf("Failed to create %s because of error: %s", name, err)

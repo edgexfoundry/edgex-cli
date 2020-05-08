@@ -11,11 +11,11 @@ import (
 	"time"
 
 	"github.com/edgexfoundry-holding/edgex-cli/config"
-	"github.com/edgexfoundry-holding/edgex-cli/pkg/urlclient"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 	"github.com/edgexfoundry/go-mod-core-contracts/clients/metadata"
 	"github.com/edgexfoundry/go-mod-core-contracts/models"
+	"github.com/edgexfoundry/go-mod-core-contracts/clients/urlclient/local"
 
 	"github.com/BurntSushi/toml"
 	"github.com/spf13/cobra"
@@ -53,25 +53,14 @@ func NewCommand() *cobra.Command {
 }
 
 func addDevice(dev models.Device) (string, error) {
-
-	ctx, _ := context.WithCancel(context.Background())
 	url := config.Conf.Clients["Metadata"].Url()
-
 	mdc := metadata.NewDeviceClient(
-		urlclient.New(
-			ctx,
-			clients.CoreMetaDataServiceKey,
-			clients.ApiDeviceRoute,
-			15000,
-			url+clients.ApiDeviceRoute,
-		),
+		local.New(url+clients.ApiDeviceRoute),
 	)
-
-	resp, err := mdc.Add(ctx, &dev)
+	resp, err := mdc.Add(context.Background(), &dev)
 	if err != nil {
 		return "", err
 	}
-
 	return resp, nil
 }
 

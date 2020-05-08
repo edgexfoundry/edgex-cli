@@ -22,10 +22,10 @@ import (
 	"os"
 
 	"github.com/edgexfoundry-holding/edgex-cli/config"
-	"github.com/edgexfoundry-holding/edgex-cli/pkg/urlclient"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 	"github.com/edgexfoundry/go-mod-core-contracts/clients/scheduler"
+	"github.com/edgexfoundry/go-mod-core-contracts/clients/urlclient/local"
 	"github.com/edgexfoundry/go-mod-core-contracts/models"
 
 	"github.com/spf13/cobra"
@@ -60,19 +60,12 @@ func updateIntervalHandler(cmd *cobra.Command, args []string) {
 }
 
 func updateInterval(n models.Interval) {
-	ctx, _ := context.WithCancel(context.Background())
 	url := config.Conf.Clients["Scheduler"].Url()
 	client := scheduler.NewIntervalClient(
-		urlclient.New(
-			ctx,
-			clients.SupportSchedulerServiceKey,
-			clients.ApiIntervalRoute,
-			15000,
-			url+clients.ApiIntervalRoute,
-		),
+		local.New(url+clients.ApiIntervalRoute),
 	)
 
-	err := client.Update(ctx, n)
+	err := client.Update(context.Background(), n)
 	if err != nil {
 		fmt.Println(err)
 	} else {
