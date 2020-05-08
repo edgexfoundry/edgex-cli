@@ -32,8 +32,8 @@ import (
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "list",
-		Short: "A list of all device services",
-		Long:  `Return all device services sorted by id.`,
+		Short: "A list of all subscriptions",
+		Long:  `Return all Subscriptions`,
 		RunE: func(cmd *cobra.Command, args []string) (err error){
 			url:=config.Conf.Clients["Notification"].Url()+clients.ApiSubscriptionRoute
 			var subscriptions []models.Subscription

@@ -3,7 +3,6 @@ package client
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 	"reflect"
@@ -52,25 +51,6 @@ func Post(url string, item interface{}) {
 	} else {
 		fmt.Printf("%s successfully created: %s ", name, resp)
 	}
-}
-
-// DeleteItemByIdOrName deletes the given item
-// The ID parameter can be either NAME or ID. We are doing this to allow the user
-// enter either the name or the ID of an object to delete.
-// First, we try ID. If successful, stop. If unsuccessful, try name.
-
-//depricated
-func DeleteItemByIdOrName(id string, pathID string, pathName string, url string) error {
-	// Try to delete the object by Id
-	err := Delete(url+pathID+id)
-	if err != nil {
-		// Try to delete the object by name
-		if pathName == "" {
-			return errors.New("Deleting by ID failed: " + url)
-		}
-		err = Delete(url+pathName+id)
-	}
-	return err
 }
 
 func printURL(url string) {

@@ -25,40 +25,44 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// NewCommand returns the rm command of type cobra.Command
-var byID bool
-
-func removeSubscriptionHandler(cmd *cobra.Command, args []string) {
-	// Checking for args
-	if len(args) == 0 {
-		fmt.Printf("Error: No subription ID/Name provided.\n")
-		return
-	}
-
-	// Create request
-	subscriptionlID := args[0]
-	url:=config.Conf.Clients["Notification"].Url() + clients.ApiSubscriptionRoute
-	err := request.DeleteItemByIdOrName(subscriptionlID,
-		"/",
-		config.PathName,
-		url)
-
-	if err != nil {
-		fmt.Printf("Failed to remove substcription `%s`: %s\n", subscriptionlID, err)
-		return
-	}
-	fmt.Printf("Subscription Removed: %s\n", subscriptionlID)
-}
+var slug string
 
 // NewCommand returns remove subscription command
 func NewCommand() *cobra.Command {
 	var cmd = &cobra.Command{
-		Use:   "rm [notification slug or age]",
-		Short: "Removes notification by slug or age",
-		Long:  `Removes a notification given its slug or age timestamp.`,
-		Args:  cobra.ExactValidArgs(1),
-		Run:   removeSubscriptionHandler,
+		Use:   "rm [--slug or id]",
+		Example: "subscription rm <id> \n" +
+			     "subscription rm --slug <slug>",
+		Short: "Removes subscription by --slug or id.",
+		Long:  `Removes a subscription given its slug or id.`,
+		RunE:   removeSubscriptionHandler,
 	}
-	cmd.Flags().BoolVar(&byID, "id", false, "Remove by id")
+	cmd.Flags().StringVarP(&slug, "slug", "s", "", "Delete Subscription by slug")
 	return cmd
 }
+
+func removeSubscriptionHandler(cmd *cobra.Command, args []string) (err error){
+	if len(args) == 0 && slug ==""{
+		fmt.Printf("Error: No Subscription ID/slug provided.\n")
+		return
+	}
+
+	url:=config.Conf.Clients["Notification"].Url()+ clients.ApiSubscriptionRoute
+	url, deletedBy := constructUrl(url, args)
+
+	err = request.Delete(url)
+	if err == nil {
+		fmt.Printf("Removed: %s\n", deletedBy)
+	}
+	return
+}
+
+func constructUrl(url string, args []string) (string, string) {
+	if slug != "" {
+		url = url + "/slug/" + slug
+		return url, slug
+	}
+	url = url + "/" + args[0]
+	return url, args[0]
+}
+
