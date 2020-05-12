@@ -25,33 +25,41 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var name string
+
 // NewCommand returns the rm device service command
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "rm [device service name|ID]",
+		Use:   "rm [--name|<id>]",
+		Example: "deviceservice rm <id> \n" +
+			     "deviceservice rm --name <name>",
 		Short: "Removes device service by name or ID",
 		Long:  `Removes a device service from the core-metadata DB.`,
-		Run: func(cmd *cobra.Command, args []string) {
-
-			// Checking for args
-			if len(args) == 0 {
-				fmt.Printf("Error: No device service ID/Name provided.\n")
+		RunE: func(cmd *cobra.Command, args []string) (err error){
+			if len(args) == 0 && name ==""{
+				fmt.Printf("Error: No device service ID/name provided.\n")
 				return
 			}
 
-			dsId := args[0]
 			url:=config.Conf.Clients["Metadata"].Url()+ clients.ApiDeviceServiceRoute
-			err := request.DeleteItemByIdOrName(dsId,
-				config.PathId,
-			    config.PathName,
-			    url)
+			url, deletedBy := constructUrl(url, args)
 
-			if err != nil {
-				fmt.Printf("Failed to remove Device service `%s`.\nError: %s\n", dsId, err )
-				return
+			err = request.Delete(url)
+			if err == nil {
+				fmt.Printf("Removed: %s\n", deletedBy)
 			}
-			fmt.Printf("Removed: %s\n", dsId)
+			return
 		},
 	}
+	cmd.Flags().StringVar(&name, "name", "", "Delete Device Service by given name")
 	return cmd
+}
+
+func constructUrl(url string, args []string) (string, string) {
+	if name != "" {
+		url = url + config.PathName + name
+		return url, name
+	}
+	url = url + config.PathId + args[0]
+	return url, args[0]
 }
