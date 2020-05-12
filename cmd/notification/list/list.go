@@ -44,7 +44,7 @@ func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "list",
 		Short: "A list of all notifications",
-		Long:  `Return a list of all notifications filtered by slug/sender/labels/start/end and limited by limit. Defaults to new notifications.`,
+		Long:  `Return a list of all notifications filtered by slug/sender/labels/start/end/new and limited by limit. Defaults to new notifications.`,
 		Args:  cobra.MaximumNArgs(3),
 		RunE:   listHandler,
 		PostRun:                    nil,
@@ -99,22 +99,21 @@ func listHandler(cmd *cobra.Command, args []string) (err error) {
 		if end != "" {
 			url += "/end/" + end
 		}
-	} else if end != "" {
+    } else if end != "" {
 		url += "/end/" + end
-	} else {
-		//Default Behavior
+	} else { // default behavior whgen no flags specified
 		url += "/new"
-	}
+    }
 
-	if multi {
+	if multi  {
 		url = url + "/" + strconv.FormatInt(int64(limit), 10)
 	}
-	verboseFlag, err := cmd.Flags().GetBool("verbose")
-	if err != nil {
+	verboseFlag, err1 := cmd.Flags().GetBool("verbose")
+	if err1 != nil {
 		fmt.Println("couldn't get verbose flag")
 	}
-	urlFlag, err := cmd.Flags().GetBool("url")
-	if err != nil {
+	urlFlag, err2 := cmd.Flags().GetBool("url")
+	if err2 != nil {
 		fmt.Println("couldn't get url flag")
 	}
 	if urlFlag || verboseFlag {
