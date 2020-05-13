@@ -27,11 +27,18 @@ build:
 
 test:
 	$(GO) test ./... -coverprofile coverage.out
+
 install:
 	echo "GOBIN=$(GOBIN)"
 	$(GO) install $(GOFLAGS)
 	mkdir -p $(HOME)/.edgex-cli
-	cp ./res/configuration.toml $(HOME)/.edgex-cli/configuration.toml 
+	cp ./res/configuration.toml $(HOME)/.edgex-cli/configuration.toml
+
+uninstall:
+	echo "GOBIN=$(GOBIN)"
+	rm $(GOBIN)/$(BINARY)
+	rm -rf $(HOME)/.edgex-cli
+
 
 clean:
 	-rm $(BINARY)
