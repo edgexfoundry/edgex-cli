@@ -37,6 +37,7 @@ func (d *coredataCleaner) cleanReadings() {
 	var readings []models.Reading
 	err := request.Get(url, readings)
 	if err != nil {
+		fmt.Printf("Error: %s\n", err.Error())
 		return
 	}
 
@@ -45,10 +46,10 @@ func (d *coredataCleaner) cleanReadings() {
 		// call delete function here
 		err = request.Delete(url + config.PathId + reading.Id)
 		if err == nil {
-			count = count +1
+			count = count + 1
 		}
 	}
-	fmt.Printf("Removed %d Reading from %d \n", count, len(readings))
+	fmt.Printf("Removed %d Readings from %d \n", count, len(readings))
 }
 
 func (d *coredataCleaner) cleanValueDescriptors() {
@@ -56,6 +57,7 @@ func (d *coredataCleaner) cleanValueDescriptors() {
 	var valueDescriptors []models.ValueDescriptor
 	err := request.Get(url, valueDescriptors)
 	if err != nil {
+		fmt.Printf("Error: %s\n", err.Error())
 		return
 	}
 
@@ -63,7 +65,7 @@ func (d *coredataCleaner) cleanValueDescriptors() {
 	for _, valueDescriptor := range valueDescriptors {
 		err = request.Delete(url + config.PathId + valueDescriptor.Id)
 		if err == nil {
-			count = count +1
+			count = count + 1
 		}
 	}
 	fmt.Printf("Removed %d Value Descriptors from %d \n", count, len(valueDescriptors))
@@ -72,9 +74,7 @@ func (d *coredataCleaner) cleanValueDescriptors() {
 func (d *coredataCleaner) cleanEvents() {
 	url := d.baseUrl + clients.ApiEventRoute + "/scruball"
 	err := request.Delete(url)
-	if err != nil {
-		fmt.Println(err)
-	} else {
+	if err == nil {
 		fmt.Print("All Events have been removed \n")
 	}
 }

@@ -46,7 +46,7 @@ func addIntervalHandler(cmd *cobra.Command, args []string) {
 	for _, fname := range args {
 		intervals, err := parseToml(fname)
 		if err != nil {
-			fmt.Println("Error occur: ", err.Error())
+			fmt.Println("Error: ", err.Error())
 			continue
 		}
 		for _, i := range intervals {
@@ -64,12 +64,10 @@ func parseToml(fname string) ([]models.Interval, error) {
 	var intervalFile = &IntervalFile{}
 	file, err := ioutil.ReadFile(fname)
 	if err != nil {
-		fmt.Println("Error loading file: ", err.Error())
 		return nil, err
 	}
 	err = toml.Unmarshal(file, intervalFile)
 	if err != nil {
-		fmt.Println("Error parsing file: ", err.Error())
 		return nil, err
 	}
 	return intervalFile.Intervals, nil

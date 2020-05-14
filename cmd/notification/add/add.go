@@ -46,7 +46,7 @@ func addNotificationHandler(cmd *cobra.Command, args []string) {
 	for _, fname := range args {
 		notifications, err := parseToml(fname)
 		if err != nil {
-			fmt.Println("Error occur: ", err.Error())
+			fmt.Println("Error: ", err.Error())
 			continue
 		}
 		for _, n := range notifications {
@@ -72,4 +72,3 @@ func parseToml(fname string) ([]models.Notification, error) {
 	}
 	return notificationsFile.Notifications, nil
 }
-

@@ -22,9 +22,10 @@ import (
 	"path/filepath"
 )
 
-const PathId ="/id/"
-const PathName ="/name/"
-var  DefaultConfigFile = filepath.Join(os.Getenv("HOME"), ".edgex-cli", "configuration.toml")
+const PathId = "/id/"
+const PathName = "/name/"
+
+var DefaultConfigFile = filepath.Join(os.Getenv("HOME"), ".edgex-cli", "configuration.toml")
 var Conf Configuration
 
 // Configuration struct will use this to write config file eventually
@@ -64,4 +65,3 @@ func LoadConfig(env Environment) error {
 	}
 	return nil
 }
-

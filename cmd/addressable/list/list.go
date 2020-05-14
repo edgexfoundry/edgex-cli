@@ -34,7 +34,7 @@ func NewCommand() *cobra.Command {
 		Use:   "list",
 		Short: "A list of all device services",
 		Long:  `Return all device services sorted by id.`,
-		RunE: func(cmd *cobra.Command, args []string) (err error){
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			//TODO Open issue in go-mod-contracts to extend the AddressableClient interface to support getAll Addressable
 			url := config.Conf.Clients["Metadata"].Url() + clients.ApiAddressableRoute
 			var addr []models.Addressable
@@ -57,15 +57,8 @@ func NewCommand() *cobra.Command {
 					addressable.Protocol,
 				)
 			}
-			if err != nil {
-				fmt.Println(err.Error())
-				return
-			}
-			err = w.Flush()
-			if err != nil {
-				fmt.Println(err.Error())
-			}
-			return 
+			w.Flush()
+			return
 		},
 	}
 	return cmd

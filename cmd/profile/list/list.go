@@ -26,7 +26,6 @@ import (
 	"github.com/edgexfoundry/go-mod-core-contracts/clients/metadata"
 	"github.com/edgexfoundry/go-mod-core-contracts/clients/urlclient/local"
 
-
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -37,11 +36,11 @@ func NewCommand() *cobra.Command {
 		Use:   "list",
 		Short: "Returns a list of device profiles",
 		Long:  `Returns the list of device profiles currently in the core-metadata database.`,
-		RunE: func(cmd *cobra.Command, args []string) (err error){
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
 
 			url := config.Conf.Clients["Metadata"].Url()
 			mdc := metadata.NewDeviceProfileClient(
-				local.New(url+clients.ApiDeviceProfileRoute),
+				local.New(url + clients.ApiDeviceProfileRoute),
 			)
 
 			profiles, err := mdc.DeviceProfiles(context.Background())

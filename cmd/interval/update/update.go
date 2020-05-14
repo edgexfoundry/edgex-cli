@@ -49,7 +49,7 @@ func updateIntervalHandler(cmd *cobra.Command, args []string) {
 	for _, fname := range args {
 		intervals, err := parseJson(fname)
 		if err != nil {
-			fmt.Println("Error occur: ", err.Error())
+			fmt.Println("Error: ", err.Error())
 			continue
 		}
 
@@ -62,7 +62,7 @@ func updateIntervalHandler(cmd *cobra.Command, args []string) {
 func updateInterval(n models.Interval) {
 	url := config.Conf.Clients["Scheduler"].Url()
 	client := scheduler.NewIntervalClient(
-		local.New(url+clients.ApiIntervalRoute),
+		local.New(url + clients.ApiIntervalRoute),
 	)
 
 	err := client.Update(context.Background(), n)
@@ -83,7 +83,7 @@ func parseJson(fname string) ([]models.Interval, error) {
 
 	fileContent := &IntervalFile{}
 	err = json.Unmarshal([]byte(byteValue), &fileContent)
-	if err != nil{
+	if err != nil {
 		return nil, err
 	}
 	return fileContent.Intervals, nil

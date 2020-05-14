@@ -15,8 +15,7 @@
 package rm
 
 import (
-	"fmt"
-
+	"errors"
 	"github.com/edgexfoundry-holding/edgex-cli/config"
 	request "github.com/edgexfoundry-holding/edgex-cli/pkg"
 
@@ -30,9 +29,9 @@ var slug string
 // NewCommand returns remove subscription command
 func NewCommand() *cobra.Command {
 	var cmd = &cobra.Command{
-		Use:   "rm [--slug or id]",
+		Use: "rm [id | --slug]",
 		Example: "subscription rm <id> \n" +
-			     "subscription rm --slug <slug>",
+			"subscription rm --slug <slug>",
 		Short: "Removes subscription by --slug or id.",
 		Long:  `Removes a subscription given its slug or id.`,
 		RunE:   removeSubscriptionHandler,
@@ -41,20 +40,13 @@ func NewCommand() *cobra.Command {
 	return cmd
 }
 
-func removeSubscriptionHandler(cmd *cobra.Command, args []string) (err error){
-	if len(args) == 0 && slug ==""{
-		fmt.Printf("Error: No Subscription ID/slug provided.\n")
-		return
+func removeSubscriptionHandler(cmd *cobra.Command, args []string) (err error) {
+	if len(args) == 0 && slug == "" {
+		return errors.New("no subscription id/slug provided")
 	}
-
-	url:=config.Conf.Clients["Notification"].Url()+ clients.ApiSubscriptionRoute
+	url := config.Conf.Clients["Notification"].Url() + clients.ApiSubscriptionRoute
 	url, deletedBy := constructUrl(url, args)
-
-	err = request.Delete(url)
-	if err == nil {
-		fmt.Printf("Removed: %s\n", deletedBy)
-	}
-	return
+	return request.DeletePrt(url, deletedBy)
 }
 
 func constructUrl(url string, args []string) (string, string) {
@@ -65,4 +57,3 @@ func constructUrl(url string, args []string) (string, string) {
 	url = url + "/" + args[0]
 	return url, args[0]
 }
-

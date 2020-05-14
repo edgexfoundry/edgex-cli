@@ -46,7 +46,7 @@ func addSubscriptionHandler(cmd *cobra.Command, args []string) {
 	for _, fname := range args {
 		subscriptions, err := parseToml(fname)
 		if err != nil {
-			fmt.Println("Error occur: ", err.Error())
+			fmt.Println("Error: ", err.Error())
 		}
 		for _, s := range subscriptions {
 			request.Post(config.Conf.Clients["Notification"].Url()+clients.ApiSubscriptionRoute, &s)

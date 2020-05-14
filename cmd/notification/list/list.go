@@ -42,11 +42,11 @@ var onlyNew bool
 
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "list",
-		Short: "A list of all notifications",
-		Long:  `Return a list of all notifications filtered by slug/sender/labels/start/end/new and limited by limit. Defaults to new notifications.`,
-		Args:  cobra.MaximumNArgs(3),
-		RunE:   listHandler,
+		Use:                        "list",
+		Short:                      "A list of all notifications",
+		Long:                       `Return a list of all notifications filtered by slug/sender/labels/start/end/new and limited by limit. Defaults to new notifications.`,
+		Args:                       cobra.MaximumNArgs(3),
+		RunE:                       listHandler,
 		PostRun:                    nil,
 		PostRunE:                   nil,
 		PersistentPostRun:          nil,
@@ -63,16 +63,15 @@ func NewCommand() *cobra.Command {
 	}
 
 	cmd.Flags().Int32VarP(&limit, "limit", "l", 50, "Limit number of results")
-	cmd.Flags().StringVar(&start,"start", "", "Filter results by start date")
-	cmd.Flags().StringVar(&end, "end", "",  "Filter results by end date")
-	cmd.Flags().StringVar(&slug,  "slug",  "",  "Filter results by slug")
-	cmd.Flags().StringVar(&sender,  "sender",  "",  "Filter results by sender")
-	cmd.Flags().StringVar(&labels,  "labels",  "",  "Filter results by labels")
+	cmd.Flags().StringVar(&start, "start", "", "Filter results by start date")
+	cmd.Flags().StringVar(&end, "end", "", "Filter results by end date")
+	cmd.Flags().StringVar(&slug, "slug", "", "Filter results by slug")
+	cmd.Flags().StringVar(&sender, "sender", "", "Filter results by sender")
+	cmd.Flags().StringVar(&labels, "labels", "", "Filter results by labels")
 	cmd.Flags().BoolVar(&onlyNew, "new", false, "Filter results by new")
 
 	return cmd
 }
-
 
 func listHandler(cmd *cobra.Command, args []string) (err error) {
 	var url string
@@ -99,25 +98,14 @@ func listHandler(cmd *cobra.Command, args []string) (err error) {
 		if end != "" {
 			url += "/end/" + end
 		}
-    } else if end != "" {
+	} else if end != "" {
 		url += "/end/" + end
 	} else { // default behavior whgen no flags specified
 		url += "/new"
-    }
+	}
 
-	if multi  {
+	if multi {
 		url = url + "/" + strconv.FormatInt(int64(limit), 10)
-	}
-	verboseFlag, err1 := cmd.Flags().GetBool("verbose")
-	if err1 != nil {
-		fmt.Println("couldn't get verbose flag")
-	}
-	urlFlag, err2 := cmd.Flags().GetBool("url")
-	if err2 != nil {
-		fmt.Println("couldn't get url flag")
-	}
-	if urlFlag || verboseFlag {
-		fmt.Printf("*** URL ==  %s *** \n", url)
 	}
 	var notifications []models.Notification
 	var aNotification models.Notification
@@ -129,13 +117,13 @@ func listHandler(cmd *cobra.Command, args []string) (err error) {
 	if err != nil {
 		return
 	}
-    if !multi { // to use the same display code
-    	notifications = []models.Notification{aNotification}
+	if !multi { // to use the same display code
+		notifications = []models.Notification{aNotification}
 	}
 	pw := viper.Get("writer").(io.WriteCloser)
 	w := new(tabwriter.Writer)
 	w.Init(pw, 0, 8, 1, '\t', 0)
-	fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t\n", "Notification ID", "Slug", "Sender",  "Status", "Severity", "Category", "Content", "Labels", "Created", "Modified")
+	fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t\n", "Notification ID", "Slug", "Sender", "Status", "Severity", "Category", "Content", "Labels", "Created", "Modified")
 	for _, notification := range notifications {
 		fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t\n",
 			notification.ID,
@@ -153,5 +141,3 @@ func listHandler(cmd *cobra.Command, args []string) (err error) {
 	w.Flush()
 	return
 }
-
-

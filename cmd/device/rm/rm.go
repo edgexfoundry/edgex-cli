@@ -16,8 +16,8 @@ package rm
 
 import (
 	"context"
+	"errors"
 	"fmt"
-
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 	"github.com/edgexfoundry/go-mod-core-contracts/clients/metadata"
 
@@ -26,43 +26,40 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var name string
+
 // NewCommand returns the rm command of type cobra.Command
 func NewCommand() *cobra.Command {
 	var cmd = &cobra.Command{
-		Use:   "rm [device name|ID]",
+		Use:   "rm [<id> | --name <device-name>]",
 		Short: "Removes device by name or ID",
 		Long: `Removes a device given its name or ID. 
 You can use: '$ edgex device list' to find a device's name and ID.`,
-		Run: func(cmd *cobra.Command, args []string) {
-
-			// Checking for args
-			if len(args) == 0 {
-				fmt.Printf("Error: No device ID/Name provided.\n")
-				return
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			if len(args) == 0 && name == "" {
+				return errors.New("no device id/name provided")
 			}
-
-			deviceID := args[0]
-
 			mdc := metadata.NewDeviceClient(
-				local.New(config.Conf.Clients["Metadata"].Url()+clients.ApiDeviceRoute),
+				local.New(config.Conf.Clients["Metadata"].Url() + clients.ApiDeviceRoute),
 			)
 
 			ctx := context.Background()
-			err := mdc.DeleteByName(ctx, deviceID)
-			if err != nil {
-				fmt.Printf("Removed: %s\n", deviceID)
-				return
+			if name != "" {
+				err = mdc.DeleteByName(ctx, name)
+				if err == nil {
+					fmt.Printf("Removed: %s\n", name)
+				}
+				return err
 			}
 
+			deviceID := args[0]
 			err = mdc.Delete(ctx, deviceID)
-			if err != nil {
-				fmt.Printf("Not removed: %s\n", deviceID)
-				fmt.Println(err)
-				return
+			if err == nil {
+				fmt.Printf("Removed: %s\n", deviceID)
 			}
-
-			fmt.Printf("Removed: %s\n", deviceID)
+			return err
 		},
 	}
+	cmd.Flags().StringVarP(&name, "name", "n", "", "Delete Device by name")
 	return cmd
 }

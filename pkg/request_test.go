@@ -13,6 +13,7 @@
 // *******************************************************************************/
 //
 package client
+
 //TODO Rewrite the test following the new logic - use "net/http/httptest"
 //
 //import (

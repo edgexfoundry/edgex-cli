@@ -17,27 +17,24 @@ func Get(url string, items interface{}) (err error) {
 	printURL(url)
 	resp, err := clients.GetRequest(context.Background(), "", local.New(url))
 	if err != nil {
-		fmt.Printf("Error: %s\n", err.Error())
 		return err
 	}
 	printResponse(string(resp))
-	err = json.Unmarshal(resp, &items)
-	if err != nil {
-		fmt.Printf("Error: %s\n", err.Error())
-	}
-	return
+	return json.Unmarshal(resp, &items)
 }
-
 func Delete(url string) error {
 	printURL(url)
-	err :=  clients.DeleteRequest(context.Background(), "", local.New(url))
-	if err != nil {
-		fmt.Printf("Error: %s\n", err.Error())
+	return clients.DeleteRequest(context.Background(), "", local.New(url))
+}
+func DeletePrt(url string, deletedBy string) error {
+	err := Delete(url)
+	if err == nil &&  deletedBy != ""{
+		fmt.Printf("Removed: %s \n", deletedBy)
+		return nil
 	}
 	return err
 }
 
-//TODO handle errors
 func Post(url string, item interface{}) {
 	printURL(url)
 	printData(item)
@@ -52,7 +49,7 @@ func Post(url string, item interface{}) {
 
 func printURL(url string) {
 	if viper.GetBool("url") || viper.GetBool("verbose") {
-		fmt.Printf("> %s:%s \n",http.MethodGet, url)
+		fmt.Printf("> %s:%s \n", http.MethodGet, url)
 	}
 }
 

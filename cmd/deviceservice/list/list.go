@@ -35,7 +35,7 @@ func NewCommand() *cobra.Command {
 		Use:   "list",
 		Short: "Lists existing devices services",
 		Long:  `Return the list fo current device services.`,
-		RunE: func(cmd *cobra.Command, args []string) (err error){
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			url := config.Conf.Clients["Metadata"].Url() + clients.ApiDeviceServiceRoute
 			var deviceServices []models.DeviceService
 			err = request.Get(url, &deviceServices)
