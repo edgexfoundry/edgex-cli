@@ -15,36 +15,35 @@
 package list
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"text/tabwriter"
 
 	"github.com/edgexfoundry-holding/edgex-cli/config"
-	request "github.com/edgexfoundry-holding/edgex-cli/pkg"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
+	"github.com/edgexfoundry/go-mod-core-contracts/clients/scheduler"
+	"github.com/edgexfoundry/go-mod-core-contracts/clients/urlclient/local"
 	"github.com/edgexfoundry/go-mod-core-contracts/models"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
-var byID bool
+func listHandler(cmd *cobra.Command, args []string) (err error) {
+	client := scheduler.NewIntervalClient(
+		local.New(config.Conf.Clients["Scheduler"].Url() + clients.ApiIntervalRoute),
+	)
 
-func listHandler(cmd *cobra.Command, args []string) (err error){
-	var url = config.Conf.Clients["Scheduler"].Url() + clients.ApiIntervalRoute
-	if len(args) > 0 {
-		if byID {
-			url += "/" + args[0]
-		} else {
-			url += "/name/" + args[0]
-		}
-
-	}
 	var intervals []models.Interval
-	err = request.Get(url, &intervals)
+	if len(args) == 0 {
+		intervals, err = client.Intervals(context.Background())
+	} else {
+		intervals, err = getInterval(client, args[0])
+	}
 	if err != nil {
-		return
+		return err
 	}
 
 	pw := viper.Get("writer").(io.WriteCloser)
@@ -67,14 +66,21 @@ func listHandler(cmd *cobra.Command, args []string) (err error){
 	return
 }
 
+func getInterval(client scheduler.IntervalClient, id string) ([]models.Interval, error) {
+	interval, err := client.Interval(context.Background(), id)
+	if err != nil {
+		return nil, err
+	}
+	return []models.Interval{interval}, nil
+}
+
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "list",
 		Short: "A list of all intervals",
-		Long:  `Return a list of all intervals.`,
+		Long:  `Return a list of all intervals or retrieve an interval by id`,
 		Args:  cobra.MaximumNArgs(1),
-		RunE:   listHandler,
+		RunE:  listHandler,
 	}
-	cmd.Flags().BoolVar(&byID, "id", false, "By ID")
 	return cmd
 }
