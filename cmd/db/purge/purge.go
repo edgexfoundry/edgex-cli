@@ -47,7 +47,7 @@ database. Currently, it only cleans up core-metadata.
 
 
 `,
-		RunE: func(cmd *cobra.Command, args []string) (err error){
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			// asking for user input
 			fmt.Println("Are you sure? This cannot be undone: [y/n]")
 			if askForConfirmation() {
@@ -126,9 +126,9 @@ func removeLogs() {
 	}
 }
 
-func removeNotifications(){
+func removeNotifications() {
 	fmt.Println("\n * Notifications")
-	url := config.Conf.Clients["Notification"].Url()+"/api/v1/cleanup"
+	url := config.Conf.Clients["Notification"].Url() + "/api/v1/cleanup"
 	err := request.Delete(url)
 	if err == nil {
 		//TODO fix the message

@@ -30,18 +30,17 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
+
 var limit int32
 
 // NewCommand returns the list device command
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:                    "list",
-
-		Short:                  "A list of all device readings",
-		Long:                   `Return all device readings.`,
-		Args:                   cobra.MaximumNArgs(1),
+		Use:   "list",
+		Short: "A list of all device readings",
+		Long:  `Return all device readings.`,
+		Args:  cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-
 			var url string
 			if len(args) > 0 {
 				var limitUrl string

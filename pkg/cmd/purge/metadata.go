@@ -65,6 +65,7 @@ func (d *metadataCleaner) cleanDeviceServices() {
 	var deviceServices []models.DeviceService
 	err := request.Get(url, &deviceServices)
 	if err != nil {
+		fmt.Printf("Error: %s\n", err.Error())
 		return
 	}
 
@@ -76,7 +77,7 @@ func (d *metadataCleaner) cleanDeviceServices() {
 		}
 	}
 
-	fmt.Printf("Removed %d Device Service from %d \n", count, len(deviceServices))
+	fmt.Printf("Removed %d Device Services from %d \n", count, len(deviceServices))
 }
 
 func (d *metadataCleaner) cleanDeviceProfiles() {
@@ -84,6 +85,7 @@ func (d *metadataCleaner) cleanDeviceProfiles() {
 	var deviceProfiles []models.DeviceProfile
 	err := request.Get(url, &deviceProfiles)
 	if err != nil {
+		fmt.Printf("Error: %s\n", err.Error())
 		return
 	}
 
@@ -94,7 +96,7 @@ func (d *metadataCleaner) cleanDeviceProfiles() {
 			count = count + 1
 		}
 	}
-	fmt.Printf("Removed %d Device Profile from %d \n", count, len(deviceProfiles))
+	fmt.Printf("Removed %d Device Profiles from %d \n", count, len(deviceProfiles))
 }
 
 func (d *metadataCleaner) cleanAddressables() {
@@ -102,6 +104,7 @@ func (d *metadataCleaner) cleanAddressables() {
 	var addressables []models.Addressable
 	err := request.Get(url, &addressables)
 	if err != nil {
+		fmt.Printf("Error: %s\n", err.Error())
 		return
 	}
 
@@ -112,5 +115,5 @@ func (d *metadataCleaner) cleanAddressables() {
 			count = count + 1
 		}
 	}
-	fmt.Printf("Removed %d Addressable from %d \n", count, len(addressables))
+	fmt.Printf("Removed %d Addressables from %d \n", count, len(addressables))
 }

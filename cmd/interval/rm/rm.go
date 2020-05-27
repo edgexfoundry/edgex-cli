@@ -16,6 +16,7 @@ package rm
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/edgexfoundry-holding/edgex-cli/config"
@@ -27,37 +28,40 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func removeIntervalHandler(cmd *cobra.Command, args []string) {
-	// Checking for args
-	if len(args) == 0 {
-		fmt.Printf("Error: No interval ID/Name provided.\n")
-		return
+var name string
+
+func removeIntervalHandler(cmd *cobra.Command, args []string) (err error) {
+	if len(args) == 0 && name == "" {
+		return errors.New("no device id/name provided.\n")
 	}
 
-	url := config.Conf.Clients["Scheduler"].Url()
-	// Create request
-	intervalID := args[0]
 	sc := scheduler.NewIntervalClient(
-		local.New(url+clients.ApiIntervalRoute),
+		local.New(config.Conf.Clients["Scheduler"].Url() + clients.ApiIntervalRoute),
 	)
-
-	err := sc.Delete(context.Background(), intervalID)
+	var deletedBy string
+	if name != "" {
+		deletedBy = name
+		err = sc.DeleteByName(context.Background(), name)
+	} else {
+		deletedBy = args[0]
+		err = sc.Delete(context.Background(), deletedBy)
+	}
 	if err != nil {
-		fmt.Println(err)
 		return
 	}
-
-	fmt.Printf("Removed: %s\n", intervalID)
+	fmt.Printf("Removed: %s\n", deletedBy)
+	return nil
 }
 
 // NewCommand returns rm interval command
 func NewCommand() *cobra.Command {
 	var cmd = &cobra.Command{
-		Use:   "rm [interval name or id]",
+		Use:   "rm [ name | id]",
 		Short: "Removes interval by name or id",
 		Long:  `Removes an interval given its name or id.`,
-		Args:  cobra.ExactValidArgs(1),
-		Run:   removeIntervalHandler,
+		//Args:  cobra.ExactValidArgs(1),
+		RunE: removeIntervalHandler,
 	}
+	cmd.Flags().StringVarP(&name, "name", "n", "", "Delete interval by name")
 	return cmd
 }

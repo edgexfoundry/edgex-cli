@@ -16,6 +16,7 @@ package rm
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/edgexfoundry-holding/edgex-cli/config"
@@ -27,42 +28,40 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var name string
+
 // NewCommand return the rm profile command
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "rm [profile name|ID]",
+		Use:   "rm [<id> | --name <profile-name>]",
 		Short: "Remove profile by name or ID",
 		Long:  `Removes the device profile given a device profile name or ID.`,
-		Run: func(cmd *cobra.Command, args []string) {
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			if len(args) == 0 && name == "" {
+				return errors.New("no profile id/name provided.\n")
+			}
 
-			// Checking for args
-			if len(args) == 0 {
-				fmt.Printf("Error: No profile ID/Name provided.\n")
+			ctx := context.Background()
+			mdc := metadata.NewDeviceProfileClient(
+				local.New(config.Conf.Clients["Metadata"].Url() + clients.ApiDeviceProfileRoute),
+			)
+			if name != "" {
+				err = mdc.DeleteByName(ctx, name)
+				if err == nil {
+					fmt.Printf("Removed: %s\n", name)
+				}
 				return
 			}
 
 			deviceID := args[0]
-			url := config.Conf.Clients["Metadata"].Url()
-
-			mdc := metadata.NewDeviceProfileClient(
-				local.New(url+clients.ApiDeviceProfileRoute),
-			)
-
-			ctx := context.Background()
-			err := mdc.DeleteByName(ctx, deviceID)
-
+			err = mdc.Delete(ctx, deviceID)
 			if err == nil {
 				fmt.Printf("Removed: %s\n", deviceID)
 				return
 			}
-
-			err = mdc.Delete(ctx, deviceID)
-			if err != nil {
-				fmt.Printf("Not removed: %s\n", deviceID)
-				fmt.Println(err)
-				return
-			}
+			return
 		},
 	}
+	cmd.Flags().StringVarP(&name, "name", "n", "", "Delete device profile by name")
 	return cmd
 }

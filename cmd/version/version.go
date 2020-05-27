@@ -7,6 +7,7 @@ import (
 )
 
 var Version = "dev"
+
 // NewCommand returns the version command
 func NewCommand() *cobra.Command {
 	var cmd = &cobra.Command{

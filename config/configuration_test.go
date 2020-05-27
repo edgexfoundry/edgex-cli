@@ -27,29 +27,29 @@ import (
 )
 
 var workDir, _ = os.Getwd()
-var ValidConfigFile = filepath.Join(workDir,  "..", "res", "configuration.toml")
+var ValidConfigFile = filepath.Join(workDir, "..", "res", "configuration.toml")
 var NonExistentConfigFile = filepath.Join(workDir, "testdata", "nonExistentConfig.toml")
 var InvalidTomlConfigFile = filepath.Join(workDir, "testdata", "invalidConfig.toml")
 var Error = errors.New("test error")
 
 var TestConf = Configuration{
 	Clients: ClientInfo{
-		"Clients.Metadata": Client{Host: "localhost", Protocol: "http", Port: 48081},
-		"Clients.CoreData": Client{Host: "localhost", Protocol: "http", Port: 48080},
-		"Clients.Scheduler": Client{Host: "localhost", Protocol: "http", Port: 48085},
+		"Clients.Metadata":     Client{Host: "localhost", Protocol: "http", Port: 48081},
+		"Clients.CoreData":     Client{Host: "localhost", Protocol: "http", Port: 48080},
+		"Clients.Scheduler":    Client{Host: "localhost", Protocol: "http", Port: 48085},
 		"Clients.Notification": Client{Host: "localhost", Protocol: "http", Port: 48060},
-		"Clients.Logging": Client{Host: "localhost", Protocol: "http", Port: 48061},
+		"Clients.Logging":      Client{Host: "localhost", Protocol: "http", Port: 48061},
 	},
 }
 
 func TestGetConfig(t *testing.T) {
 	tests := []struct {
-		name              string
-		env               Environment
-		configFilePath    string
+		name           string
+		env            Environment
+		configFilePath string
 		//result            Configuration
 		expectError       bool
-		expectedErrorType  error
+		expectedErrorType error
 	}{
 		{
 			name:              "Successful GetDefaultConfig",
@@ -125,7 +125,7 @@ func getConfigFileMockEnvError() Environment {
 
 	dbMock.On("SetConfigFile", NonExistentConfigFile).Return(nil)
 	dbMock.On("GetString", "config-file").Return(NonExistentConfigFile)
-	dbMock.On("IsSet",mock.Anything).Return(true)
+	dbMock.On("IsSet", mock.Anything).Return(true)
 	return &dbMock
 }
 
@@ -134,6 +134,6 @@ func getConfigFileMockDecodeError() Environment {
 
 	dbMock.On("SetConfigFile", InvalidTomlConfigFile).Return(nil)
 	dbMock.On("GetString", "config-file").Return(InvalidTomlConfigFile)
-	dbMock.On("IsSet",mock.Anything).Return(true)
+	dbMock.On("IsSet", mock.Anything).Return(true)
 	return &dbMock
 }

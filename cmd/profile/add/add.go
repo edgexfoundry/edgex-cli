@@ -31,7 +31,7 @@ func NewCommand() *cobra.Command {
 			for _, fname := range args {
 				dp, err := parseYaml(fname)
 				if err != nil {
-					fmt.Println("Error occur: ", err.Error())
+					fmt.Println("Error: ", err.Error())
 				}
 				addDeviceProfile(dp)
 			}
@@ -43,7 +43,7 @@ func NewCommand() *cobra.Command {
 func addDeviceProfile(dp *models.DeviceProfile) {
 	url := config.Conf.Clients["Metadata"].Url()
 	mdc := metadata.NewDeviceProfileClient(
-		local.New(url+clients.ApiDeviceProfileRoute),
+		local.New(url + clients.ApiDeviceProfileRoute),
 	)
 
 	dpId, err := mdc.Add(context.Background(), dp)

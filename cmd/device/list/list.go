@@ -53,7 +53,7 @@ func NewCommand() *cobra.Command {
 			//TODO should we always check for err retuinred from fmt.Fprintf ?
 			_, err = fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t\n", "Device ID", "Device Name", "Operating State", "Device Service", "Device Profile")
 			if err != nil {
-				fmt.Println(err.Error())
+				return
 			}
 			for _, device := range devices {
 				fmt.Fprintf(w, "%s\t%s\t%v\t%s\t%s\t\n",
@@ -66,9 +66,6 @@ func NewCommand() *cobra.Command {
 			}
 			//TODO we do not constantly check for errors returned by w.Flush(). SHould we do it in the entire project ?
 			err = w.Flush()
-			if err != nil {
-				return
-			}
 			return
 		},
 	}

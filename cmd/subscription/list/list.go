@@ -34,8 +34,8 @@ func NewCommand() *cobra.Command {
 		Use:   "list",
 		Short: "A list of all subscriptions",
 		Long:  `Return all Subscriptions`,
-		RunE: func(cmd *cobra.Command, args []string) (err error){
-			url:=config.Conf.Clients["Notification"].Url()+clients.ApiSubscriptionRoute
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			url := config.Conf.Clients["Notification"].Url() + clients.ApiSubscriptionRoute
 			var subscriptions []models.Subscription
 			err = request.Get(url, &subscriptions)
 			if err != nil {
@@ -58,9 +58,6 @@ func NewCommand() *cobra.Command {
 			}
 
 			err = w.Flush()
-			if err != nil {
-				return
-			}
 			return
 		},
 	}

@@ -14,8 +14,8 @@ import (
 
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 	"github.com/edgexfoundry/go-mod-core-contracts/clients/metadata"
-	"github.com/edgexfoundry/go-mod-core-contracts/models"
 	"github.com/edgexfoundry/go-mod-core-contracts/clients/urlclient/local"
+	"github.com/edgexfoundry/go-mod-core-contracts/models"
 
 	"github.com/BurntSushi/toml"
 	"github.com/spf13/cobra"
@@ -42,9 +42,9 @@ func NewCommand() *cobra.Command {
 		Use:   "add",
 		Short: "Add devices",
 		Long:  `Create the devices described in the given TOML file.`,
-		Run: func(cmd *cobra.Command, args []string) {
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			fname := cmd.Flag("file").Value.String()
-			processFile(fname)
+			return processFile(fname)
 		},
 	}
 	cmd.Flags().StringVarP(&file, "file", "f", "", "Toml file containing device(s) configuration (required)")
@@ -55,7 +55,7 @@ func NewCommand() *cobra.Command {
 func addDevice(dev models.Device) (string, error) {
 	url := config.Conf.Clients["Metadata"].Url()
 	mdc := metadata.NewDeviceClient(
-		local.New(url+clients.ApiDeviceRoute),
+		local.New(url + clients.ApiDeviceRoute),
 	)
 	resp, err := mdc.Add(context.Background(), &dev)
 	if err != nil {
@@ -64,7 +64,7 @@ func addDevice(dev models.Device) (string, error) {
 	return resp, nil
 }
 
-func processFile(fname string) {
+func processFile(fname string) (err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			fmt.Println("Invalid TOML")
@@ -74,18 +74,15 @@ func processFile(fname string) {
 	var content = &DeviceFile{}
 	file, err := ioutil.ReadFile(fname)
 	if err != nil {
-		fmt.Println("Error: ", err.Error())
 		return
 	}
 
 	err = toml.Unmarshal(file, content)
 	if err != nil {
-		fmt.Println("Error: ", err.Error())
 		return
 	}
 
 	for _, d := range content.DeviceList {
-		fmt.Println("Creating device: ", d.Name)
 		millis := time.Now().UnixNano() / int64(time.Millisecond)
 		dev := models.Device{
 			Name:           d.Name,
@@ -105,4 +102,5 @@ func processFile(fname string) {
 			fmt.Println("Created with ID: ", id)
 		}
 	}
+	return nil
 }

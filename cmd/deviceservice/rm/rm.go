@@ -15,8 +15,7 @@
 package rm
 
 import (
-	"fmt"
-
+	"errors"
 	"github.com/edgexfoundry-holding/edgex-cli/config"
 	request "github.com/edgexfoundry-holding/edgex-cli/pkg"
 
@@ -30,25 +29,18 @@ var name string
 // NewCommand returns the rm device service command
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "rm [--name|<id>]",
+		Use: "rm [--name|<id>]",
 		Example: "deviceservice rm <id> \n" +
-			     "deviceservice rm --name <name>",
+			"deviceservice rm --name <name>",
 		Short: "Removes device service by name or ID",
 		Long:  `Removes a device service from the core-metadata DB.`,
 		RunE: func(cmd *cobra.Command, args []string) (err error){
-			if len(args) == 0 && name ==""{
-				fmt.Printf("Error: No device service ID/name provided.\n")
-				return
+			if len(args) == 0 && name == "" {
+				return errors.New("no device service id/name provided")
 			}
-
-			url:=config.Conf.Clients["Metadata"].Url()+ clients.ApiDeviceServiceRoute
+			url := config.Conf.Clients["Metadata"].Url() + clients.ApiDeviceServiceRoute
 			url, deletedBy := constructUrl(url, args)
-
-			err = request.Delete(url)
-			if err == nil {
-				fmt.Printf("Removed: %s\n", deletedBy)
-			}
-			return
+			return request.DeletePrt(url, deletedBy)
 		},
 	}
 	cmd.Flags().StringVar(&name, "name", "", "Delete Device Service by given name")

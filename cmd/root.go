@@ -80,21 +80,20 @@ func NewCommand() *cobra.Command {
 
 		},
 		SilenceUsage: true,
-		Use:   "edgex-cli",
-		Short: "EdgeX command line interface",
+		Use:          "edgex-cli",
+		Short:        "EdgeX command line interface",
 		Long: "\n" +
 
-    " ______     _              __   __            _____  _       _____        \n" +
-	"|  ____|   | |             \\ \\ / /           / ____|| |     |_   _|     \n" +
-	"| |__    __| |  __ _   ___  \\ V /   ______  | |     | |       | |        \n" +
-	"|  __|  / _` | / _` | / _ \\  > <   |______| | |     | |       | |        \n" +
-	"| |____| (_| || (_| ||  __/ / . \\           | |____ | |____  _| |_       \n" +
-	"|______|\\__,_| \\__, | \\___|/_/ \\_\\           \\_____||______||_____| \n" +
-	"		__/ |                                                             \n" +
-	"	       |___/                                                              \n" +
+			" ______     _              __   __            _____  _       _____        \n" +
+			"|  ____|   | |             \\ \\ / /           / ____|| |     |_   _|     \n" +
+			"| |__    __| |  __ _   ___  \\ V /   ______  | |     | |       | |        \n" +
+			"|  __|  / _` | / _` | / _ \\  > <   |______| | |     | |       | |        \n" +
+			"| |____| (_| || (_| ||  __/ / . \\           | |____ | |____  _| |_       \n" +
+			"|______|\\__,_| \\__, | \\___|/_/ \\_\\           \\_____||______||_____| \n" +
+			"		__/ |                                                             \n" +
+			"	       |___/                                                              \n" +
 
-
-	`
+			`
 EdgeX CLI version: ` + version.Version +
 			`
 https://www.edgexfoundry.org/
@@ -145,6 +144,7 @@ func Execute() {
 	}
 	defer closeWriter()
 }
+
 //closeWriter function will be executed first and then os.Exit(1) will be executed in case of err
 func closeWriter() {
 	shouldClose := viper.GetBool("writerShouldClose")

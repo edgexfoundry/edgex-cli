@@ -31,11 +31,12 @@ func (d *schedulerCleaner) Purge() {
 	d.cleanIntervalActions()
 }
 
-func (d *schedulerCleaner) cleanIntervals(){
+func (d *schedulerCleaner) cleanIntervals() {
 	url := d.baseUrl + clients.ApiIntervalRoute
 	var intervals []models.Interval
 	err := request.Get(url, &intervals)
 	if err != nil {
+		fmt.Printf("Error: %s\n", err.Error())
 		return
 	}
 
@@ -43,7 +44,7 @@ func (d *schedulerCleaner) cleanIntervals(){
 	for _, interval := range intervals {
 		err = request.Delete(url + "/" + interval.ID)
 		if err == nil {
-			count = count +1
+			count = count + 1
 		}
 	}
 	fmt.Printf("Removed %d Intervals from %d \n", count, len(intervals))
@@ -54,6 +55,7 @@ func (d *schedulerCleaner) cleanIntervalActions() {
 	var intervalActions []models.IntervalAction
 	err := request.Get(url, &intervalActions)
 	if err != nil {
+		fmt.Printf("Error: %s\n", err.Error())
 		return
 	}
 
@@ -61,7 +63,7 @@ func (d *schedulerCleaner) cleanIntervalActions() {
 	for _, intervalAction := range intervalActions {
 		err = request.Delete(url + "/" + intervalAction.ID)
 		if err == nil {
-			count = count +1
+			count = count + 1
 		}
 	}
 	fmt.Printf("Removed %d Interval Actions from %d \n", count, len(intervalActions))

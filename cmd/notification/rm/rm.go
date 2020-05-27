@@ -15,8 +15,7 @@
 package rm
 
 import (
-	"fmt"
-
+	"errors"
 	"github.com/edgexfoundry-holding/edgex-cli/config"
 	request "github.com/edgexfoundry-holding/edgex-cli/pkg"
 
@@ -28,26 +27,19 @@ import (
 // NewCommand returns the rm command of type cobra.Command
 var byAge bool
 
-//TODO need revisit
+//TODO need revisit ! What are the supported flags ? Are they consistent with the other commands ?
 func removeNotificationHandler(cmd *cobra.Command, args []string) (err error){
 	// Checking for args
 	if len(args) == 0 {
-		fmt.Printf("Error: No profile ID/Name provided.\n")
-		return
+		return errors.New("no notification ID/Name provided")
 	}
-
 	url := config.Conf.Clients["Notification"].Url() + clients.ApiNotificationRoute
 	if byAge {
 		url += "/age/" + args[0]
 	} else {
 		url += "/slug/" + args[0]
 	}
-
-	err = request.Delete(url)
-	if err == nil {
-		fmt.Printf("Removed: %s\n",  args[0])
-	}
-	return
+	return request.DeletePrt(url, args[0])
 }
 
 func NewCommand() *cobra.Command {

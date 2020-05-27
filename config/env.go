@@ -41,4 +41,3 @@ func (ViperEnv) GetString(key string) string {
 func NewViperEnv() Environment {
 	return ViperEnv{}
 }
-
