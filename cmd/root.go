@@ -20,6 +20,7 @@ import (
 	"os"
 
 	"github.com/edgexfoundry-holding/edgex-cli/cmd/addressable"
+	"github.com/edgexfoundry-holding/edgex-cli/cmd/command"
 	"github.com/edgexfoundry-holding/edgex-cli/cmd/db"
 	"github.com/edgexfoundry-holding/edgex-cli/cmd/device"
 	"github.com/edgexfoundry-holding/edgex-cli/cmd/deviceservice"
@@ -109,6 +110,7 @@ https://www.edgexfoundry.org/
 	cmd.AddCommand(status.NewCommand())
 	cmd.AddCommand(db.NewCommand())
 	cmd.AddCommand(addressable.NewCommand())
+	cmd.AddCommand(command.NewCommand())
 	// --- Support Services Commands ---
 	cmd.AddCommand(notification.NewCommand())
 	cmd.AddCommand(subscription.NewCommand())
