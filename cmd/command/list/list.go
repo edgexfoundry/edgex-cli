@@ -17,6 +17,7 @@ import (
 	"github.com/spf13/viper"
 	"html/template"
 	"io"
+	"strings"
 	"text/tabwriter"
 
 	"github.com/edgexfoundry-holding/edgex-cli/config"
@@ -30,9 +31,13 @@ import (
 
 var device string
 
-const cmdTempl = "Id\tName\tPath\t\n" +
-	"{{range $i, $c := .Commands}}" +
-	"{{$c.Id}}\t{{$c.Name}}\t{{$c.Get.URL}}\t\n" +
+const cmdsTempl = "Name\tDevice Id\tDevice Name\tMethods\tURL\t\n" +
+	"{{range .}}" +
+		"{{ $id :=.Id}}" + //deviceId
+		"{{ $name :=.Name}}" + //deviceName
+		"{{range $i, $c := .Commands}}" +
+			"{{$c.Name}}\t{{$id}}\t{{$name}}\t{{supportedMethods $c}}\t{{if $c.Get.URL}}{{$c.Get.URL}}{{else}}{{$c.Put.URL}}{{end}}\t\n" +
+		"{{end}}" +
 	"{{end}}"
 
 func NewCommand() *cobra.Command {
@@ -43,28 +48,56 @@ func NewCommand() *cobra.Command {
 		RunE:  listHandler,
 	}
 	cmd.Flags().StringVarP(&device, "device", "d", "", "List commands associated with device specified by name")
-	cmd.MarkFlagRequired("device")
 	return cmd
 }
 
 func listHandler(cmd *cobra.Command, args []string) (err error) {
-	url := config.Conf.Clients["Command"].Url() + clients.ApiDeviceRoute + "/name/" + device
-	var response models.CommandResponse
-	err = request.Get(url, &response)
+	var responses []models.CommandResponse
+	if device != "" {
+		responses, err = getCommandsByDeviceName(device)
+	} else {
+		responses, err = getCommands()
+	}
 	if err != nil {
 		return
 	}
 	pw := viper.Get("writer").(io.WriteCloser)
 	w := new(tabwriter.Writer)
 	w.Init(pw, 0, 8, 1, '\t', 0)
-	tmpl, err := template.New("commandList").Parse(cmdTempl)
+	tmpl, err := template.New("commandList").Funcs(template.FuncMap{"supportedMethods": supportedMethods}).Parse(cmdsTempl)
 	if err != nil {
 		return err
 	}
-	err = tmpl.Execute(w, response)
+	err = tmpl.Execute(w, responses)
 	if err != nil {
 		return err
 	}
 	w.Flush()
 	return
+}
+
+func getCommands() ([]models.CommandResponse, error) {
+	var responses []models.CommandResponse
+	url := config.Conf.Clients["Command"].Url() + clients.ApiDeviceRoute
+	err := request.Get(url, &responses)
+	return responses, err
+}
+
+func getCommandsByDeviceName(d string) ([]models.CommandResponse, error) {
+	var response models.CommandResponse
+	url := config.Conf.Clients["Command"].Url() + clients.ApiDeviceRoute + "/name/" + device
+	err := request.Get(url, &response)
+	responses := []models.CommandResponse{response}
+	return responses, err
+}
+
+func supportedMethods(cmd models.Command) (methods string) {
+	if cmd.Get.Path != "" {
+		methods = "Get,"
+	}
+	if cmd.Put.Path != "" {
+		methods = methods + " Put"
+	}
+	methods = strings.TrimSpace(methods)
+	return strings.TrimSuffix(methods, ",")
 }
