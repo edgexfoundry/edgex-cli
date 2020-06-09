@@ -7,6 +7,10 @@
         Host = 'localhost'
         Protocol = 'http'
         Port = 48080
+    [Clients.Command]
+        Protocol = 'http'
+        Host = 'localhost'
+        Port = 48082
     [Clients.Scheduler]
         Host = 'localhost'
         Protocol = 'http'
