@@ -17,12 +17,11 @@ package list
 import (
 	"github.com/edgexfoundry-holding/edgex-cli/config"
 	request "github.com/edgexfoundry-holding/edgex-cli/pkg"
-	"github.com/edgexfoundry-holding/edgex-cli/pkg/formatter"
+	"github.com/edgexfoundry-holding/edgex-cli/pkg/formatters"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 	"github.com/edgexfoundry/go-mod-core-contracts/models"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 const addrTempl = "Id\tName\tProtocol\tHTTPMethod\tAddress\tPort\n" +
@@ -47,14 +46,7 @@ func listHandler(cmd *cobra.Command, args []string) (err error) {
 	if err != nil {
 		return
 	}
-	formatter := newAddrListFormatter()
+	formatter := formatters.NewFormatter("addrList", addrTempl, nil)
 	err = formatter.Write(addr)
 	return
-}
-
-func newAddrListFormatter() formatter.FormatWriter {
-	if viper.GetBool("verbose") {
-		return &formatter.EmptyFormatter{}
-	}
-	return formatter.New("addrList", addrTempl, nil)
 }

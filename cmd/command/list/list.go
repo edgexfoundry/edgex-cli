@@ -14,13 +14,12 @@
 package list
 
 import (
-	"github.com/spf13/viper"
 	"html/template"
 	"strings"
 
 	"github.com/edgexfoundry-holding/edgex-cli/config"
 	request "github.com/edgexfoundry-holding/edgex-cli/pkg"
-	"github.com/edgexfoundry-holding/edgex-cli/pkg/formatter"
+	"github.com/edgexfoundry-holding/edgex-cli/pkg/formatters"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 	"github.com/edgexfoundry/go-mod-core-contracts/models"
@@ -60,16 +59,9 @@ func listHandler(cmd *cobra.Command, args []string) (err error) {
 	if err != nil {
 		return
 	}
-	formatter := newCmdListFormatter()
+	formatter := formatters.NewFormatter("commandList", cmdsTempl, template.FuncMap{"supportedMethods": supportedMethods})
 	err = formatter.Write(responses)
 	return
-}
-
-func newCmdListFormatter() formatter.FormatWriter {
-	if viper.GetBool("verbose") {
-		return &formatter.EmptyFormatter{}
-	}
-	return formatter.New("commandList", cmdsTempl, template.FuncMap{"supportedMethods": supportedMethods})
 }
 
 func getCommands() ([]models.CommandResponse, error) {
