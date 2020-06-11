@@ -15,12 +15,9 @@
 package list
 
 import (
-	"fmt"
-	"io"
-	"text/tabwriter"
-
 	"github.com/edgexfoundry-holding/edgex-cli/config"
 	request "github.com/edgexfoundry-holding/edgex-cli/pkg"
+	"github.com/edgexfoundry-holding/edgex-cli/pkg/formatter"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 	"github.com/edgexfoundry/go-mod-core-contracts/models"
@@ -28,38 +25,36 @@ import (
 	"github.com/spf13/viper"
 )
 
+const addrTempl = "Id\tName\tProtocol\tHTTPMethod\tAddress\tPort\n" +
+	"{{range .}}" +
+		"{{.Id}}\t{{.Name}}\t{{.Protocol}}\t{{.HTTPMethod}}\t{{.Address}}\t{{.Port}}\n" +
+	"{{end}}"
+
 // NewCommand returns the list device command
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "list",
 		Short: "A list of all device services",
 		Long:  `Return all device services sorted by id.`,
-		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			//TODO Open issue in go-mod-contracts to extend the AddressableClient interface to support getAll Addressable
-			url := config.Conf.Clients["Metadata"].Url() + clients.ApiAddressableRoute
-			var addr []models.Addressable
-			err = request.Get(url, &addr)
-			if err != nil {
-				return
-			}
-
-			pw := viper.Get("writer").(io.Writer)
-			w := new(tabwriter.Writer)
-			w.Init(pw, 0, 8, 1, '\t', 0)
-			_, err = fmt.Fprintf(w, "%s\t%s\t%s\t\n", "ID", "Name", "Protocol")
-			if err != nil {
-				fmt.Println(err.Error())
-			}
-			for _, addressable := range addr {
-				fmt.Fprintf(w, "%s\t%s\t%v\t\n",
-					addressable.Id,
-					addressable.Name,
-					addressable.Protocol,
-				)
-			}
-			w.Flush()
-			return
-		},
+		RunE:  listHandler,
 	}
 	return cmd
+}
+func listHandler(cmd *cobra.Command, args []string) (err error) {
+	url := config.Conf.Clients["Metadata"].Url() + clients.ApiAddressableRoute
+	var addr []models.Addressable
+	err = request.Get(url, &addr)
+	if err != nil {
+		return
+	}
+	formatter := newAddrListFormatter()
+	err = formatter.Write(addr)
+	return
+}
+
+func newAddrListFormatter() formatter.FormatWriter {
+	if viper.GetBool("verbose") {
+		return &formatter.EmptyFormatter{}
+	}
+	return formatter.New("addrList", addrTempl, nil)
 }
