@@ -16,12 +16,11 @@ package list
 import (
 	"github.com/spf13/viper"
 	"html/template"
-	"io"
 	"strings"
-	"text/tabwriter"
 
 	"github.com/edgexfoundry-holding/edgex-cli/config"
 	request "github.com/edgexfoundry-holding/edgex-cli/pkg"
+	"github.com/edgexfoundry-holding/edgex-cli/pkg/formatter"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 	"github.com/edgexfoundry/go-mod-core-contracts/models"
@@ -33,10 +32,10 @@ var device string
 
 const cmdsTempl = "Name\tDevice Id\tDevice Name\tMethods\tURL\t\n" +
 	"{{range .}}" +
-		"{{ $id :=.Id}}" + //deviceId
-		"{{ $name :=.Name}}" + //deviceName
+		"{{ $deviceId :=.Id}}" +
+		"{{ $deviceName :=.Name}}" +
 		"{{range $i, $c := .Commands}}" +
-			"{{$c.Name}}\t{{$id}}\t{{$name}}\t{{supportedMethods $c}}\t{{if $c.Get.URL}}{{$c.Get.URL}}{{else}}{{$c.Put.URL}}{{end}}\t\n" +
+			"{{$c.Name}}\t{{$deviceId}}\t{{$deviceName}}\t{{supportedMethods $c}}\t{{if $c.Get.URL}}{{$c.Get.URL}}{{else}}{{$c.Put.URL}}{{end}}\t\n" +
 		"{{end}}" +
 	"{{end}}"
 
@@ -61,19 +60,16 @@ func listHandler(cmd *cobra.Command, args []string) (err error) {
 	if err != nil {
 		return
 	}
-	pw := viper.Get("writer").(io.WriteCloser)
-	w := new(tabwriter.Writer)
-	w.Init(pw, 0, 8, 1, '\t', 0)
-	tmpl, err := template.New("commandList").Funcs(template.FuncMap{"supportedMethods": supportedMethods}).Parse(cmdsTempl)
-	if err != nil {
-		return err
-	}
-	err = tmpl.Execute(w, responses)
-	if err != nil {
-		return err
-	}
-	w.Flush()
+	formatter := newCmdListFormatter()
+	err = formatter.Write(responses)
 	return
+}
+
+func newCmdListFormatter() formatter.FormatWriter {
+	if viper.GetBool("verbose") {
+		return &formatter.EmptyFormatter{}
+	}
+	return formatter.New("commandList", cmdsTempl, template.FuncMap{"supportedMethods": supportedMethods})
 }
 
 func getCommands() ([]models.CommandResponse, error) {
