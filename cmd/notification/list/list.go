@@ -15,20 +15,18 @@
 package list
 
 import (
-	"fmt"
-	"github.com/edgexfoundry-holding/edgex-cli/pkg/utils"
-	"io"
+	"html/template"
 	"strconv"
-	"text/tabwriter"
 
 	"github.com/edgexfoundry-holding/edgex-cli/config"
 	request "github.com/edgexfoundry-holding/edgex-cli/pkg"
+	"github.com/edgexfoundry-holding/edgex-cli/pkg/formatters"
+	"github.com/edgexfoundry-holding/edgex-cli/pkg/utils"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 	"github.com/edgexfoundry/go-mod-core-contracts/models"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 // See https://github.com/edgexfoundry/edgex-go/blob/master/api/openapi/v1/support-notifications.yaml
@@ -40,6 +38,11 @@ var labels string
 var sender string
 var onlyNew bool
 
+const notificationTemplete = "Notification ID\tSlug\tSender\tStatus\tSeverity\tCategory\tContent\tLabels\tCreated\tModified\n" +
+	"{{range .}}" +
+	"{{.ID}}\t{{.Slug}}\t{{.Sender}}\t{{.Status}}\t{{.Severity}}\t{{.Category}}\t{{.Content}}\t{{.Labels}}\t{{DisplayDuration .Created}}\t{{DisplayDuration .Modified}}\n" +
+	"{{end}}"
+
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:                        "list",
@@ -47,18 +50,6 @@ func NewCommand() *cobra.Command {
 		Long:                       `Return a list of all notifications filtered by slug/sender/labels/start/end/new and limited by limit. Defaults to new notifications.`,
 		Args:                       cobra.MaximumNArgs(3),
 		RunE:                       listHandler,
-		PostRun:                    nil,
-		PostRunE:                   nil,
-		PersistentPostRun:          nil,
-		PersistentPostRunE:         nil,
-		SilenceErrors:              false,
-		SilenceUsage:               false,
-		DisableFlagParsing:         false,
-		DisableAutoGenTag:          false,
-		DisableFlagsInUseLine:      false,
-		DisableSuggestions:         false,
-		SuggestionsMinimumDistance: 0,
-		TraverseChildren:           false,
 		FParseErrWhitelist:         cobra.FParseErrWhitelist{},
 	}
 
@@ -120,24 +111,7 @@ func listHandler(cmd *cobra.Command, args []string) (err error) {
 	if !multi { // to use the same display code
 		notifications = []models.Notification{aNotification}
 	}
-	pw := viper.Get("writer").(io.WriteCloser)
-	w := new(tabwriter.Writer)
-	w.Init(pw, 0, 8, 1, '\t', 0)
-	fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t\n", "Notification ID", "Slug", "Sender", "Status", "Severity", "Category", "Content", "Labels", "Created", "Modified")
-	for _, notification := range notifications {
-		fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t\n",
-			notification.ID,
-			notification.Slug,
-			notification.Sender,
-			notification.Status,
-			notification.Severity,
-			notification.Category,
-			notification.Content,
-			notification.Labels,
-			utils.DisplayDuration(notification.Created),
-			utils.DisplayDuration(notification.Modified),
-		)
-	}
-	w.Flush()
+	formatter := formatters.NewFormatter("notificationList", notificationTemplete, template.FuncMap{"DisplayDuration": utils.DisplayDuration})
+	err = formatter.Write(notifications)
 	return
 }

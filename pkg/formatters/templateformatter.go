@@ -28,6 +28,7 @@ type HtmlTempleteFormatter struct {
 
 func NewHtmlTempleteFormatter(name string, format string, funcMaps template.FuncMap) *HtmlTempleteFormatter {
 	return &HtmlTempleteFormatter{
+		//TODO should I always specify template name?
 		Name:     name,
 		Format:   format,
 		FuncMaps: funcMaps,
@@ -37,7 +38,7 @@ func NewHtmlTempleteFormatter(name string, format string, funcMaps template.Func
 func (f *HtmlTempleteFormatter) Write(obj interface{}) (err error) {
 	pw := viper.Get("writer").(io.WriteCloser)
 	w := new(tabwriter.Writer)
-	w.Init(pw, 0, 8, 1, '\t', 0)
+	w.Init(pw, 0, 8, 2, '\t', 0)
 	tmpl := template.New(f.Name)
 	if f.FuncMaps != nil {
 		tmpl.Funcs(f.FuncMaps)

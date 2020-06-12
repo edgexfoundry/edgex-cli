@@ -16,19 +16,23 @@ package list
 
 import (
 	"context"
-	"fmt"
+	"html/template"
+
 	"github.com/edgexfoundry-holding/edgex-cli/config"
+	"github.com/edgexfoundry-holding/edgex-cli/pkg/formatters"
 	"github.com/edgexfoundry-holding/edgex-cli/pkg/utils"
-	"io"
-	"text/tabwriter"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 	"github.com/edgexfoundry/go-mod-core-contracts/clients/metadata"
 	"github.com/edgexfoundry/go-mod-core-contracts/clients/urlclient/local"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
+
+const profileTemplete = "Profile ID\tProfile Name\tManufacturer\tModel\tCreated\tModified\n" +
+	"{{range .}}" +
+	"{{.Id}}\t{{.Name}}\t{{.Manufacturer}}\t{{.Model}}\t{{DisplayDuration .Created}}\t{{DisplayDuration .Modified}}\n" +
+	"{{end}}"
 
 // NewCommand return the list profiles command
 func NewCommand() *cobra.Command {
@@ -36,37 +40,24 @@ func NewCommand() *cobra.Command {
 		Use:   "list",
 		Short: "Returns a list of device profiles",
 		Long:  `Returns the list of device profiles currently in the core-metadata database.`,
-		RunE: func(cmd *cobra.Command, args []string) (err error) {
-
-			url := config.Conf.Clients["Metadata"].Url()
-			mdc := metadata.NewDeviceProfileClient(
-				local.New(url + clients.ApiDeviceProfileRoute),
-			)
-
-			profiles, err := mdc.DeviceProfiles(context.Background())
-			if err != nil {
-				return
-			}
-
-			// TODO: Add commands and resources? They both are lists, so we need to think about how to display them
-
-			pw := viper.Get("writer").(io.WriteCloser)
-			w := new(tabwriter.Writer)
-			w.Init(pw, 0, 8, 1, '\t', 0)
-			fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t%s\t\n", "Profile ID", "Profile Name", "Created", "Modified", "Manufacturer", "Model")
-			for _, device := range profiles {
-				fmt.Fprintf(w, "%s\t%s\t%v\t%v\t%v\t%v\t\n",
-					device.Id,
-					device.Name,
-					utils.DisplayDuration(device.Created),
-					utils.DisplayDuration(device.Modified),
-					device.Manufacturer,
-					device.Model,
-				)
-			}
-			w.Flush()
-			return
-		},
+		RunE: listHandler,
 	}
 	return cmd
+}
+
+func listHandler(cmd *cobra.Command, args []string) (err error) {
+	url := config.Conf.Clients["Metadata"].Url()
+	mdc := metadata.NewDeviceProfileClient(
+		local.New(url + clients.ApiDeviceProfileRoute),
+	)
+
+	profiles, err := mdc.DeviceProfiles(context.Background())
+	if err != nil {
+		return
+	}
+
+	// TODO: Add commands and resources? They both are lists, so we need to think about how to display them
+	formatter := formatters.NewFormatter("dpList", profileTemplete, template.FuncMap{"DisplayDuration": utils.DisplayDuration})
+	err = formatter.Write(profiles)
+	return
 }

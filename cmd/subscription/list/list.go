@@ -15,18 +15,20 @@
 package list
 
 import (
-	"fmt"
-	"github.com/edgexfoundry/go-mod-core-contracts/models"
-	"io"
-	"text/tabwriter"
-
 	"github.com/edgexfoundry-holding/edgex-cli/config"
 	request "github.com/edgexfoundry-holding/edgex-cli/pkg"
+	"github.com/edgexfoundry-holding/edgex-cli/pkg/formatters"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
+	"github.com/edgexfoundry/go-mod-core-contracts/models"
+
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
+
+const subscriptionTemplete = "Subscription ID\tSlug\tReceiver\tDescription\tOrigin\n" +
+	"{{range .}}" +
+	"{{.ID}}\t{{.Slug}}\t{{.Receiver}}t{{.Description}}t{{.Origin}}\n" +
+	"{{end}}"
 
 // NewCommand returns the list device command
 func NewCommand() *cobra.Command {
@@ -34,32 +36,20 @@ func NewCommand() *cobra.Command {
 		Use:   "list",
 		Short: "A list of all subscriptions",
 		Long:  `Return all Subscriptions`,
-		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			url := config.Conf.Clients["Notification"].Url() + clients.ApiSubscriptionRoute
-			var subscriptions []models.Subscription
-			err = request.Get(url, &subscriptions)
-			if err != nil {
-				return
-			}
-
-			pw := viper.Get("writer").(io.Writer)
-			w := new(tabwriter.Writer)
-			w.Init(pw, 0, 8, 1, '\t', 0)
-			_, err = fmt.Fprintf(w, "%s\t%s\t%s\t\n", "Subscription ID", "Subscription Slug", "Origin")
-			if err != nil {
-				return
-			}
-			for _, subscription := range subscriptions {
-				fmt.Fprintf(w, "%s\t%s\t%v\t\n",
-					subscription.ID,
-					subscription.Slug,
-					subscription.Origin,
-				)
-			}
-
-			err = w.Flush()
-			return
-		},
+		RunE: listHandler,
 	}
 	return cmd
+}
+
+func listHandler(cmd *cobra.Command, args []string) (err error) {
+	url := config.Conf.Clients["Notification"].Url() + clients.ApiSubscriptionRoute
+	var subscriptions []models.Subscription
+	err = request.Get(url, &subscriptions)
+	if err != nil {
+		return
+	}
+
+	formatter := formatters.NewFormatter("subscriptionList", subscriptionTemplete, nil)
+	err = formatter.Write(subscriptions)
+	return
 }

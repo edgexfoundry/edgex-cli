@@ -16,11 +16,10 @@ package list
 
 import (
 	"context"
-	"fmt"
-	"io"
-	"text/tabwriter"
+	"html/template"
 
 	"github.com/edgexfoundry-holding/edgex-cli/config"
+	"github.com/edgexfoundry-holding/edgex-cli/pkg/formatters"
 	"github.com/edgexfoundry-holding/edgex-cli/pkg/utils"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
@@ -29,8 +28,12 @@ import (
 	"github.com/edgexfoundry/go-mod-core-contracts/models"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
+
+const eventTemplete = "Event ID\tDevice\tOrigin\tCreated\tModified\n" +
+	"{{range .}}" +
+	"{{.ID}}\t{{.Device}}\t{{.Origin}}\t{{DisplayDuration .Created}}\t{{DisplayDuration .Modified}}\n" +
+	"{{end}}"
 
 var limit int
 var device string
@@ -66,21 +69,8 @@ func listHandler(cmd *cobra.Command, args []string) (err error) {
 		return err
 	}
 
-	pw := viper.Get("writer").(io.WriteCloser)
-	w := new(tabwriter.Writer)
-	w.Init(pw, 0, 8, 1, '\t', 0)
-	fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t\n", "Event ID", "Device", "Origin", "Created", "Modified")
-
-	for _, event := range events {
-		fmt.Fprintf(w, "%s\t%s\t%v\t%v\t%s\t\n",
-			event.ID,
-			event.Device,
-			event.Origin,
-			utils.DisplayDuration(event.Created),
-			utils.DisplayDuration(event.Modified),
-		)
-	}
-	w.Flush()
+	formatter := formatters.NewFormatter("eventList", eventTemplete, template.FuncMap{"DisplayDuration": utils.DisplayDuration})
+	err = formatter.Write(events)
 	return
 }
 
