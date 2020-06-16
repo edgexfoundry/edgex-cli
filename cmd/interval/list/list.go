@@ -48,7 +48,7 @@ func listHandler(cmd *cobra.Command, args []string) (err error) {
 		return err
 	}
 
-	formatter := formatters.NewFormatter("commandList", intervalTemplete, nil)
+	formatter := formatters.NewFormatter("intervalList", intervalTemplete, nil)
 	err = formatter.Write(intervals)
 	return
 }
