@@ -19,7 +19,6 @@ func Get(url string, items interface{}) (err error) {
 	if err != nil {
 		return err
 	}
-	printResponse(string(resp))
 	return json.Unmarshal(resp, &items)
 }
 func Delete(url string) error {
@@ -57,12 +56,6 @@ func printData(item interface{}) {
 	if viper.GetBool("verbose") {
 		body := reflect.ValueOf(item).MethodByName("String").Call([]reflect.Value{})[0].Interface().(string)
 		fmt.Printf("> Request data: %s\n", body)
-	}
-}
-
-func printResponse(data string) {
-	if viper.GetBool("verbose") {
-		fmt.Printf("Response body: %s\n", data)
 	}
 }
 

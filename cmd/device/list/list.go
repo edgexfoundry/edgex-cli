@@ -16,19 +16,20 @@ package list
 
 import (
 	"context"
-	"fmt"
-	"io"
-	"text/tabwriter"
 
 	"github.com/edgexfoundry-holding/edgex-cli/config"
+	"github.com/edgexfoundry-holding/edgex-cli/pkg/formatters"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 	"github.com/edgexfoundry/go-mod-core-contracts/clients/metadata"
 	"github.com/edgexfoundry/go-mod-core-contracts/clients/urlclient/local"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
+const deviceTempl = "Device ID\tDevice Name\tOperating State\tAdmin State\tDevice Service\tDevice Profile\n" +
+	"{{range .}}" +
+	"{{.Id}}\t{{.Name}}\t{{.OperatingState}}\t{{.AdminState}}\t{{.Service.Name}}\t{{.Profile.Name}}\n" +
+	"{{end}}"
 
 // NewCommand returns the list device command
 func NewCommand() *cobra.Command {
@@ -36,38 +37,23 @@ func NewCommand() *cobra.Command {
 		Use:   "list",
 		Short: "A list of all device services",
 		Long:  `Return all device services sorted by id.`,
-		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			url := config.Conf.Clients["Metadata"].Url() + clients.ApiDeviceRoute
-			mdc := metadata.NewDeviceClient(
-				local.New(url),
-			)
-
-			devices, err := mdc.Devices(context.Background())
-			if err != nil {
-				return
-			}
-
-			pw := viper.Get("writer").(io.Writer)
-			w := new(tabwriter.Writer)
-			w.Init(pw, 0, 8, 3, ' ', 0)
-			//TODO should we always check for err retuinred from fmt.Fprintf ?
-			_, err = fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t\n", "Device ID", "Device Name", "Operating State", "Device Service", "Device Profile")
-			if err != nil {
-				return
-			}
-			for _, device := range devices {
-				fmt.Fprintf(w, "%s\t%s\t%v\t%s\t%s\t\n",
-					device.Id,
-					device.Name,
-					device.OperatingState,
-					device.Service.Name,
-					device.Profile.Name,
-				)
-			}
-			//TODO we do not constantly check for errors returned by w.Flush(). SHould we do it in the entire project ?
-			err = w.Flush()
-			return
-		},
+		RunE: listHandler,
 	}
 	return cmd
+}
+
+func listHandler(cmd *cobra.Command, args []string) (err error) {
+	url := config.Conf.Clients["Metadata"].Url() + clients.ApiDeviceRoute
+	mdc := metadata.NewDeviceClient(
+		local.New(url),
+	)
+
+	devices, err := mdc.Devices(context.Background())
+	if err != nil {
+		return
+	}
+
+	formatter := formatters.NewFormatter("addrList", deviceTempl, nil)
+	err = formatter.Write(devices)
+	return
 }
