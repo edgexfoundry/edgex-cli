@@ -26,5 +26,5 @@ func NewFormatter (template string, funcMaps template.FuncMap) FormatWriter {
 	if viper.GetBool("verbose") {
 		return &JsonFormatter{}
 	}
-	return NewHtmlTempleteFormatter(template, funcMaps)
+	return NewHtmlTemplateFormatter(template, funcMaps)
 }

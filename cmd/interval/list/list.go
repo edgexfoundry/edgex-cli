@@ -28,7 +28,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const intervalTemplete = "Interval ID\tName\tStart\tEnd\tFrequency\tCron\tRunOnce\n" +
+const intervalTemplate = "Interval ID\tName\tStart\tEnd\tFrequency\tCron\tRunOnce\n" +
 	"{{range .}}" +
 	"{{.ID}}\t{{.Name}}\t{{.Start}}\t{{.End}}\t{{.Frequency}}\t{{.Cron}}\t{{.RunOnce}}\n" +
 	"{{end}}"
@@ -48,7 +48,7 @@ func listHandler(cmd *cobra.Command, args []string) (err error) {
 		return err
 	}
 
-	formatter := formatters.NewFormatter(intervalTemplete, nil)
+	formatter := formatters.NewFormatter(intervalTemplate, nil)
 	err = formatter.Write(intervals)
 	return
 }

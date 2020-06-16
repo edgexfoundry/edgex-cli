@@ -25,7 +25,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const subscriptionTemplete = "Subscription ID\tSlug\tReceiver\tDescription\tOrigin\n" +
+const subscriptionTemplate = "Subscription ID\tSlug\tReceiver\tDescription\tOrigin\n" +
 	"{{range .}}" +
 	"{{.ID}}\t{{.Slug}}\t{{.Receiver}}t{{.Description}}t{{.Origin}}\n" +
 	"{{end}}"
@@ -49,7 +49,7 @@ func listHandler(cmd *cobra.Command, args []string) (err error) {
 		return
 	}
 
-	formatter := formatters.NewFormatter(subscriptionTemplete, nil)
+	formatter := formatters.NewFormatter(subscriptionTemplate, nil)
 	err = formatter.Write(subscriptions)
 	return
 }

@@ -30,7 +30,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const eventTemplete = "Event ID\tDevice\tOrigin\tCreated\tModified\n" +
+const eventTemplate = "Event ID\tDevice\tOrigin\tCreated\tModified\n" +
 	"{{range .}}" +
 	"{{.ID}}\t{{.Device}}\t{{.Origin}}\t{{DisplayDuration .Created}}\t{{DisplayDuration .Modified}}\n" +
 	"{{end}}"
@@ -69,7 +69,7 @@ func listHandler(cmd *cobra.Command, args []string) (err error) {
 		return err
 	}
 
-	formatter := formatters.NewFormatter(eventTemplete, template.FuncMap{"DisplayDuration": utils.DisplayDuration})
+	formatter := formatters.NewFormatter(eventTemplate, template.FuncMap{"DisplayDuration": utils.DisplayDuration})
 	err = formatter.Write(events)
 	return
 }

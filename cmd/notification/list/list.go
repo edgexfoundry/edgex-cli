@@ -38,7 +38,7 @@ var labels string
 var sender string
 var onlyNew bool
 
-const notificationTemplete = "Notification ID\tSlug\tSender\tStatus\tSeverity\tCategory\tContent\tLabels\tCreated\tModified\n" +
+const notificationTemplate = "Notification ID\tSlug\tSender\tStatus\tSeverity\tCategory\tContent\tLabels\tCreated\tModified\n" +
 	"{{range .}}" +
 	"{{.ID}}\t{{.Slug}}\t{{.Sender}}\t{{.Status}}\t{{.Severity}}\t{{.Category}}\t{{.Content}}\t{{.Labels}}\t{{DisplayDuration .Created}}\t{{DisplayDuration .Modified}}\n" +
 	"{{end}}"
@@ -111,7 +111,7 @@ func listHandler(cmd *cobra.Command, args []string) (err error) {
 	if !multi { // to use the same display code
 		notifications = []models.Notification{aNotification}
 	}
-	formatter := formatters.NewFormatter(notificationTemplete, template.FuncMap{"DisplayDuration": utils.DisplayDuration})
+	formatter := formatters.NewFormatter(notificationTemplate, template.FuncMap{"DisplayDuration": utils.DisplayDuration})
 	err = formatter.Write(notifications)
 	return
 }

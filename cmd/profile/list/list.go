@@ -29,7 +29,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const profileTemplete = "Profile ID\tProfile Name\tManufacturer\tModel\tCreated\tModified\n" +
+const profileTemplate = "Profile ID\tProfile Name\tManufacturer\tModel\tCreated\tModified\n" +
 	"{{range .}}" +
 	"{{.Id}}\t{{.Name}}\t{{.Manufacturer}}\t{{.Model}}\t{{DisplayDuration .Created}}\t{{DisplayDuration .Modified}}\n" +
 	"{{end}}"
@@ -57,7 +57,7 @@ func listHandler(cmd *cobra.Command, args []string) (err error) {
 	}
 
 	// TODO: Add commands and resources? They both are lists, so we need to think about how to display them
-	formatter := formatters.NewFormatter(profileTemplete, template.FuncMap{"DisplayDuration": utils.DisplayDuration})
+	formatter := formatters.NewFormatter(profileTemplate, template.FuncMap{"DisplayDuration": utils.DisplayDuration})
 	err = formatter.Write(profiles)
 	return
 }

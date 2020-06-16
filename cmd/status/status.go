@@ -64,7 +64,7 @@ This command is not stable yet.
 					resp.Body.Close()
 				}
 			}
-			formatters.NewHtmlTempleteFormatter(statusTemplate, nil).Write(clientStatuses)
+			formatters.NewHtmlTemplateFormatter(statusTemplate, nil).Write(clientStatuses)
 		},
 	}
 	return cmd

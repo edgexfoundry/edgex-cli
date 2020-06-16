@@ -31,7 +31,7 @@ import (
 
 var limit int32
 
-const readingTemplete = "Reading ID\tName\tDevice\tOrigin\tValue\tCreated\tModified\tPushed\n" +
+const readingTemplate = "Reading ID\tName\tDevice\tOrigin\tValue\tCreated\tModified\tPushed\n" +
 	"{{range .}}" +
 	"{{.Id}}\t{{.Name}}\t{{.Device}}\t{{.Origin}}\t{{.Value}}\t{{DisplayDuration .Created}}\t{{DisplayDuration .Modified}}\t{{DisplayDuration .Pushed}}\n" +
 	"{{end}}"
@@ -70,7 +70,7 @@ func listHandler(cmd *cobra.Command, args []string) (err error) {
 		return
 	}
 
-	formatter := formatters.NewFormatter(readingTemplete, template.FuncMap{"DisplayDuration": utils.DisplayDuration})
+	formatter := formatters.NewFormatter(readingTemplate, template.FuncMap{"DisplayDuration": utils.DisplayDuration})
 	err = formatter.Write(readings)
 	return
 }
