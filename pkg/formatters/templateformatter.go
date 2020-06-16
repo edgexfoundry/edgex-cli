@@ -26,10 +26,10 @@ type HtmlTempleteFormatter struct {
 	FuncMaps template.FuncMap
 }
 
-func NewHtmlTempleteFormatter(name string, format string, funcMaps template.FuncMap) *HtmlTempleteFormatter {
+func NewHtmlTempleteFormatter(format string, funcMaps template.FuncMap) *HtmlTempleteFormatter {
 	return &HtmlTempleteFormatter{
-		//TODO should I always specify template name?
-		Name:     name,
+		//use one common name for all templates
+		Name:     "cliTemplate",
 		Format:   format,
 		FuncMaps: funcMaps,
 	}

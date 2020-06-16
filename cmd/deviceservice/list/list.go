@@ -51,7 +51,7 @@ func listHandler(cmd *cobra.Command, args []string) (err error) {
 		return
 	}
 
-	formatter := formatters.NewFormatter("dsList", dsTemplete, template.FuncMap{"DisplayDuration": utils.DisplayDuration})
+	formatter := formatters.NewFormatter(dsTemplete, template.FuncMap{"DisplayDuration": utils.DisplayDuration})
 	err = formatter.Write(deviceServices)
 	return
 }

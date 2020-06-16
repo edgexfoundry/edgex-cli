@@ -49,7 +49,7 @@ func listHandler(cmd *cobra.Command, args []string) (err error) {
 		return
 	}
 
-	formatter := formatters.NewFormatter("subscriptionList", subscriptionTemplete, nil)
+	formatter := formatters.NewFormatter(subscriptionTemplete, nil)
 	err = formatter.Write(subscriptions)
 	return
 }

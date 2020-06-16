@@ -111,7 +111,7 @@ func listHandler(cmd *cobra.Command, args []string) (err error) {
 	if !multi { // to use the same display code
 		notifications = []models.Notification{aNotification}
 	}
-	formatter := formatters.NewFormatter("notificationList", notificationTemplete, template.FuncMap{"DisplayDuration": utils.DisplayDuration})
+	formatter := formatters.NewFormatter(notificationTemplete, template.FuncMap{"DisplayDuration": utils.DisplayDuration})
 	err = formatter.Write(notifications)
 	return
 }

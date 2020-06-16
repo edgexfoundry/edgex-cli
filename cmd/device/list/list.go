@@ -53,7 +53,7 @@ func listHandler(cmd *cobra.Command, args []string) (err error) {
 		return
 	}
 
-	formatter := formatters.NewFormatter("addrList", deviceTempl, nil)
+	formatter := formatters.NewFormatter(deviceTempl, nil)
 	err = formatter.Write(devices)
 	return
 }

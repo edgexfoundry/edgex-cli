@@ -70,7 +70,7 @@ func listHandler(cmd *cobra.Command, args []string) (err error) {
 		return
 	}
 
-	formatter := formatters.NewFormatter("readingList", readingTemplete, template.FuncMap{"DisplayDuration": utils.DisplayDuration})
+	formatter := formatters.NewFormatter(readingTemplete, template.FuncMap{"DisplayDuration": utils.DisplayDuration})
 	err = formatter.Write(readings)
 	return
 }

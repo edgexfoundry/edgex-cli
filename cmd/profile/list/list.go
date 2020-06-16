@@ -57,7 +57,7 @@ func listHandler(cmd *cobra.Command, args []string) (err error) {
 	}
 
 	// TODO: Add commands and resources? They both are lists, so we need to think about how to display them
-	formatter := formatters.NewFormatter("dpList", profileTemplete, template.FuncMap{"DisplayDuration": utils.DisplayDuration})
+	formatter := formatters.NewFormatter(profileTemplete, template.FuncMap{"DisplayDuration": utils.DisplayDuration})
 	err = formatter.Write(profiles)
 	return
 }
