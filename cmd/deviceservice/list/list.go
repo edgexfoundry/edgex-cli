@@ -27,7 +27,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const dsTemplete = "Service ID\tService Name\tOperating State\tAdmin State\tAddressable Name\tCreated\n" +
+const dsTemplate = "Service ID\tService Name\tOperating State\tAdmin State\tAddressable Name\tCreated\n" +
 	"{{range .}}" +
 	"{{.Id}}\t{{.Name}}\t{{.OperatingState}}\t{{.AdminState}}\t{{.Addressable.Name}}\t{{DisplayDuration .Created}}\n" +
 	"{{end}}"
@@ -51,7 +51,7 @@ func listHandler(cmd *cobra.Command, args []string) (err error) {
 		return
 	}
 
-	formatter := formatters.NewFormatter(dsTemplete, template.FuncMap{"DisplayDuration": utils.DisplayDuration})
+	formatter := formatters.NewFormatter(dsTemplate, template.FuncMap{"DisplayDuration": utils.DisplayDuration})
 	err = formatter.Write(deviceServices)
 	return
 }
