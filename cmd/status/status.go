@@ -18,15 +18,24 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"os"
-	"text/tabwriter"
 
 	"github.com/edgexfoundry-holding/edgex-cli/config"
+	"github.com/edgexfoundry-holding/edgex-cli/pkg/formatters"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 
 	"github.com/spf13/cobra"
 )
+
+const (
+	NotConnected = "Not Connected"
+	OK           = "Ok"
+)
+
+const statusTemplate = "Service Name\tURL\tStatus\n" +
+	"{{range .}}" +
+	"{{.Name}}\t{{.Url}}\t{{.Status}}\n" +
+	"{{end}}"
 
 // NewCommand returns the status command
 func NewCommand() *cobra.Command {
@@ -39,27 +48,30 @@ This command pings each edgex microservice and prints their status.
 This command is not stable yet.
 `,
 		Run: func(cmd *cobra.Command, args []string) {
-			w := new(tabwriter.Writer)
-			w.Init(os.Stdout, 0, 8, 1, '\t', 0)
-
+			var clientStatuses []clientStatus
 			for clientName, client := range config.Conf.Clients {
 				resp, err := http.Get(client.Url() + clients.ApiPingRoute)
 				if err != nil {
-					fmt.Fprintf(w, "%s \t not connected\n", clientName)
+					clientStatuses = append(clientStatuses, clientStatus{clientName,client.Url(), NotConnected})
 				} else {
 					data, err := ioutil.ReadAll(resp.Body)
 					if err != nil {
-						fmt.Fprintf(w, "%s \t Unexpected error: %v\n", clientName, err)
+						clientStatuses = append(clientStatuses, clientStatus{clientName,client.Url(), fmt.Sprintf("%s \t Unexpected error: %v\n", clientName, err)})
 					}
 					if string(data) == "pong" {
-						fmt.Fprintf(w, "%s \t OK\n", clientName)
+						clientStatuses = append(clientStatuses, clientStatus{clientName,client.Url(), OK})
 					}
 					resp.Body.Close()
 				}
 			}
-			w.Flush()
-
+			formatters.NewHtmlTemplateFormatter(statusTemplate, nil).Write(clientStatuses)
 		},
 	}
 	return cmd
+}
+
+type clientStatus struct {
+	Name string
+	Url  string
+	Status string
 }

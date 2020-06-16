@@ -59,7 +59,7 @@ func listHandler(cmd *cobra.Command, args []string) (err error) {
 	if err != nil {
 		return
 	}
-	formatter := formatters.NewFormatter("commandList", cmdsTempl, template.FuncMap{"supportedMethods": supportedMethods})
+	formatter := formatters.NewFormatter(cmdsTempl, template.FuncMap{"supportedMethods": supportedMethods})
 	err = formatter.Write(responses)
 	return
 }

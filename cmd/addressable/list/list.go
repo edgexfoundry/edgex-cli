@@ -46,7 +46,7 @@ func listHandler(cmd *cobra.Command, args []string) (err error) {
 	if err != nil {
 		return
 	}
-	formatter := formatters.NewFormatter("addrList", addrTempl, nil)
+	formatter := formatters.NewFormatter(addrTempl, nil)
 	err = formatter.Write(addr)
 	return
 }

@@ -16,11 +16,9 @@ package list
 
 import (
 	"context"
-	"fmt"
-	"io"
-	"text/tabwriter"
 
 	"github.com/edgexfoundry-holding/edgex-cli/config"
+	"github.com/edgexfoundry-holding/edgex-cli/pkg/formatters"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 	"github.com/edgexfoundry/go-mod-core-contracts/clients/scheduler"
@@ -28,8 +26,12 @@ import (
 	"github.com/edgexfoundry/go-mod-core-contracts/models"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
+
+const intervalTemplate = "Interval ID\tName\tStart\tEnd\tFrequency\tCron\tRunOnce\n" +
+	"{{range .}}" +
+	"{{.ID}}\t{{.Name}}\t{{.Start}}\t{{.End}}\t{{.Frequency}}\t{{.Cron}}\t{{.RunOnce}}\n" +
+	"{{end}}"
 
 func listHandler(cmd *cobra.Command, args []string) (err error) {
 	client := scheduler.NewIntervalClient(
@@ -46,23 +48,8 @@ func listHandler(cmd *cobra.Command, args []string) (err error) {
 		return err
 	}
 
-	pw := viper.Get("writer").(io.WriteCloser)
-	w := new(tabwriter.Writer)
-	w.Init(pw, 0, 8, 1, '\t', 0)
-	fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t%s\t%s\t\n", "Interval ID", "Name", "Start",
-		"End", "Frequency", "Cron", "RunOnce")
-	for _, interval := range intervals {
-		fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t%s\t%t\t\n",
-			interval.ID,
-			interval.Name,
-			interval.Start,
-			interval.End,
-			interval.Frequency,
-			interval.Cron,
-			interval.RunOnce,
-		)
-	}
-	w.Flush()
+	formatter := formatters.NewFormatter(intervalTemplate, nil)
+	err = formatter.Write(intervals)
 	return
 }
 
@@ -84,3 +71,4 @@ func NewCommand() *cobra.Command {
 	}
 	return cmd
 }
+

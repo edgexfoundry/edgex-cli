@@ -20,24 +20,25 @@ import (
 	"text/tabwriter"
 )
 
-type HtmlTempleteFormatter struct {
+type HtmlTemplateFormatter struct {
 	Name     string
 	Format   string
 	FuncMaps template.FuncMap
 }
 
-func NewHtmlTempleteFormatter(name string, format string, funcMaps template.FuncMap) *HtmlTempleteFormatter {
-	return &HtmlTempleteFormatter{
-		Name:     name,
+func NewHtmlTemplateFormatter(format string, funcMaps template.FuncMap) *HtmlTemplateFormatter {
+	return &HtmlTemplateFormatter{
+		//use one common name for all templates
+		Name:     "cliTemplate",
 		Format:   format,
 		FuncMaps: funcMaps,
 	}
 }
 
-func (f *HtmlTempleteFormatter) Write(obj interface{}) (err error) {
+func (f *HtmlTemplateFormatter) Write(obj interface{}) (err error) {
 	pw := viper.Get("writer").(io.WriteCloser)
 	w := new(tabwriter.Writer)
-	w.Init(pw, 0, 8, 1, '\t', 0)
+	w.Init(pw, 0, 8, 2, '\t', 0)
 	tmpl := template.New(f.Name)
 	if f.FuncMaps != nil {
 		tmpl.Funcs(f.FuncMaps)

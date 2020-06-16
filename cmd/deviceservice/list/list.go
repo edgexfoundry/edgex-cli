@@ -15,19 +15,22 @@
 package list
 
 import (
-	"fmt"
+	"html/template"
+
 	"github.com/edgexfoundry-holding/edgex-cli/config"
 	request "github.com/edgexfoundry-holding/edgex-cli/pkg"
+	"github.com/edgexfoundry-holding/edgex-cli/pkg/formatters"
 	"github.com/edgexfoundry-holding/edgex-cli/pkg/utils"
-	"io"
-	"text/tabwriter"
-
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 	"github.com/edgexfoundry/go-mod-core-contracts/models"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
+
+const dsTemplate = "Service ID\tService Name\tOperating State\tAdmin State\tAddressable Name\tCreated\n" +
+	"{{range .}}" +
+	"{{.Id}}\t{{.Name}}\t{{.OperatingState}}\t{{.AdminState}}\t{{.Addressable.Name}}\t{{DisplayDuration .Created}}\n" +
+	"{{end}}"
 
 // NewCommand returns the list device services command
 func NewCommand() *cobra.Command {
@@ -35,29 +38,20 @@ func NewCommand() *cobra.Command {
 		Use:   "list",
 		Short: "Lists existing devices services",
 		Long:  `Return the list fo current device services.`,
-		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			url := config.Conf.Clients["Metadata"].Url() + clients.ApiDeviceServiceRoute
-			var deviceServices []models.DeviceService
-			err = request.Get(url, &deviceServices)
-			if err != nil {
-				return
-			}
-
-			pw := viper.Get("writer").(io.WriteCloser)
-			w := new(tabwriter.Writer)
-			w.Init(pw, 0, 8, 1, '\t', 0)
-			fmt.Fprintf(w, "%s\t%s\t%s\t%s\t\n", "Service ID", "Service Name", "Created", "Operating State")
-			for _, deviceService := range deviceServices {
-				fmt.Fprintf(w, "%s\t%s\t%v\t%v\t\n",
-					deviceService.Id,
-					deviceService.Name,
-					utils.DisplayDuration(deviceService.Created),
-					deviceService.OperatingState,
-				)
-			}
-			w.Flush()
-			return
-		},
+		RunE: listHandler,
 	}
 	return cmd
+}
+
+func listHandler(cmd *cobra.Command, args []string) (err error) {
+	url := config.Conf.Clients["Metadata"].Url() + clients.ApiDeviceServiceRoute
+	var deviceServices []models.DeviceService
+	err = request.Get(url, &deviceServices)
+	if err != nil {
+		return
+	}
+
+	formatter := formatters.NewFormatter(dsTemplate, template.FuncMap{"DisplayDuration": utils.DisplayDuration})
+	err = formatter.Write(deviceServices)
+	return
 }
