@@ -14,7 +14,7 @@ import (
 )
 
 func Get(url string, items interface{}) (err error) {
-	printURL(url)
+	printURL(url, http.MethodGet)
 	resp, err := clients.GetRequest(context.Background(), "", local.New(url))
 	if err != nil {
 		return err
@@ -22,7 +22,7 @@ func Get(url string, items interface{}) (err error) {
 	return json.Unmarshal(resp, &items)
 }
 func Delete(url string) error {
-	printURL(url)
+	printURL(url, http.MethodDelete)
 	return clients.DeleteRequest(context.Background(), "", local.New(url))
 }
 func DeletePrt(url string, deletedBy string) error {
@@ -35,7 +35,7 @@ func DeletePrt(url string, deletedBy string) error {
 }
 
 func Post(url string, item interface{}) {
-	printURL(url)
+	printURL(url, http.MethodPost)
 	printData(item)
 	resp, err := clients.PostJSONRequest(context.Background(), "", item, local.New(url))
 	name := getType(item)
@@ -46,9 +46,9 @@ func Post(url string, item interface{}) {
 	}
 }
 
-func printURL(url string) {
+func printURL(url string, method string) {
 	if viper.GetBool("url") || viper.GetBool("verbose") {
-		fmt.Printf("> %s:%s \n", http.MethodGet, url)
+		fmt.Printf("> %s: %s \n", method, url)
 	}
 }
 
