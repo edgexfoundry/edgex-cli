@@ -16,6 +16,8 @@ package rm
 
 import (
 	"errors"
+	"fmt"
+
 	"github.com/edgexfoundry-holding/edgex-cli/config"
 	request "github.com/edgexfoundry-holding/edgex-cli/pkg"
 
@@ -24,32 +26,36 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// NewCommand returns the rm command of type cobra.Command
-var byAge bool
+var age string
+var slug string
 
-//TODO need revisit ! What are the supported flags ? Are they consistent with the other commands ?
 func removeNotificationHandler(cmd *cobra.Command, args []string) (err error){
-	// Checking for args
-	if len(args) == 0 {
-		return errors.New("no notification ID/Name provided")
+	if age == "" && slug == "" {
+		return errors.New("at least one flag should be provided")
+	} else if age != "" && slug != ""{
+		return errors.New("age or slug flag should be provided, not both")
 	}
-	url := config.Conf.Clients["Notification"].Url() + clients.ApiNotificationRoute
-	if byAge {
-		url += "/age/" + args[0]
-	} else {
-		url += "/slug/" + args[0]
-	}
-	return request.DeletePrt(url, args[0])
+	url, deletedBy := constructUrl()
+	return request.DeletePrt(url, deletedBy)
 }
 
+// NewCommand returns the rm command of type cobra.Command
 func NewCommand() *cobra.Command {
 	var cmd = &cobra.Command{
-		Use:   "rm [notification slug or age]",
+		Use:   "rm [--slug | --age]",
 		Short: "Removes notification by slug or age",
-		Long:  `Removes a notification given its slug or age timestamp.`,
-		Args:  cobra.ExactValidArgs(1),
+		Long:  "Removes notifications by slug or age (the current notifications timestamp minus their last modification timestamp should be less than the age parameter)",
 		RunE:   removeNotificationHandler,
 	}
-	cmd.Flags().BoolVar(&byAge, "age", false, "Remove by age")
+	cmd.Flags().StringVar(&age, "age", "", "Notification age (in milliseconds)")
+	cmd.Flags().StringVarP(&slug, "slug", "s", "", "Meaningful, case insensitive identifier")
 	return cmd
+}
+
+func constructUrl() (string, string) {
+	url := config.Conf.Clients["Notification"].Url() + clients.ApiNotificationRoute
+	if age != "" {
+		return fmt.Sprintf("%s/age/%s", url, age), age
+	}
+	return fmt.Sprintf("%s/slug/%s", url, slug), slug
 }
