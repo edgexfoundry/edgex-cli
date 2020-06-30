@@ -35,8 +35,8 @@ const deviceTempl = "Device ID\tDevice Name\tOperating State\tAdmin State\tDevic
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "list",
-		Short: "A list of all device services",
-		Long:  `Return all device services sorted by id.`,
+		Short: "A list of all devices",
+		Long:  `Return all devices sorted by id.`,
 		RunE: listHandler,
 	}
 	return cmd
