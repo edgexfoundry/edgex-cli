@@ -15,12 +15,13 @@
 package reading
 
 import (
+	"github.com/edgexfoundry-holding/edgex-cli/cmd/reading/count"
 	listevent "github.com/edgexfoundry-holding/edgex-cli/cmd/reading/list"
 
 	"github.com/spf13/cobra"
 )
 
-// NewCommand returns the device command of type cobra.Command
+// NewCommand returns the reading commands of type cobra.Command
 func NewCommand() *cobra.Command {
 	var cmd = &cobra.Command{
 		Use:   "reading",
@@ -28,5 +29,6 @@ func NewCommand() *cobra.Command {
 		Long:  `Actions related to device-generated readings.`,
 	}
 	cmd.AddCommand(listevent.NewCommand())
+	cmd.AddCommand(count.NewCommand())
 	return cmd
 }
