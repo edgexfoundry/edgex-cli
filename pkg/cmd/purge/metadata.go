@@ -15,10 +15,6 @@ import (
 
 type MetadataCleaner interface {
 	Purge()
-	cleanDevices()
-	cleanDeviceServices()
-	cleanDeviceProfiles()
-	cleanAddressables()
 }
 
 type metadataCleaner struct {

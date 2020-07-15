@@ -10,9 +10,6 @@ import (
 
 type CoreDataCleaner interface {
 	Purge()
-	cleanEvents()
-	cleanReadings()
-	cleanValueDescriptors()
 }
 
 type coredataCleaner struct {
@@ -27,29 +24,8 @@ func NewCoredataCleaner() CoreDataCleaner {
 	}
 }
 func (d *coredataCleaner) Purge() {
-	d.cleanEvents()
-	d.cleanReadings()
+	d.cleanEventsAndReadings()
 	d.cleanValueDescriptors()
-}
-
-func (d *coredataCleaner) cleanReadings() {
-	url := d.baseUrl + clients.ApiReadingRoute
-	var readings []models.Reading
-	err := request.Get(url, readings)
-	if err != nil {
-		fmt.Printf("Error: %s\n", err.Error())
-		return
-	}
-
-	var count int
-	for _, reading := range readings {
-		// call delete function here
-		err = request.Delete(url + config.PathId + reading.Id)
-		if err == nil {
-			count = count + 1
-		}
-	}
-	fmt.Printf("Removed %d Readings from %d \n", count, len(readings))
 }
 
 func (d *coredataCleaner) cleanValueDescriptors() {
@@ -71,10 +47,10 @@ func (d *coredataCleaner) cleanValueDescriptors() {
 	fmt.Printf("Removed %d Value Descriptors from %d \n", count, len(valueDescriptors))
 }
 
-func (d *coredataCleaner) cleanEvents() {
+func (d *coredataCleaner) cleanEventsAndReadings() {
 	url := d.baseUrl + clients.ApiEventRoute + "/scruball"
 	err := request.Delete(url)
 	if err == nil {
-		fmt.Print("All Events have been removed \n")
+		fmt.Print("All Events and Readings have been removed \n")
 	}
 }

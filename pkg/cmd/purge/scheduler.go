@@ -10,8 +10,6 @@ import (
 
 type SchedulerCleaner interface {
 	Purge()
-	cleanIntervals()
-	cleanIntervalActions()
 }
 
 type schedulerCleaner struct {
