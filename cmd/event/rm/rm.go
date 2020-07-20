@@ -70,13 +70,12 @@ func validate(args []string) error {
 	return nil
 }
 
-
 func deleteByIds(dc coredata.EventClient, eventIds []string) error {
 	for _, eventId := range eventIds {
 		err := dc.Delete(context.Background(), eventId)
-		if err == nil{
+		if err == nil {
 			fmt.Printf("Event with id %s removed\n", eventId)
-		}else{
+		} else {
 			fmt.Printf("Error: %s \n", err)
 		}
 	}

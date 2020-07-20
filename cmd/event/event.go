@@ -19,6 +19,7 @@ import (
 	"github.com/edgexfoundry-holding/edgex-cli/cmd/event/count"
 	listevent "github.com/edgexfoundry-holding/edgex-cli/cmd/event/list"
 	rmevent "github.com/edgexfoundry-holding/edgex-cli/cmd/event/rm"
+	"github.com/edgexfoundry-holding/edgex-cli/cmd/event/scrub"
 
 	"github.com/spf13/cobra"
 )
@@ -34,5 +35,6 @@ func NewCommand() *cobra.Command {
 	cmd.AddCommand(addevent.NewCommand())
 	cmd.AddCommand(listevent.NewCommand())
 	cmd.AddCommand(count.NewCommand())
+	cmd.AddCommand(scrub.NewCommand())
 	return cmd
 }

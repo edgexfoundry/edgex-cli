@@ -20,13 +20,13 @@ package purgedb
 
 import (
 	"fmt"
-	"log"
 	"strconv"
 	"time"
 
 	"github.com/edgexfoundry-holding/edgex-cli/config"
 	request "github.com/edgexfoundry-holding/edgex-cli/pkg"
 	cleaners "github.com/edgexfoundry-holding/edgex-cli/pkg/cmd/purge"
+	"github.com/edgexfoundry-holding/edgex-cli/pkg/confirmation"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 
@@ -42,69 +42,20 @@ func NewCommand() *cobra.Command {
 
 USE WITH CAUTION. The effect of this command is irreversible.
 
-The end goal for this command is to act like a clean_mongo.js script for any underlying 
-database. Currently, it only cleans up core-metadata.
-
+The end goal for this command is to clean all data from the underlying 
+database.
 
 `,
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			// asking for user input
-			fmt.Println("Are you sure? This cannot be undone: [y/n]")
-			if askForConfirmation() {
-				fmt.Println("Removing all objects from DB...")
-				purge()
-			} else {
-				fmt.Println("Aborting")
+			// asking user to confirm the purge action
+			if !confirmation.New().Confirm(){
 				return
 			}
-
+			purge()
 			return
 		},
 	}
 	return cmd
-}
-
-// three following functions where found here: https://gist.github.com/albrow/5882501
-
-// askForConfirmation uses Scanln to parse user input. A user must type in "yes" or "no" and
-// then press enter. It has fuzzy matching, so "y", "Y", "yes", "YES", and "Yes" all count as
-// confirmations. If the input is not recognized, it will ask again. The function does not return
-// until it gets a valid response from the user. Typically, you should use fmt to print out a question
-// before calling askForConfirmation. E.g. fmt.Println("WARNING: Are you sure? (yes/no)")
-func askForConfirmation() bool {
-	var response string
-	_, err := fmt.Scanln(&response)
-	if err != nil {
-		log.Fatal(err)
-	}
-	okayResponses := []string{"y", "Y", "yes", "Yes", "YES"}
-	nokayResponses := []string{"n", "N", "no", "No", "NO"}
-	if containsString(okayResponses, response) {
-		return true
-	} else if containsString(nokayResponses, response) {
-		return false
-	} else {
-		fmt.Println("Are you sure? This cannot be undone:")
-		return askForConfirmation()
-	}
-}
-
-// You might want to put the following two functions in a separate utility package.
-
-// posString returns the first index of element in slice.
-// If slice does not contain element, returns -1.
-func posString(slice []string, element string) int {
-	for index, elem := range slice {
-		if elem == element {
-			return index
-		}
-	}
-	return -1
-}
-
-// containsString returns true iff slice contains element
-func containsString(slice []string, element string) bool {
-	return !(posString(slice, element) == -1)
 }
 
 func purge() {

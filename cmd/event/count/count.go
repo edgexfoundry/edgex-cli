@@ -10,7 +10,7 @@ import (
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 	"github.com/edgexfoundry/go-mod-core-contracts/clients/coredata"
 	"github.com/edgexfoundry/go-mod-core-contracts/clients/urlclient/local"
-	
+
 	"github.com/spf13/cobra"
 )
 
@@ -40,11 +40,10 @@ func countHandler(cmd *cobra.Command, args []string) (err error) {
 		countNumber, err = client.EventCount(context.Background())
 		template = fmt.Sprintf("Total events count: %v", countNumber)
 	}
-	if err != nil{
+	if err != nil {
 		return err
 	}
 	formatter := formatters.NewFormatter(template, nil)
 	err = formatter.Write(countNumber)
 	return
 }
-
