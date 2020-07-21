@@ -25,8 +25,8 @@ import (
 func NewCommand() *cobra.Command {
 	var cmd = &cobra.Command{
 		Use:   "addressable",
-		Short: "Addressable command command",
-		Long:  `Actions related to addressables.`,
+		Short: "Addressable command",
+		Long:  `Actions related to addressable.`,
 	}
 	cmd.AddCommand(listaddressable.NewCommand())
 	// cmd.AddCommand(rmsubscription.NewCommand())
