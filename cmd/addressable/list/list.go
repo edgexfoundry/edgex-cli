@@ -33,8 +33,8 @@ const addrTempl = "Id\tName\tProtocol\tHTTPMethod\tAddress\tPort\n" +
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "list",
-		Short: "A list of all device services",
-		Long:  `Return all device services sorted by id.`,
+		Short: "A list of all addressable",
+		Long:  `Return all addressable sorted by id.`,
 		RunE:  listHandler,
 	}
 	return cmd
