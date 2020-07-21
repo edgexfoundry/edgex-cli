@@ -2,22 +2,20 @@ package purge
 
 import (
 	"fmt"
+
 	"github.com/edgexfoundry-holding/edgex-cli/config"
 	request "github.com/edgexfoundry-holding/edgex-cli/pkg"
+
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 	"github.com/edgexfoundry/go-mod-core-contracts/models"
 )
-
-type CoreDataCleaner interface {
-	Purge()
-}
 
 type coredataCleaner struct {
 	baseUrl string
 }
 
 // NewCoredataCleaner creates an instance of CoreDataCleaner
-func NewCoredataCleaner() CoreDataCleaner {
+func NewCoredataCleaner() Purgeable {
 	fmt.Println("\n * core-data")
 	return &coredataCleaner{
 		baseUrl: config.Conf.Clients["CoreData"].Url(),
