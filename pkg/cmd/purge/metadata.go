@@ -13,16 +13,12 @@ import (
 	"github.com/edgexfoundry/go-mod-core-contracts/models"
 )
 
-type MetadataCleaner interface {
-	Purge()
-}
-
 type metadataCleaner struct {
 	baseUrl string
 }
 
 // NewMetadataCleaner creates an instance of MetadataCleaner
-func NewMetadataCleaner() MetadataCleaner {
+func NewMetadataCleaner() Purgeable {
 	fmt.Println("\n * core-metadata")
 	return &metadataCleaner{
 		baseUrl: config.Conf.Clients["Metadata"].Url(),

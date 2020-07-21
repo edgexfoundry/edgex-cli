@@ -2,22 +2,20 @@ package purge
 
 import (
 	"fmt"
+
 	"github.com/edgexfoundry-holding/edgex-cli/config"
 	request "github.com/edgexfoundry-holding/edgex-cli/pkg"
+
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 	"github.com/edgexfoundry/go-mod-core-contracts/models"
 )
-
-type SchedulerCleaner interface {
-	Purge()
-}
 
 type schedulerCleaner struct {
 	baseUrl string
 }
 
 // NewSchedulerCleaner creates an instance of SchedulerCleaner
-func NewSchedulerCleaner() SchedulerCleaner {
+func NewSchedulerCleaner() Purgeable {
 	fmt.Println("\n * Scheduler")
 	return &schedulerCleaner{
 		baseUrl: config.Conf.Clients["Scheduler"].Url(),
