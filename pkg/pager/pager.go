@@ -32,11 +32,11 @@ type Writer struct {
 }
 
 // getPagerCommand inspects the PAGER environment variable for a pager command,
-// otherwise returns a reasonable default ("less -FRX")
+// otherwise returns a reasonable default ("more)
 func getPagerCommand() (string, []string) {
 	fromEnv := os.Getenv("PAGER")
 	if fromEnv == "" {
-		return "less", []string{"-FRX"}
+		return "more", nil
 	}
 
 	split := strings.Split(fromEnv, " ")
