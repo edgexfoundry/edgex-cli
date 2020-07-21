@@ -21,25 +21,18 @@ import (
 
 	"github.com/edgexfoundry-holding/edgex-cli/config"
 	request "github.com/edgexfoundry-holding/edgex-cli/pkg"
+	"github.com/edgexfoundry-holding/edgex-cli/pkg/utils"
+
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 
 	"github.com/spf13/cobra"
 )
 
-const unitValues = "List of possible values:\n" +
-	"ms - milliseconds\n" +
-	"s - seconds\n" +
-	"h - hours\n" +
-	"d - days\n"
-
-const unitUsage = "Specify the time unit used with the --age flag\n" + unitValues
+const TimeUnitUsage = "Specify the time unit used with the --age flag\nList of possible values:\n" + utils.TimeUnitDescriptions
 
 var age string
 var unit string
 var slug string
-
-//empty struct has width of zero.  It occupies zero bytes of storage
-var units = map[string]struct{}{"ms": {}, "s": {}, "h": {}, "d": {}, "m": {}}
 
 // NewCommand returns the rm command of type cobra.Command
 func NewCommand() *cobra.Command {
@@ -51,7 +44,7 @@ func NewCommand() *cobra.Command {
 	}
 	cmd.Flags().StringVarP(&age, "age", "a", "", "Notification age (by default in milliseconds). To customize the unit use --unit flag")
 	cmd.Flags().StringVarP(&slug, "slug", "s", "", "Meaningful, case insensitive identifier")
-	cmd.Flags().StringVar(&unit, "unit", "ms", unitUsage)
+	cmd.Flags().StringVar(&unit, "unit", "ms", TimeUnitUsage)
 	return cmd
 }
 
@@ -61,39 +54,27 @@ func removeNotificationHandler(cmd *cobra.Command, args []string) (err error) {
 	} else if age != "" && slug != "" {
 		return errors.New("age or slug flag should be provided, not both")
 	}
-	if _, present := units[unit]; !present {
-		return errors.New(unitValues)
-	}
-	ageInt, err := strconv.ParseInt(age, 10, 64)
+
+	url, deletedBy, err := constructUrl()
 	if err != nil {
-		return errors.New("age is not an number")
+		return err
 	}
-	url, deletedBy := constructUrl(ageInt)
 	return request.DeletePrt(url, deletedBy)
 }
 
-func convertAgeToMillisecond(age int64) int64 {
-	var ageMilliseconds int64
-	switch unit {
-	case "ms":
-		ageMilliseconds = age
-	case "s":
-		ageMilliseconds = age * 1000
-	case "m":
-		ageMilliseconds = age * 60 * 1000
-	case "h":
-		ageMilliseconds = age * 60 * 60 * 1000
-	case "d":
-		ageMilliseconds = age * 24 * 60 * 60 * 1000
-	}
-	return ageMilliseconds
-}
-
-func constructUrl(ageInt int64) (string, string) {
-	url := config.Conf.Clients["Notification"].Url() + clients.ApiNotificationRoute
+func constructUrl() (string, string, error) {
+	baseUrl := config.Conf.Clients["Notification"].Url() + clients.ApiNotificationRoute
+	url := fmt.Sprintf("%s/slug/%s", baseUrl, slug)
 	if age != "" {
-		ageMilliseconds := convertAgeToMillisecond(ageInt)
-		return fmt.Sprintf("%s/age/%v", url, ageMilliseconds), age + unit
+		if _, present := utils.TimeUnitsMap[unit]; !present {
+			return "", "", errors.New("List of possible values:\n" + utils.TimeUnitDescriptions)
+		}
+		ageInt, err := strconv.ParseInt(age, 10, 64)
+		if err != nil {
+			return "", "", err
+		}
+		ageMilliseconds := utils.ConvertAgeToMillisecond(unit, ageInt)
+		return fmt.Sprintf("%s/age/%v", baseUrl, ageMilliseconds), age + unit, nil
 	}
-	return fmt.Sprintf("%s/slug/%s", url, slug), slug
+	return url, slug, nil
 }

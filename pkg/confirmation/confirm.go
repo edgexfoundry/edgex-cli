@@ -38,6 +38,7 @@ func NewCustom(confirm, abort string) UserConfirmation {
 		abortMsg:   abortMsg,
 	}
 }
+
 // askForConfirmation uses Scanln to parse user input. A user must type in "yes" or "no" and
 // then press enter. It has fuzzy matching, so "y", "Y", "yes", "YES", and "Yes" all count as
 // confirmations. If the input is not recognized, it will ask again. The function does not return
@@ -63,7 +64,7 @@ func askForConfirmation() bool {
 }
 
 //Ask user to confirm the execution
-func (c UserConfirmation) Confirm() bool{
+func (c UserConfirmation) Confirm() bool {
 	fmt.Println(c.confirmMsg)
 	if !askForConfirmation() {
 		fmt.Println(c.abortMsg)
@@ -71,4 +72,3 @@ func (c UserConfirmation) Confirm() bool{
 	}
 	return true
 }
-

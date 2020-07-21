@@ -27,7 +27,7 @@ func Delete(url string) error {
 }
 func DeletePrt(url string, deletedBy string) error {
 	err := Delete(url)
-	if err == nil &&  deletedBy != ""{
+	if err == nil && deletedBy != "" {
 		fmt.Printf("Removed: %s \n", deletedBy)
 		return nil
 	}
