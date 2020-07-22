@@ -34,6 +34,8 @@ import (
 var age string
 var unit string
 var device string
+const errMsg = "events could be removed by one criteria: by id(s), by device name or by age. " +
+	"please provide id(s) as argument(s) or provide one flag (--device/--age)"
 
 // NewCommand return rm events command
 func NewCommand() *cobra.Command {
@@ -88,14 +90,14 @@ func deleteForDevice(dc coredata.EventClient) (err error) {
 
 func validate(args []string) error {
 	if len(args) == 0 && device == "" && age == "" {
-		return errors.New("no event id/device name nor age provided")
+		return errors.New(errMsg)
 	}
-	if len(args) != 0 && (device != "" || age != "") ||
-		device != "" && (len(args) != 0 || age != "") ||
-		age != "" && (len(args) != 0 || device != "") {
-		return errors.New("provide either event id or device name or age")
+	if len(args) != 0 && device == "" && age == "" ||
+		device != "" && len(args) == 0 && age == "" ||
+		age != "" && len(args) == 0 && device == "" {
+		return nil
 	}
-	return nil
+	return errors.New(errMsg)
 }
 
 func deleteByIds(dc coredata.EventClient, eventIds []string) error {
