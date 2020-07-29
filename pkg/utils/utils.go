@@ -40,3 +40,30 @@ func DisplayDuration(tt int64) string {
 		return humanDuration(time.Since(ttTime))
 	}
 }
+
+const TimeUnitDescriptions = "ms - milliseconds\n" +
+	"s - seconds\n" +
+	"m - minutes\n" +
+	"h - hours\n" +
+	"d - days\n"
+
+//empty struct has width of zero. It occupies zero bytes of storage
+var TimeUnitsMap = map[string]struct{}{"ms": {}, "s": {}, "h": {}, "d": {}, "m": {}}
+
+func ConvertAgeToMillisecond(unit string, age int64) int64 {
+	var ageMilliseconds int64
+	switch unit {
+	case "ms":
+		ageMilliseconds = age
+	case "s":
+		ageMilliseconds = age * 1000
+	case "m":
+		ageMilliseconds = age * 60 * 1000
+	case "h":
+		ageMilliseconds = age * 60 * 60 * 1000
+	case "d":
+		ageMilliseconds = age * 24 * 60 * 60 * 1000
+	}
+	return ageMilliseconds
+}
+

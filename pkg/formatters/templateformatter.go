@@ -54,4 +54,3 @@ func (f *HtmlTemplateFormatter) Write(obj interface{}) (err error) {
 	w.Flush()
 	return nil
 }
-

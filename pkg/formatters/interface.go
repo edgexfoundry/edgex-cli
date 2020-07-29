@@ -22,7 +22,7 @@ type FormatWriter interface {
 	Write(obj interface{}) error
 }
 
-func NewFormatter (template string, funcMaps template.FuncMap) FormatWriter {
+func NewFormatter(template string, funcMaps template.FuncMap) FormatWriter {
 	if viper.GetBool("verbose") {
 		return &JsonFormatter{}
 	}
