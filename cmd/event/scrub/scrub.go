@@ -12,8 +12,8 @@ import (
 
 var all bool
 
-const scrubPushedConfirmMsg = "You are trying to remove all pushed events and their associated. This cannot be undone. Are you sure you want to proceed? [y/n]"
-const scrubAllConfirmMsg = "You are trying to removes all events and readings from the database. This cannot be undone. Are you sure you want to proceed?: [y/n]"
+const scrubPushedConfirmMsg = "You are trying to remove all pushed events and their associated readings. This cannot be undone. Are you sure you want to proceed? [y/n]"
+const scrubAllConfirmMsg = "You are trying to remove all events and their associated readings from the database. This cannot be undone. Are you sure you want to proceed?: [y/n]"
 
 // NewCommand return scrub events command
 func NewCommand() *cobra.Command {
