@@ -23,13 +23,17 @@ import (
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 	"github.com/edgexfoundry/go-mod-core-contracts/clients/metadata"
 	"github.com/edgexfoundry/go-mod-core-contracts/clients/urlclient/local"
+	"github.com/edgexfoundry/go-mod-core-contracts/models"
 
 	"github.com/spf13/cobra"
 )
+
 const deviceTempl = "Device ID\tDevice Name\tOperating State\tAdmin State\tDevice Service\tDevice Profile\n" +
 	"{{range .}}" +
 	"{{.Id}}\t{{.Name}}\t{{.OperatingState}}\t{{.AdminState}}\t{{.Service.Name}}\t{{.Profile.Name}}\n" +
 	"{{end}}"
+
+var name string
 
 // NewCommand returns the list device command
 func NewCommand() *cobra.Command {
@@ -37,8 +41,9 @@ func NewCommand() *cobra.Command {
 		Use:   "list",
 		Short: "A list of all devices",
 		Long:  `Return all devices sorted by id.`,
-		RunE: listHandler,
+		RunE:  listHandler,
 	}
+	cmd.Flags().StringVarP(&name, "name", "n", "", "Returns Device matching the given name")
 	return cmd
 }
 
@@ -47,10 +52,20 @@ func listHandler(cmd *cobra.Command, args []string) (err error) {
 	mdc := metadata.NewDeviceClient(
 		local.New(url),
 	)
+	var devices []models.Device
+	var device models.Device
 
-	devices, err := mdc.Devices(context.Background())
-	if err != nil {
-		return
+	if name != "" {
+		device, err = mdc.DeviceForName(context.Background(), name)
+		if err != nil {
+			return
+		}
+		devices = append(devices, device)
+	} else {
+		devices, err = mdc.Devices(context.Background())
+		if err != nil {
+			return
+		}
 	}
 
 	formatter := formatters.NewFormatter(deviceTempl, nil)
