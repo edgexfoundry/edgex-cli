@@ -12,6 +12,9 @@ import (
 
 var all bool
 
+const scrubPushedConfirmMsg = "You are trying to remove all pushed events and their associated readings. This cannot be undone. Are you sure you want to proceed? [y/n]"
+const scrubAllConfirmMsg = "You are trying to remove all events and their associated readings from the database. This cannot be undone. Are you sure you want to proceed?: [y/n]"
+
 // NewCommand return scrub events command
 func NewCommand() *cobra.Command {
 	var cmd = &cobra.Command{
@@ -27,18 +30,21 @@ When used with "--all" flag, it removes all readings and events from the databas
 }
 
 func scrubHandler(cmd *cobra.Command, args []string) (err error) {
-	// asking user to confirm the scrub command
-	if !confirmation.New().Confirm() {
-		return
-	}
 	all, err1 := cmd.Flags().GetBool("all")
 	if err1 != nil {
 		return err1
 	}
 
 	url := config.Conf.Clients["CoreData"].Url() + clients.ApiEventRoute + "/scrub"
+	confirmMsg := scrubPushedConfirmMsg
 	if all {
+		confirmMsg = scrubAllConfirmMsg
 		url = config.Conf.Clients["CoreData"].Url() + clients.ApiEventRoute + "/scruball"
+	}
+
+	// asking user to confirm the scrub command
+	if !confirmation.NewCustom(confirmMsg, "").Confirm() {
+		return
 	}
 
 	err = request.Delete(url)
