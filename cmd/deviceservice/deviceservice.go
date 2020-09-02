@@ -15,6 +15,7 @@
 package deviceservice
 
 import (
+	adddeviceservice "github.com/edgexfoundry-holding/edgex-cli/cmd/deviceservice/add"
 	listdeviceservice "github.com/edgexfoundry-holding/edgex-cli/cmd/deviceservice/list"
 	rmdeviceservice "github.com/edgexfoundry-holding/edgex-cli/cmd/deviceservice/rm"
 
@@ -49,5 +50,6 @@ layer, and to other microservices in other layers of EdgeX Foundry.`,
 	}
 	cmd.AddCommand(rmdeviceservice.NewCommand())
 	cmd.AddCommand(listdeviceservice.NewCommand())
+	cmd.AddCommand(adddeviceservice.NewCommand())
 	return cmd
 }
