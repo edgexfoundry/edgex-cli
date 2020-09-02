@@ -21,6 +21,7 @@ import (
 	request "github.com/edgexfoundry-holding/edgex-cli/pkg"
 	"github.com/edgexfoundry-holding/edgex-cli/pkg/formatters"
 	"github.com/edgexfoundry-holding/edgex-cli/pkg/utils"
+
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 	"github.com/edgexfoundry/go-mod-core-contracts/models"
 
@@ -32,26 +33,46 @@ const dsTemplate = "Service ID\tService Name\tOperating State\tAdmin State\tAddr
 	"{{.Id}}\t{{.Name}}\t{{.OperatingState}}\t{{.AdminState}}\t{{.Addressable.Name}}\t{{DisplayDuration .Created}}\n" +
 	"{{end}}"
 
+var name string
+
 // NewCommand returns the list device services command
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "list",
+		Use:   "list [<id>]\",",
 		Short: "Lists existing devices services",
-		Long:  `Return the list fo current device services.`,
-		RunE: listHandler,
+		Long:  `Return the list of current device services or Device Service matching the given id`,
+		RunE:  listHandler,
 	}
+	cmd.Flags().StringVarP(&name, "name", "n", "", "Returns Device Service matching the given name")
 	return cmd
 }
 
 func listHandler(cmd *cobra.Command, args []string) (err error) {
 	url := config.Conf.Clients["Metadata"].Url() + clients.ApiDeviceServiceRoute
 	var deviceServices []models.DeviceService
-	err = request.Get(url, &deviceServices)
-	if err != nil {
-		return
+	var ds models.DeviceService
+	if name != "" {
+		err = request.Get(url+"/name/"+name, &ds)
+		if err != nil {
+			return
+		}
+		deviceServices = append(deviceServices, ds)
+	} else if len(args) != 0 {
+		var ds models.DeviceService
+		err = request.Get(url+"/"+args[0], &ds)
+		if err != nil {
+			return err
+		}
+		deviceServices = append(deviceServices, ds)
+	} else {
+		err = request.Get(url, &deviceServices)
+		if err != nil {
+			return
+		}
 	}
 
 	formatter := formatters.NewFormatter(dsTemplate, template.FuncMap{"DisplayDuration": utils.DisplayDuration})
 	err = formatter.Write(deviceServices)
 	return
 }
+
