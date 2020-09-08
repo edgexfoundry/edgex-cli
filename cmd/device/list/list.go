@@ -28,9 +28,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const deviceTempl = "Device ID\tDevice Name\tOperating State\tAdmin State\tDevice Service\tDevice Profile\n" +
+const deviceTempl = "Device ID\tDevice Name\tDescription\tOperating State\tAdmin State\tDevice Service\tDevice Profile\n" +
 	"{{range .}}" +
-	"{{.Id}}\t{{.Name}}\t{{.OperatingState}}\t{{.AdminState}}\t{{.Service.Name}}\t{{.Profile.Name}}\n" +
+	"{{.Id}}\t{{.Name}}\t{{.Description}}\t{{.OperatingState}}\t{{.AdminState}}\t{{.Service.Name}}\t{{.Profile.Name}}\n" +
 	"{{end}}"
 
 var name string
