@@ -18,6 +18,7 @@ import (
 	adddeviceservice "github.com/edgexfoundry-holding/edgex-cli/cmd/deviceservice/add"
 	listdeviceservice "github.com/edgexfoundry-holding/edgex-cli/cmd/deviceservice/list"
 	rmdeviceservice "github.com/edgexfoundry-holding/edgex-cli/cmd/deviceservice/rm"
+	updatedeviceservice "github.com/edgexfoundry-holding/edgex-cli/cmd/deviceservice/update"
 
 	"github.com/spf13/cobra"
 )
@@ -51,5 +52,6 @@ layer, and to other microservices in other layers of EdgeX Foundry.`,
 	cmd.AddCommand(rmdeviceservice.NewCommand())
 	cmd.AddCommand(listdeviceservice.NewCommand())
 	cmd.AddCommand(adddeviceservice.NewCommand())
+	cmd.AddCommand(updatedeviceservice.NewCommand())
 	return cmd
 }

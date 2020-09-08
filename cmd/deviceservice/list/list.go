@@ -28,9 +28,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const dsTemplate = "Service ID\tService Name\tOperating State\tAdmin State\tAddressable Name\tCreated\n" +
+const dsTemplate = "Service ID\tService Name\tOperating State\tAdmin State\tAddressable Name\tDescription\tCreated\n" +
 	"{{range .}}" +
-	"{{.Id}}\t{{.Name}}\t{{.OperatingState}}\t{{.AdminState}}\t{{.Addressable.Name}}\t{{DisplayDuration .Created}}\n" +
+	"{{.Id}}\t{{.Name}}\t{{.OperatingState}}\t{{.AdminState}}\t{{.Addressable.Name}}\t{{.Description}}\t{{DisplayDuration .Created}}\n" +
 	"{{end}}"
 
 var name string
