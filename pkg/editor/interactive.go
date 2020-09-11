@@ -16,6 +16,8 @@
 package editor
 
 import (
+	"bytes"
+	"html/template"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -85,4 +87,29 @@ func CaptureInputFromEditor(template []byte) ([]byte, error) {
 	}
 
 	return updatedBytes, nil
+}
+
+// OpenInteractiveEditor opens users default editor populated with a JSON representation of a structure
+func OpenInteractiveEditor(o interface{}, temp string, funcMap template.FuncMap) ([]byte, error) {
+	t := template.New("Template")
+	if funcMap != nil {
+		t.Funcs(funcMap)
+	}
+	dsJsonTemplate, err := t.Parse(temp)
+	if err != nil {
+		return nil, err
+	}
+
+	buff := bytes.NewBuffer([]byte{})
+	err = dsJsonTemplate.Execute(buff, o)
+	if err != nil {
+		return nil, err
+	}
+
+	return CaptureInputFromEditor(buff.Bytes())
+}
+
+// isLastElementOfSlice is a function which is used in HTML templates to determine the last element in a slice
+func IsLastElementOfSlice(index int, lenght int) bool {
+	return index == lenght-1
 }
