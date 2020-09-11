@@ -27,14 +27,14 @@ var operState string
 var addrName string
 var file string
 
-const DeviceServicesTempl = `[{{range $ds := .}}` + update.DeviceSrviceTempl +
+const DeviceServicesTempl = `[{{range $ds := .}}` + update.DeviceServiceTempl +
 	`{{end}}]`
 
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "add",
 		Short: "Add device service",
-		Long:  `Create device service described in a given JSON file or use the interactive mode with additional flags.`,
+		Long:  `Create device service(s) described in the given JSON file or use the interactive mode with additional flags.`,
 		RunE:  newDeviceServiceHandler,
 	}
 	cmd.Flags().BoolVarP(&interactiveMode, editor.InteractiveModeLabel, "i", false, "Open a default editor to customize the Event information")

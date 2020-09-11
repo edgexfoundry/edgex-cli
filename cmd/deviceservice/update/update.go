@@ -19,7 +19,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const DeviceSrviceTempl = `{
+const DeviceServiceTempl = `{
    "Id": "{{.Id}}",
    "Name" : "{{.Name}}",
    "Description" : "{{.Description}}",
@@ -45,17 +45,18 @@ func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "update",
 		Short: "Update device service",
-		Long:  `Update device service(s) described in the given JSON file or use the interactive mode with additional flags.`,
+		Long:  `Update device service(s) described in the given JSON file or use the interactive mode enabled by providing 
+ name of existing device service.`,
 		RunE:  deviceServiceHandler,
 	}
-	cmd.Flags().StringVarP(&name, "name", "n", "", "Name")
+	cmd.Flags().StringVarP(&name, "name", "n", "", "Device Service name. Service with given name is loaded into default editor, ready to be customized")
 	cmd.Flags().StringVarP(&file, "file", "f", "", "Json file containing device service configuration to update")
 	return cmd
 }
 
 func deviceServiceHandler(cmd *cobra.Command, args []string) error {
 	if name != "" && file != "" {
-		return errors.New("DeviceService could be updated by providing a file, or by specifying device service name to be updated and using interactive mode. ")
+		return errors.New("DeviceService could be updated by providing a file, or by specifying device service name to be updated using interactive mode. ")
 	}
 
 	if name == "" && file == "" {
@@ -88,7 +89,7 @@ func parseDeviceService(name string) (models.DeviceService, error) {
 		return models.DeviceService{}, err
 	}
 
-	updatedDeviceServiceBytes, err := editor.OpenInteractiveEditor(ds, DeviceSrviceTempl, template.FuncMap{
+	updatedDeviceServiceBytes, err := editor.OpenInteractiveEditor(ds, DeviceServiceTempl, template.FuncMap{
 		"lastElem": editor.IsLastElementOfSlice,
 	})
 
