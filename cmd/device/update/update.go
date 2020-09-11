@@ -50,12 +50,12 @@ func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "update",
 		Short: "Update device",
-		Long: `Update device with given name using interactive mode or update device(s) described in a JSON file.
-Interactive mode opens a default editor to customize Device information`,
+		Long: `Update device(s) described in the given JSON file or use the interactive mode enabled by providing 
+ name of existing device service`,
 		RunE: deviceHandler,
 	}
-	cmd.Flags().StringVarP(&name, "name", "n", "", "Name")
-	cmd.Flags().StringVarP(&file, "file", "f", "", "Json file containing device service configuration to update")
+	cmd.Flags().StringVarP(&name, "name", "n", "", "Device name. Device with given name is loaded into default editor, ready to be customized")
+	cmd.Flags().StringVarP(&file, "file", "f", "", "Json file containing device configuration to update")
 	return cmd
 }
 
@@ -125,7 +125,7 @@ func parseDevice(name string) (models.Device, error) {
 	var d models.Device
 	err = json.Unmarshal(updatedDeviceBytes, &d)
 	if err != nil {
-		return models.Device{}, errors.New("Unable to execute the command. The provided information is not valid: " + err.Error())
+		return models.Device{}, errors.New("Unable to execute the command. The provided information is invalid: " + err.Error())
 	}
 	return d, nil
 }
