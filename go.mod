@@ -1,4 +1,4 @@
-module github.com/edgexfoundry-holding/edgex-cli
+module github.com/edgexfoundry/edgex-cli
 
 require (
 	github.com/BurntSushi/toml v0.3.1

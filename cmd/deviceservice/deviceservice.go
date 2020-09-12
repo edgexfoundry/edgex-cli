@@ -15,10 +15,10 @@
 package deviceservice
 
 import (
-	adddeviceservice "github.com/edgexfoundry-holding/edgex-cli/cmd/deviceservice/add"
-	listdeviceservice "github.com/edgexfoundry-holding/edgex-cli/cmd/deviceservice/list"
-	rmdeviceservice "github.com/edgexfoundry-holding/edgex-cli/cmd/deviceservice/rm"
-	updatedeviceservice "github.com/edgexfoundry-holding/edgex-cli/cmd/deviceservice/update"
+	adddeviceservice "github.com/edgexfoundry/edgex-cli/cmd/deviceservice/add"
+	listdeviceservice "github.com/edgexfoundry/edgex-cli/cmd/deviceservice/list"
+	rmdeviceservice "github.com/edgexfoundry/edgex-cli/cmd/deviceservice/rm"
+	updatedeviceservice "github.com/edgexfoundry/edgex-cli/cmd/deviceservice/update"
 
 	"github.com/spf13/cobra"
 )

@@ -15,9 +15,9 @@
 package addressable
 
 import (
-	// addsubscription "github.com/edgexfoundry-holding/edgex-cli/cmd/subscription/add"
-	listaddressable "github.com/edgexfoundry-holding/edgex-cli/cmd/addressable/list"
-	// rmsubscription "github.com/edgexfoundry-holding/edgex-cli/cmd/subscription/rm"
+	// addsubscription "github.com/edgexfoundry/edgex-cli/cmd/subscription/add"
+	listaddressable "github.com/edgexfoundry/edgex-cli/cmd/addressable/list"
+	// rmsubscription "github.com/edgexfoundry/edgex-cli/cmd/subscription/rm"
 	"github.com/spf13/cobra"
 )
 

@@ -15,9 +15,9 @@
 package profile
 
 import (
-	addprofile "github.com/edgexfoundry-holding/edgex-cli/cmd/profile/add"
-	listprofile "github.com/edgexfoundry-holding/edgex-cli/cmd/profile/list"
-	rmprofile "github.com/edgexfoundry-holding/edgex-cli/cmd/profile/rm"
+	addprofile "github.com/edgexfoundry/edgex-cli/cmd/profile/add"
+	listprofile "github.com/edgexfoundry/edgex-cli/cmd/profile/list"
+	rmprofile "github.com/edgexfoundry/edgex-cli/cmd/profile/rm"
 
 	"github.com/spf13/cobra"
 )

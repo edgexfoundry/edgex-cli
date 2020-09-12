@@ -23,7 +23,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/edgexfoundry-holding/edgex-cli/config/mocks"
+	"github.com/edgexfoundry/edgex-cli/config/mocks"
 )
 
 var workDir, _ = os.Getwd()
