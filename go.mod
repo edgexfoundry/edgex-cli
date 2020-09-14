@@ -1,10 +1,10 @@
-module github.com/edgexfoundry-holding/edgex-cli
+module github.com/edgexfoundry/edgex-cli
 
 require (
 	github.com/BurntSushi/toml v0.3.1
-	github.com/edgexfoundry/go-mod-core-contracts v0.1.75
+	github.com/edgexfoundry/go-mod-core-contracts v0.1.78
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
-	github.com/pelletier/go-toml v1.8.0
+	github.com/pelletier/go-toml v1.8.1
 	github.com/spf13/afero v1.3.5
 	github.com/spf13/cobra v0.0.7
 	github.com/spf13/viper v1.7.1

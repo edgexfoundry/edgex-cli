@@ -18,8 +18,8 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	"github.com/edgexfoundry-holding/edgex-cli/config"
-	request "github.com/edgexfoundry-holding/edgex-cli/pkg"
+	"github.com/edgexfoundry/edgex-cli/config"
+	request "github.com/edgexfoundry/edgex-cli/pkg"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 	"github.com/edgexfoundry/go-mod-core-contracts/models"

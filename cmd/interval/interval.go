@@ -15,10 +15,10 @@
 package interval
 
 import (
-	addinterval "github.com/edgexfoundry-holding/edgex-cli/cmd/interval/add"
-	listinterval "github.com/edgexfoundry-holding/edgex-cli/cmd/interval/list"
-	rminterval "github.com/edgexfoundry-holding/edgex-cli/cmd/interval/rm"
-	updateinterval "github.com/edgexfoundry-holding/edgex-cli/cmd/interval/update"
+	addinterval "github.com/edgexfoundry/edgex-cli/cmd/interval/add"
+	listinterval "github.com/edgexfoundry/edgex-cli/cmd/interval/list"
+	rminterval "github.com/edgexfoundry/edgex-cli/cmd/interval/rm"
+	updateinterval "github.com/edgexfoundry/edgex-cli/cmd/interval/update"
 
 	"github.com/spf13/cobra"
 )
