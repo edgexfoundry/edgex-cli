@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/edgexfoundry-holding/edgex-cli/config"
+	"github.com/edgexfoundry/edgex-cli/config"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 )

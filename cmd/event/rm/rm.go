@@ -20,9 +20,9 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/edgexfoundry-holding/edgex-cli/cmd/notification/rm"
-	"github.com/edgexfoundry-holding/edgex-cli/config"
-	"github.com/edgexfoundry-holding/edgex-cli/pkg/utils"
+	"github.com/edgexfoundry/edgex-cli/cmd/notification/rm"
+	"github.com/edgexfoundry/edgex-cli/config"
+	"github.com/edgexfoundry/edgex-cli/pkg/utils"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 	"github.com/edgexfoundry/go-mod-core-contracts/clients/coredata"

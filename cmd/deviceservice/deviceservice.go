@@ -15,6 +15,7 @@
 package deviceservice
 
 import (
+
 	"github.com/edgexfoundry-holding/edgex-cli/cmd/deviceservice/add"
 	"github.com/edgexfoundry-holding/edgex-cli/cmd/deviceservice/list"
 	"github.com/edgexfoundry-holding/edgex-cli/cmd/deviceservice/rm"

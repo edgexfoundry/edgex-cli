@@ -15,6 +15,7 @@
 package device
 
 import (
+
 	"github.com/edgexfoundry-holding/edgex-cli/cmd/device/add"
 	"github.com/edgexfoundry-holding/edgex-cli/cmd/device/list"
 	"github.com/edgexfoundry-holding/edgex-cli/cmd/device/rm"

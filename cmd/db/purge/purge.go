@@ -23,10 +23,10 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/edgexfoundry-holding/edgex-cli/config"
-	request "github.com/edgexfoundry-holding/edgex-cli/pkg"
-	cleaners "github.com/edgexfoundry-holding/edgex-cli/pkg/cmd/purge"
-	"github.com/edgexfoundry-holding/edgex-cli/pkg/confirmation"
+	"github.com/edgexfoundry/edgex-cli/config"
+	request "github.com/edgexfoundry/edgex-cli/pkg"
+	cleaners "github.com/edgexfoundry/edgex-cli/pkg/cmd/purge"
+	"github.com/edgexfoundry/edgex-cli/pkg/confirmation"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 

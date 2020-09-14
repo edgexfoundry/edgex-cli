@@ -14,7 +14,7 @@
 package command
 
 import (
-	listcommand "github.com/edgexfoundry-holding/edgex-cli/cmd/command/list"
+	listcommand "github.com/edgexfoundry/edgex-cli/cmd/command/list"
 	"github.com/spf13/cobra"
 )
 
