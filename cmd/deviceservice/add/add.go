@@ -7,9 +7,9 @@ import (
 	"fmt"
 	"html/template"
 
-	"github.com/edgexfoundry-holding/edgex-cli/cmd/deviceservice/update"
-	"github.com/edgexfoundry-holding/edgex-cli/config"
-	"github.com/edgexfoundry-holding/edgex-cli/pkg/editor"
+	"github.com/edgexfoundry/edgex-cli/cmd/deviceservice/update"
+	"github.com/edgexfoundry/edgex-cli/config"
+	"github.com/edgexfoundry/edgex-cli/pkg/editor"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 	"github.com/edgexfoundry/go-mod-core-contracts/clients/metadata"

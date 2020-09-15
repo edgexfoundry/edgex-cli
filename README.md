@@ -1,4 +1,4 @@
-[![Go Report Card](https://goreportcard.com/badge/edgexfoundry-holding/edgex-cli)](https://goreportcard.com/report/edgexfoundry-holding/edgex-cli)
+[![Go Report Card](https://goreportcard.com/badge/edgexfoundry/edgex-cli)](https://goreportcard.com/report/edgexfoundry/edgex-cli)
 
 # edgex-cli
 
@@ -55,7 +55,7 @@ In order to run this tool, you will need an accessible **running EdgeX instance*
 * Clone the git repo:
 
 ```
-$ git clone https://github.com/edgexfoundry-holding/edgex-cli
+$ git clone https://github.com/edgexfoundry/edgex-cli
 ```
 
 * Change directory:

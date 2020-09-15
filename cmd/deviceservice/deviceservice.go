@@ -15,10 +15,11 @@
 package deviceservice
 
 import (
-	adddeviceservice "github.com/edgexfoundry-holding/edgex-cli/cmd/deviceservice/add"
-	listdeviceservice "github.com/edgexfoundry-holding/edgex-cli/cmd/deviceservice/list"
-	rmdeviceservice "github.com/edgexfoundry-holding/edgex-cli/cmd/deviceservice/rm"
-	updatedeviceservice "github.com/edgexfoundry-holding/edgex-cli/cmd/deviceservice/update"
+
+	"github.com/edgexfoundry-holding/edgex-cli/cmd/deviceservice/add"
+	"github.com/edgexfoundry-holding/edgex-cli/cmd/deviceservice/list"
+	"github.com/edgexfoundry-holding/edgex-cli/cmd/deviceservice/rm"
+	"github.com/edgexfoundry-holding/edgex-cli/cmd/deviceservice/update"
 
 	"github.com/spf13/cobra"
 )
@@ -49,9 +50,9 @@ The DS Layer converts the data produced and communicated by the IoT object, into
 common EdgeX Foundry data structure, and sends that converted data into the Core Services 
 layer, and to other microservices in other layers of EdgeX Foundry.`,
 	}
-	cmd.AddCommand(rmdeviceservice.NewCommand())
-	cmd.AddCommand(listdeviceservice.NewCommand())
-	cmd.AddCommand(adddeviceservice.NewCommand())
-	cmd.AddCommand(updatedeviceservice.NewCommand())
+	cmd.AddCommand(rm.NewCommand())
+	cmd.AddCommand(list.NewCommand())
+	cmd.AddCommand(add.NewCommand())
+	cmd.AddCommand(update.NewCommand())
 	return cmd
 }

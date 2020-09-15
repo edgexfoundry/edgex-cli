@@ -15,11 +15,11 @@
 package event
 
 import (
-	addevent "github.com/edgexfoundry-holding/edgex-cli/cmd/event/add"
-	"github.com/edgexfoundry-holding/edgex-cli/cmd/event/count"
-	listevent "github.com/edgexfoundry-holding/edgex-cli/cmd/event/list"
-	rmevent "github.com/edgexfoundry-holding/edgex-cli/cmd/event/rm"
-	"github.com/edgexfoundry-holding/edgex-cli/cmd/event/scrub"
+	addevent "github.com/edgexfoundry/edgex-cli/cmd/event/add"
+	"github.com/edgexfoundry/edgex-cli/cmd/event/count"
+	listevent "github.com/edgexfoundry/edgex-cli/cmd/event/list"
+	rmevent "github.com/edgexfoundry/edgex-cli/cmd/event/rm"
+	"github.com/edgexfoundry/edgex-cli/cmd/event/scrub"
 
 	"github.com/spf13/cobra"
 )

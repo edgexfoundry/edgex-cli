@@ -24,7 +24,10 @@ import (
 	"github.com/edgexfoundry/go-mod-core-contracts/clients/urlclient/local"
 	"io/ioutil"
 
-	"github.com/edgexfoundry-holding/edgex-cli/config"
+
+	"github.com/edgexfoundry/edgex-cli/config"
+	request "github.com/edgexfoundry/edgex-cli/pkg"
+
 
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 	"github.com/edgexfoundry/go-mod-core-contracts/models"

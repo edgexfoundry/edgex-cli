@@ -17,8 +17,8 @@ package list
 import (
 	"context"
 
-	"github.com/edgexfoundry-holding/edgex-cli/config"
-	"github.com/edgexfoundry-holding/edgex-cli/pkg/formatters"
+	"github.com/edgexfoundry/edgex-cli/config"
+	"github.com/edgexfoundry/edgex-cli/pkg/formatters"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 	"github.com/edgexfoundry/go-mod-core-contracts/clients/scheduler"

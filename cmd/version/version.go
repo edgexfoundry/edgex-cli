@@ -1,7 +1,7 @@
 package version
 
 import (
-	"github.com/edgexfoundry-holding/edgex-cli/pkg/cmd/version"
+	"github.com/edgexfoundry/edgex-cli/pkg/cmd/version"
 
 	"github.com/spf13/cobra"
 )

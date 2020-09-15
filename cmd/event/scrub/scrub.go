@@ -1,9 +1,9 @@
 package scrub
 
 import (
-	"github.com/edgexfoundry-holding/edgex-cli/config"
-	request "github.com/edgexfoundry-holding/edgex-cli/pkg"
-	"github.com/edgexfoundry-holding/edgex-cli/pkg/confirmation"
+	"github.com/edgexfoundry/edgex-cli/config"
+	request "github.com/edgexfoundry/edgex-cli/pkg"
+	"github.com/edgexfoundry/edgex-cli/pkg/confirmation"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 
