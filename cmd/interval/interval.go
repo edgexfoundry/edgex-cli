@@ -15,10 +15,11 @@
 package interval
 
 import (
-	addinterval "github.com/edgexfoundry/edgex-cli/cmd/interval/add"
-	listinterval "github.com/edgexfoundry/edgex-cli/cmd/interval/list"
-	rminterval "github.com/edgexfoundry/edgex-cli/cmd/interval/rm"
-	updateinterval "github.com/edgexfoundry/edgex-cli/cmd/interval/update"
+
+	"github.com/edgexfoundry/edgex-cli/cmd/interval/add"
+	"github.com/edgexfoundry/edgex-cli/cmd/interval/list"
+	"github.com/edgexfoundry/edgex-cli/cmd/interval/rm"
+  "github.com/edgexfoundry/edgex-cli/cmd/interval/update"
 
 	"github.com/spf13/cobra"
 )
@@ -29,9 +30,9 @@ func NewCommand() *cobra.Command {
 		Short: "Interval command",
 		Long:  `Actions related to intervals (scheduler).`,
 	}
-	cmd.AddCommand(addinterval.NewCommand())
-	cmd.AddCommand(rminterval.NewCommand())
-	cmd.AddCommand(updateinterval.NewCommand())
-	cmd.AddCommand(listinterval.NewCommand())
+	cmd.AddCommand(add.NewCommand())
+	cmd.AddCommand(rm.NewCommand())
+	cmd.AddCommand(update.NewCommand())
+	cmd.AddCommand(list.NewCommand())
 	return cmd
 }
