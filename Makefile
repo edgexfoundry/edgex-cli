@@ -1,4 +1,4 @@
-.PHONY: build clean install
+.PHONY: build test clean install
 
 GO = CGO_ENABLED=0 GO111MODULE=on go
 
@@ -27,7 +27,11 @@ build:
 
 test:
 	$(GO) test ./... -coverprofile coverage.out
-
+	GO111MODULE=on go vet ./...
+	gofmt -l .
+	[ "`gofmt -l .`" = "" ]
+	./bin/test-go-mod-tidy.sh
+	./bin/test-attribution-txt.sh
 install:
 	echo "GOBIN=$(GOBIN)"
 	$(GO) install $(GOFLAGS)
