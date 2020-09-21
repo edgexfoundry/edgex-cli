@@ -71,4 +71,3 @@ func NewCommand() *cobra.Command {
 	}
 	return cmd
 }
-

@@ -40,7 +40,7 @@ func NewCommand() *cobra.Command {
 		Use:   "list",
 		Short: "Returns a list of device profiles",
 		Long:  `Returns the list of device profiles currently in the core-metadata database.`,
-		RunE: listHandler,
+		RunE:  listHandler,
 	}
 	return cmd
 }

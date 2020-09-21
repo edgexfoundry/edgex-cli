@@ -48,7 +48,7 @@ database.
 `,
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			// asking user to confirm the purge action
-			if !confirmation.New().Confirm(){
+			if !confirmation.New().Confirm() {
 				return
 			}
 			purge()

@@ -52,14 +52,14 @@ This command is not stable yet.
 			for clientName, client := range config.Conf.Clients {
 				resp, err := http.Get(client.Url() + clients.ApiPingRoute)
 				if err != nil {
-					clientStatuses = append(clientStatuses, clientStatus{clientName,client.Url(), NotConnected})
+					clientStatuses = append(clientStatuses, clientStatus{clientName, client.Url(), NotConnected})
 				} else {
 					data, err := ioutil.ReadAll(resp.Body)
 					if err != nil {
-						clientStatuses = append(clientStatuses, clientStatus{clientName,client.Url(), fmt.Sprintf("%s \t Unexpected error: %v\n", clientName, err)})
+						clientStatuses = append(clientStatuses, clientStatus{clientName, client.Url(), fmt.Sprintf("%s \t Unexpected error: %v\n", clientName, err)})
 					}
 					if string(data) == "pong" {
-						clientStatuses = append(clientStatuses, clientStatus{clientName,client.Url(), OK})
+						clientStatuses = append(clientStatuses, clientStatus{clientName, client.Url(), OK})
 					}
 					resp.Body.Close()
 				}
@@ -71,7 +71,7 @@ This command is not stable yet.
 }
 
 type clientStatus struct {
-	Name string
-	Url  string
+	Name   string
+	Url    string
 	Status string
 }

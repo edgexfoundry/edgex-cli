@@ -61,24 +61,24 @@ func NewCommand() *cobra.Command {
 		Long:  `Create interval(s) described in the given JSON file or use the interactive mode with additional flags.`,
 		RunE:  newIntervalHandler,
 	}
-	cmd.Flags().BoolVarP(&interactiveMode, editor.InteractiveModeLabel, "i", false, "Open a default " +
+	cmd.Flags().BoolVarP(&interactiveMode, editor.InteractiveModeLabel, "i", false, "Open a default "+
 		"editor to customize the Interval information")
 	cmd.Flags().StringVarP(&name, "name", "n", "", "Interval name")
 	cmd.Flags().StringVarP(&start, "start", "s", "", "Interval Start time in format YYYYMMDD'T'HHmmss")
 	cmd.Flags().StringVarP(&end, "end", "e", "", "Interval End time in format YYYYMMDD'T'HHmmss")
-	cmd.Flags().StringVarP(&cron, "cron", "c", "", "Styled regular expression indicating " +
+	cmd.Flags().StringVarP(&cron, "cron", "c", "", "Styled regular expression indicating "+
 		"how often the action under interval should occur. Use either runOnce, frequency or cron and not all.")
-	cmd.Flags().BoolVar(&runOnce, "runOnce",false, "runOnce - boolean indicating that this interval " +
+	cmd.Flags().BoolVar(&runOnce, "runOnce", false, "runOnce - boolean indicating that this interval "+
 		"runs one time - at the time indicated by the start")
-	cmd.Flags().StringVar(&frequency, "frequency", "", "Interval frequency - how frequently should the\n" +
-		"event occur. It is a sequence of decimal numbers, each with optional fraction and a unit suffix," +
-		"such as \"300ms\", \"1.5h\" or \"2h45m\" or \"1h15m30s10us9ns\".\n" +
-		"// Valid time units are:" +
-		" \"ns\" (nanoseconds)," +
-		"\"us\" (or \"µs\" for microseconds)," +
-		"\"ms\"(for milliseconds), " +
-		"\"s\"(seconds)," +
-		"\"m\"(minutes)," +
+	cmd.Flags().StringVar(&frequency, "frequency", "", "Interval frequency - how frequently should the\n"+
+		"event occur. It is a sequence of decimal numbers, each with optional fraction and a unit suffix,"+
+		"such as \"300ms\", \"1.5h\" or \"2h45m\" or \"1h15m30s10us9ns\".\n"+
+		"// Valid time units are:"+
+		" \"ns\" (nanoseconds),"+
+		"\"us\" (or \"µs\" for microseconds),"+
+		"\"ms\"(for milliseconds), "+
+		"\"s\"(seconds),"+
+		"\"m\"(minutes),"+
 		" \"h\"(hours)")
 
 	cmd.Flags().StringVarP(&file, "file", "f", "", "Json file containing interval(s) configuration")
@@ -165,7 +165,7 @@ func parseInterval(interactiveMode bool) ([]models.Interval, error) {
 }
 
 //loadIntervalFromFile could read a file that contains single Interval or list of Intervals
-func loadIntervalFromFile(filePath string) ([]models.Interval, error){
+func loadIntervalFromFile(filePath string) ([]models.Interval, error) {
 	defer func() {
 		if r := recover(); r != nil {
 			fmt.Println("Error: Invalid Json")
