@@ -75,4 +75,3 @@ func listHandler(cmd *cobra.Command, args []string) (err error) {
 	err = formatter.Write(deviceServices)
 	return
 }
-
