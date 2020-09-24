@@ -47,7 +47,7 @@ func Post(url string, item interface{}) {
 }
 
 func printURL(url string, method string) {
-	if viper.GetBool("url") || viper.GetBool("verbose") {
+	if viper.GetBool("url") {
 		fmt.Printf("> %s: %s \n", method, url)
 	}
 }
