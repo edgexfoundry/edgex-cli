@@ -124,7 +124,7 @@ https://www.edgexfoundry.org/
 	Configfile := ""
 	// get flags values
 	cmd.PersistentFlags().BoolVarP(&URL, "url", "u", false, "Print URL(s) used by the entered command.")
-	cmd.PersistentFlags().BoolVarP(&Verbose, "verbose", "v", false, "Print entire HTTP response.")
+	cmd.PersistentFlags().BoolVarP(&Verbose, "verbose", "v", false, "Print request body & response body.")
 	cmd.PersistentFlags().BoolVarP(&NoPager, "no-pager", "", false, "Do not pipe output into a pager.")
 	cmd.PersistentFlags().StringVar(&Configfile, "config-file", "", "configuration file")
 	return cmd
