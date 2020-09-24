@@ -31,11 +31,11 @@ var device string
 
 const cmdsTempl = "Name\tDevice Id\tDevice Name\tMethods\tURL\t\n" +
 	"{{range .}}" +
-		"{{ $deviceId :=.Id}}" +
-		"{{ $deviceName :=.Name}}" +
-		"{{range $i, $c := .Commands}}" +
-			"{{$c.Name}}\t{{$deviceId}}\t{{$deviceName}}\t{{supportedMethods $c}}\t{{if $c.Get.URL}}{{$c.Get.URL}}{{else}}{{$c.Put.URL}}{{end}}\t\n" +
-		"{{end}}" +
+	"{{ $deviceId :=.Id}}" +
+	"{{ $deviceName :=.Name}}" +
+	"{{range $i, $c := .Commands}}" +
+	"{{$c.Name}}\t{{$deviceId}}\t{{$deviceName}}\t{{supportedMethods $c}}\t{{if $c.Get.URL}}{{$c.Get.URL}}{{else}}{{$c.Put.URL}}{{end}}\t\n" +
+	"{{end}}" +
 	"{{end}}"
 
 func NewCommand() *cobra.Command {

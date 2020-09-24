@@ -45,9 +45,9 @@ func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "update",
 		Short: "Update device service",
-		Long:  `Update device service(s) described in the given JSON file or use the interactive mode enabled by providing 
+		Long: `Update device service(s) described in the given JSON file or use the interactive mode enabled by providing 
  name of existing device service`,
-		RunE:  deviceServiceHandler,
+		RunE: deviceServiceHandler,
 	}
 	cmd.Flags().StringVarP(&name, "name", "n", "", "Device Service name. Service with given name is loaded into default editor, ready to be customized")
 	cmd.Flags().StringVarP(&file, "file", "f", "", "Json file containing device service configuration to update")
@@ -80,6 +80,7 @@ func deviceServiceHandler(cmd *cobra.Command, args []string) error {
 
 	return nil
 }
+
 //parseDeviceService loads a device service to be updated and open a default editor for customization
 func parseDeviceService(name string) (models.DeviceService, error) {
 	var err error
@@ -121,7 +122,7 @@ func updateDeviceServiceFromFile() error {
 }
 
 //loadJsonFile could read a file that contains single Device service or list of Device Services
-func LoadDSFromFile(filePath string) ([]models.DeviceService, error){
+func LoadDSFromFile(filePath string) ([]models.DeviceService, error) {
 	defer func() {
 		if r := recover(); r != nil {
 			fmt.Println("Error: Invalid Json")

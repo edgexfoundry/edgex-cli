@@ -34,6 +34,7 @@ import (
 var age string
 var unit string
 var device string
+
 const errMsg = "events could be removed by one criteria: by id(s), by device name or by age. " +
 	"please provide id(s) as argument(s) or provide one flag (--device/--age)"
 

@@ -26,7 +26,7 @@ import (
 
 const addrTempl = "Id\tName\tProtocol\tHTTPMethod\tAddress\tPort\n" +
 	"{{range .}}" +
-		"{{.Id}}\t{{.Name}}\t{{.Protocol}}\t{{.HTTPMethod}}\t{{.Address}}\t{{.Port}}\n" +
+	"{{.Id}}\t{{.Name}}\t{{.Protocol}}\t{{.HTTPMethod}}\t{{.Address}}\t{{.Port}}\n" +
 	"{{end}}"
 
 // NewCommand returns the list device command

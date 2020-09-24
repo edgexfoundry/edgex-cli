@@ -36,7 +36,7 @@ func NewCommand() *cobra.Command {
 		Use:   "list",
 		Short: "A list of all subscriptions",
 		Long:  `Return all Subscriptions`,
-		RunE: listHandler,
+		RunE:  listHandler,
 	}
 	return cmd
 }

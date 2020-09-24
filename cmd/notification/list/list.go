@@ -45,12 +45,12 @@ const notificationTemplate = "Notification ID\tSlug\tSender\tStatus\tSeverity\tC
 
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:                        "list",
-		Short:                      "A list of all notifications",
-		Long:                       `Return a list of all notifications filtered by slug/sender/labels/start/end/new and limited by limit. Defaults to new notifications.`,
-		Args:                       cobra.MaximumNArgs(3),
-		RunE:                       listHandler,
-		FParseErrWhitelist:         cobra.FParseErrWhitelist{},
+		Use:                "list",
+		Short:              "A list of all notifications",
+		Long:               `Return a list of all notifications filtered by slug/sender/labels/start/end/new and limited by limit. Defaults to new notifications.`,
+		Args:               cobra.MaximumNArgs(3),
+		RunE:               listHandler,
+		FParseErrWhitelist: cobra.FParseErrWhitelist{},
 	}
 
 	cmd.Flags().Int32VarP(&limit, "limit", "l", 50, "Limit number of results")
