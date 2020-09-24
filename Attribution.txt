@@ -1,0 +1,87 @@
+pmezard/go-difflib (MIT ?) https://github.com/pmezard/go-difflib
+https://github.com/pmezard/go-difflib/blob/master/LICENSE
+
+gopkg.in/yaml.v3 (MIT) https://github.com/go-yaml/yaml/tree/v3
+https://github.com/go-yaml/yaml/blob/v3/LICENSE
+
+subosito/gotenv (MIT) https://github.com/subosito/gotenv
+https://github.com/subosito/gotenv/blob/master/LICENSE
+
+x448/float16 (MIT) https://github.com/x448/float16
+https://github.com/x448/float16/blob/master/LICENSE
+
+golang.org/x/sys (MIT ?) golang.org/x/sys
+https://github.com/golang/sys/blob/master/LICENSE
+
+golang.org/x/text (MIT ?) golang.org/x/text
+https://github.com/golang/text/blob/master/LICENSE
+
+gopkg.in/ini.v1 (Apache 2) https://github.com/go-ini/ini/tree/v1.61.0
+https://github.com/go-ini/ini/blob/v1.61.0/LICENSE
+
+spf13/pflag (BSD 3) https://github.com/spf13/pflag
+https://github.com/spf13/pflag/blob/master/LICENSE
+
+spf13/jwalterweatherman (MIT) https://github.com/spf13/jwalterweatherman
+https://github.com/spf13/jwalterweatherman/blob/master/LICENSE
+
+spf13/cast (MIT) https://github.com/spf13/cast
+https://github.com/spf13/cast/blob/master/LICENSE
+
+davecgh/go-spew (ISC) https://github.com/davecgh/go-spew
+https://github.com/davecgh/go-spew/blob/master/LICENSE
+
+fsnotify/fsnotify (BSD 3) https://github.com/fsnotify/fsnotify
+https://github.com/fsnotify/fsnotify/blob/master/LICENSE
+
+fxamacker/cbor (MIT) https://github.com/fxamacker/cbor/v2
+https://github.com/fxamacker/cbor/blob/master/LICENSE
+
+google/uuid (BSD 3) https://github.com/google/uuid
+https://github.com/google/uuid/blob/master/LICENSE
+
+hashicorp/hcl (Mozilla Public License 2.0) https://github.com/hashicorp/hcl
+https://github.com/hashicorp/hcl/blob/master/LICENSE
+
+magiconair/properties (BSD 2) https://github.com/magiconair/properties 
+https://github.com/magiconair/properties/blob/master/LICENSE.md
+
+inconshreveable/mousetrap (Apache 2.0) https://github.com/inconshreveable/mousetrap
+https://github.com/inconshreveable/mousetrap/blob/master/LICENSE
+
+mitchellh/mapstructure (MIT) https://github.com/mitchellh/mapstructure
+https://github.com/mitchellh/mapstructure/blob/master/LICENSE
+
+BurntSushi/toml (MIT) https://github.com/BurntSushi/toml
+https://github.com/BurntSushi/toml/blob/master/COPYING
+
+edgexfoundry/go-mod-core-contracts (Apache 2.0) https://github.com/edgexfoundry/go-mod-core-contracts
+https://github.com/edgexfoundry/go-mod-core-contracts/blob/master/LICENSE
+
+niemeyer/pretty (MIT) https://github.com/niemeyer/pretty
+https://github.com/niemeyer/pretty/blob/master/License 
+
+pelletier/go-toml (MIT) https://github.com/pelletier/go-toml
+https://github.com/pelletier/go-toml/blob/master/LICENSE
+
+spf13/afero (Apache 2.0) https://github.com/spf13/afero
+https://github.com/spf13/afero/blob/master/LICENSE.txt
+
+spf13/cobra (Apache 2.0) https://github.com/spf13/cobra
+https://github.com/spf13/cobra/blob/master/LICENSE.txt
+
+spf13/viper (MIT) https://github.com/spf13/viper
+https://github.com/spf13/viper/blob/master/LICENSE
+
+stretchr/objx v0.2.0 (MIT) https://github.com/stretchr/objx
+https://github.com/stretchr/objx/blob/master/LICENSE
+
+stretchr/testify (MIT) https://github.com/stretchr/testify
+https://github.com/stretchr/testify/blob/master/LICENSE
+
+gopkg.in/check.v1 (Simplified Free BSD) https://github.com/go-check/check/
+https://github.com/go-check/check/blob/v1/LICENSE
+
+gopkg.in/yaml.v2 (Apache 2.0) https://github.com/go-yaml/yaml/
+https://github.com/go-yaml/yaml/blob/v2.2.2/LICENSE
+

@@ -4,4 +4,6 @@ go.sum
 coverage.out
 
 .idea/
-
+archives
+bin
+VERSION

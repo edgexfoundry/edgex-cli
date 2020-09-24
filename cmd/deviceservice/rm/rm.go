@@ -34,7 +34,7 @@ func NewCommand() *cobra.Command {
 			"deviceservice rm --name <name>",
 		Short: "Removes device service by name or ID",
 		Long:  `Removes a device service from the core-metadata DB.`,
-		RunE: func(cmd *cobra.Command, args []string) (err error){
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			if len(args) == 0 && name == "" {
 				return errors.New("no device service id/name provided")
 			}

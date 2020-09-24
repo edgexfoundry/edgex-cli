@@ -130,9 +130,8 @@ func parseDevice(name string) (models.Device, error) {
 	return d, nil
 }
 
-
 //LoadDevicesFromFile could read a file that contains single Device or list of Device
-func LoadDevicesFromFile(filePath string) ([]models.Device, error){
+func LoadDevicesFromFile(filePath string) ([]models.Device, error) {
 	defer func() {
 		if r := recover(); r != nil {
 			fmt.Println("Error: Invalid Json")
@@ -159,4 +158,3 @@ func LoadDevicesFromFile(filePath string) ([]models.Device, error){
 	}
 	return devices, nil
 }
-

@@ -66,4 +66,3 @@ func ConvertAgeToMillisecond(unit string, age int64) int64 {
 	}
 	return ageMilliseconds
 }
-

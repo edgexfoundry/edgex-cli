@@ -34,7 +34,7 @@ func NewCommand() *cobra.Command {
 			"subscription rm --slug <slug>",
 		Short: "Removes subscription by --slug or id.",
 		Long:  `Removes a subscription given its slug or id.`,
-		RunE:   removeSubscriptionHandler,
+		RunE:  removeSubscriptionHandler,
 	}
 	cmd.Flags().StringVarP(&slug, "slug", "s", "", "Delete Subscription by slug")
 	return cmd

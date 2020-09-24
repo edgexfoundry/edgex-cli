@@ -15,12 +15,11 @@
 package device
 
 import (
-
 	"github.com/edgexfoundry/edgex-cli/cmd/device/add"
 	"github.com/edgexfoundry/edgex-cli/cmd/device/list"
 	"github.com/edgexfoundry/edgex-cli/cmd/device/rm"
 	"github.com/edgexfoundry/edgex-cli/cmd/device/update"
-	
+
 	"github.com/spf13/cobra"
 )
 
