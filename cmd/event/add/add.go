@@ -87,7 +87,6 @@ func NewCommand() *cobra.Command {
 			populateEvent(&newEvent)
 			var newEventBytes []byte
 			var err error
-			interactiveMode, err := command.Flags().GetBool(editor.InteractiveModeLabel)
 			if interactiveMode {
 				newEventBytes, err = openInteractiveEditor(newEvent)
 			} else {

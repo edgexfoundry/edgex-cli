@@ -9,19 +9,21 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"html/template"
+
+	"github.com/edgexfoundry/edgex-cli/cmd/device/update"
 	"github.com/edgexfoundry/edgex-cli/config"
 	"github.com/edgexfoundry/edgex-cli/pkg/editor"
-	"github.com/edgexfoundry/go-mod-core-contracts/models"
-	"io/ioutil"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 	"github.com/edgexfoundry/go-mod-core-contracts/clients/metadata"
 	"github.com/edgexfoundry/go-mod-core-contracts/clients/urlclient/local"
+	"github.com/edgexfoundry/go-mod-core-contracts/models"
+
 	"github.com/spf13/cobra"
 )
 
 const DeviceTemplate = `[{{range $d := .}}` + update.DeviceTemp + `{{end}}]`
-
 
 var interactiveMode bool
 var name string
@@ -58,12 +60,7 @@ func deviceHandler(cmd *cobra.Command, args []string) error {
 	}
 
 	if file != "" {
-		return createDeviceFromFile()
-	}
-
-	interactiveMode, err := cmd.Flags().GetBool(editor.InteractiveModeLabel)
-	if err != nil {
-		return err
+		return createDevicesFromFile()
 	}
 
 	devices, err := parseDevice(interactiveMode)
@@ -82,8 +79,8 @@ func deviceHandler(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func createDeviceFromFile() error {
-	devices, err := LoadDeviceFromFile(file)
+func createDevicesFromFile() error {
+	devices, err := update.LoadDevicesFromFile(file)
 	if err != nil {
 		return err
 	}
@@ -112,7 +109,12 @@ func parseDevice(interactiveMode bool) ([]models.Device, error) {
 
 	var updatedDeviceBytes []byte
 	if interactiveMode {
-		updatedDeviceBytes, err = editor.OpenInteractiveEditor(devices, DeviceTemplate, nil)
+		updatedDeviceBytes, err = editor.OpenInteractiveEditor(devices, DeviceTemplate, template.FuncMap{
+			"inc": func(i int) int {
+				return i + 1
+			},
+			"lastElem": editor.IsLastElementOfSlice,
+		})
 	}
 	if err != nil {
 		return nil, err
@@ -135,33 +137,4 @@ func populateDevice(devices *[]models.Device) {
 	d.Profile = models.DeviceProfile{Name: profileName}
 	d.Service = models.DeviceService{Name: serviceName}
 	*devices = append(*devices, d)
-}
-
-//LoadDeviceFromFile could read a file that contains single Device or list of Device Services
-func LoadDeviceFromFile(filePath string) ([]models.Device, error) {
-	defer func() {
-		if r := recover(); r != nil {
-			fmt.Println("Error: Invalid Json")
-		}
-	}()
-	file, err := ioutil.ReadFile(filePath)
-	if err != nil {
-		return nil, err
-	}
-
-	var devices []models.Device
-
-	//check if the file contains just one Device
-	var d models.Device
-	err = json.Unmarshal(file, &d)
-	if err != nil {
-		//check if the file contains list of Device
-		err = json.Unmarshal(file, &devices)
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		devices = append(devices, d)
-	}
-	return devices, nil
 }

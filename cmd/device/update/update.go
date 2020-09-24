@@ -19,7 +19,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const deviceTemp = `{
+const DeviceTemp = `{
   "Id": "{{.Id}}",
   "Name": "{{.Name}}",
   "Description":"{{.Description}}",
@@ -112,7 +112,7 @@ func parseDevice(name string) (models.Device, error) {
 	}
 
 	//populate the template with the loaded device and open default editor, so the client could customize the data
-	updatedDeviceBytes, err := editor.OpenInteractiveEditor(device, deviceTemp, template.FuncMap{
+	updatedDeviceBytes, err := editor.OpenInteractiveEditor(device, DeviceTemp, template.FuncMap{
 		"inc": func(i int) int {
 			return i + 1
 		},
