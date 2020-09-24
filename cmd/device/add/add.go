@@ -6,101 +6,162 @@ package add
 
 import (
 	"context"
+	"encoding/json"
+	"errors"
 	"fmt"
-	"io/ioutil"
-	"time"
-
 	"github.com/edgexfoundry/edgex-cli/config"
+	"github.com/edgexfoundry/edgex-cli/pkg/editor"
+	"github.com/edgexfoundry/go-mod-core-contracts/models"
+	"io/ioutil"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 	"github.com/edgexfoundry/go-mod-core-contracts/clients/metadata"
 	"github.com/edgexfoundry/go-mod-core-contracts/clients/urlclient/local"
-	"github.com/edgexfoundry/go-mod-core-contracts/models"
-
-	"github.com/BurntSushi/toml"
 	"github.com/spf13/cobra"
 )
 
-type DeviceConfig struct {
-	Name            string
-	Profile         string
-	Description     string
-	Service         string
-	Labels          []string
-	AddressableName string
-	Protocols       map[string]models.ProtocolProperties
-	AutoEvents      []models.AutoEvent
-}
+const DeviceTemplate = `[{{range $d := .}}` + update.DeviceTemp + `{{end}}]`
 
-type DeviceFile struct {
-	DeviceList []DeviceConfig
-}
 
+var interactiveMode bool
+var name string
+var description string
+var adminState string
+var operState string
+var profileName string
+var serviceName string
+var file string
+
+// NewCommand returns the update device command
 func NewCommand() *cobra.Command {
-	var file string
 	cmd := &cobra.Command{
 		Use:   "add",
 		Short: "Add devices",
-		Long:  `Create the devices described in the given TOML file.`,
-		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			fname := cmd.Flag("file").Value.String()
-			return processFile(fname)
-		},
+		Long:  `Create devices described in a given JSON file or use the interactive mode with additional flags.`,
+		RunE:  deviceHandler,
 	}
-	cmd.Flags().StringVarP(&file, "file", "f", "", "Toml file containing device(s) configuration (required)")
-	cmd.MarkFlagRequired("file")
+	cmd.Flags().BoolVarP(&interactiveMode, editor.InteractiveModeLabel, "i", false, "Open a default editor to customize the Event information")
+	cmd.Flags().StringVarP(&name, "name", "n", "", "Name")
+	cmd.Flags().StringVarP(&description, "description", "d", "", "Description")
+	cmd.Flags().StringVar(&adminState, "adminState", "", "Admin Status")
+	cmd.Flags().StringVar(&operState, "operatingStatus", "", "Operating Status")
+	cmd.Flags().StringVar(&profileName, "profileName", "", "Device Profile name")
+	cmd.Flags().StringVar(&serviceName, "serviceName", "", "Device Service name")
+
+	cmd.Flags().StringVarP(&file, "file", "f", "", "File containing device configuration in json format")
 	return cmd
 }
 
-func addDevice(dev models.Device) (string, error) {
-	url := config.Conf.Clients["Metadata"].Url()
-	mdc := metadata.NewDeviceClient(
-		local.New(url + clients.ApiDeviceRoute),
-	)
-	resp, err := mdc.Add(context.Background(), &dev)
-	if err != nil {
-		return "", err
+func deviceHandler(cmd *cobra.Command, args []string) error {
+	if interactiveMode && file != "" {
+		return errors.New("you could work with interactive mode or file, but not with both")
 	}
-	return resp, nil
+
+	if file != "" {
+		return createDeviceFromFile()
+	}
+
+	interactiveMode, err := cmd.Flags().GetBool(editor.InteractiveModeLabel)
+	if err != nil {
+		return err
+	}
+
+	devices, err := parseDevice(interactiveMode)
+	if err != nil {
+		return err
+	}
+
+	client := local.New(config.Conf.Clients["Metadata"].Url() + clients.ApiDeviceRoute)
+	for _, d := range devices {
+		_, err = metadata.NewDeviceClient(client).Add(context.Background(), &d)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
-func processFile(fname string) (err error) {
-	defer func() {
-		if r := recover(); r != nil {
-			fmt.Println("Invalid TOML")
-		}
-	}()
-
-	var content = &DeviceFile{}
-	file, err := ioutil.ReadFile(fname)
+func createDeviceFromFile() error {
+	devices, err := LoadDeviceFromFile(file)
 	if err != nil {
-		return
+		return err
 	}
 
-	err = toml.Unmarshal(file, content)
-	if err != nil {
-		return
-	}
-
-	for _, d := range content.DeviceList {
-		millis := time.Now().UnixNano() / int64(time.Millisecond)
-		dev := models.Device{
-			Name:           d.Name,
-			Profile:        models.DeviceProfile{Name: d.Profile},
-			Protocols:      d.Protocols,
-			Labels:         d.Labels,
-			Service:        models.DeviceService{Name: d.Service, Addressable: models.Addressable{Name: d.AddressableName}},
-			AdminState:     models.Unlocked,
-			OperatingState: models.Enabled,
-			AutoEvents:     d.AutoEvents,
-		}
-		dev.Origin = millis
-		id, err := addDevice(dev)
+	client := local.New(config.Conf.Clients["Metadata"].Url() + clients.ApiDeviceRoute)
+	for _, d := range devices {
+		_, err = metadata.NewDeviceClient(client).Add(context.Background(), &d)
 		if err != nil {
 			fmt.Println("Error: ", err.Error())
-		} else {
-			fmt.Println("Created with ID: ", id)
 		}
 	}
 	return nil
+}
+
+func parseDevice(interactiveMode bool) ([]models.Device, error) {
+	//parse Device based on interactive mode and the other provided flags
+	var err error
+	var devices []models.Device
+	if name != "" {
+		client := local.New(config.Conf.Clients["Metadata"].Url() + clients.ApiDeviceRoute)
+		from, _ := metadata.NewDeviceClient(client).DeviceForName(context.Background(), name)
+		devices = append(devices, from)
+	} else {
+		populateDevice(&devices)
+	}
+
+	var updatedDeviceBytes []byte
+	if interactiveMode {
+		updatedDeviceBytes, err = editor.OpenInteractiveEditor(devices, DeviceTemplate, nil)
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	var updatedDevices []models.Device
+	err = json.Unmarshal(updatedDeviceBytes, &updatedDevices)
+	if err != nil {
+		return nil, errors.New("Unable to execute the command. The provided information is not valid:" + err.Error())
+	}
+	return updatedDevices, err
+}
+
+func populateDevice(devices *[]models.Device) {
+	d := models.Device{}
+	d.Name = name
+	d.Description = description
+	d.AdminState = models.AdminState(adminState)
+	d.OperatingState = models.OperatingState(operState)
+	d.Profile = models.DeviceProfile{Name: profileName}
+	d.Service = models.DeviceService{Name: serviceName}
+	*devices = append(*devices, d)
+}
+
+//LoadDeviceFromFile could read a file that contains single Device or list of Device Services
+func LoadDeviceFromFile(filePath string) ([]models.Device, error) {
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Println("Error: Invalid Json")
+		}
+	}()
+	file, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		return nil, err
+	}
+
+	var devices []models.Device
+
+	//check if the file contains just one Device
+	var d models.Device
+	err = json.Unmarshal(file, &d)
+	if err != nil {
+		//check if the file contains list of Device
+		err = json.Unmarshal(file, &devices)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		devices = append(devices, d)
+	}
+	return devices, nil
 }
