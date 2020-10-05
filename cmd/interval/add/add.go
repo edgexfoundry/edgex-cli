@@ -58,7 +58,7 @@ func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "add",
 		Short: "Add interval",
-		Long:  `Create interval(s) described in the given JSON file or use the interactive mode with additional flags.`,
+		Long:  `Create interval(s) described in a given JSON file or use the interactive mode with additional flags.`,
 		RunE:  newIntervalHandler,
 	}
 	cmd.Flags().BoolVarP(&interactiveMode, editor.InteractiveModeLabel, "i", false, "Open a default "+
