@@ -20,6 +20,7 @@ import (
 	"fmt"
 
 	"github.com/edgexfoundry/edgex-cli/config"
+	request "github.com/edgexfoundry/edgex-cli/pkg"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 	"github.com/edgexfoundry/go-mod-core-contracts/clients/scheduler"
@@ -42,14 +43,13 @@ func removeIntervalHandler(cmd *cobra.Command, args []string) (err error) {
 	if name != "" {
 		deletedBy = name
 		err = sc.DeleteByName(context.Background(), name)
-	} else {
-		deletedBy = args[0]
-		err = sc.Delete(context.Background(), deletedBy)
+		if err != nil {
+			return
+		}
+		fmt.Printf("Removed: %s\n", deletedBy)
+	} else if len(args[0]) != 0 {
+		return request.DeleteByIds(sc, args)
 	}
-	if err != nil {
-		return
-	}
-	fmt.Printf("Removed: %s\n", deletedBy)
 	return nil
 }
 

@@ -66,3 +66,29 @@ func getType(item interface{}) string {
 		return t.Name()
 	}
 }
+
+func DeleteByIds(i interface{}, ids []string) error {
+	methodVal := reflect.ValueOf(i).MethodByName("Delete")
+	if !methodVal.IsValid() {
+		return fmt.Errorf("unsupported method: %s", "Delete")
+	} else if methodVal.Type().NumIn() != 2 {
+		return fmt.Errorf("client method has %q input parameters, want 2", methodVal.Type().NumIn())
+	} else if methodVal.Type().In(0) != reflect.TypeOf((*context.Context)(nil)).Elem() {
+		return fmt.Errorf("client method's first input parameter is %q, want `context.Context`", methodVal.Type().In(0))
+	} else if methodVal.Type().In(1) != reflect.TypeOf((*string)(nil)).Elem() {
+		return fmt.Errorf("client method's first input parameter is %q, want `context.Context`", methodVal.Type().In(1))
+	} else if methodVal.Type().NumOut() != 1 {
+		return fmt.Errorf("client method has %q output parameters, want 1", methodVal.Type().NumOut())
+	}
+
+	for _, id := range ids {
+		out := methodVal.Call([]reflect.Value{reflect.ValueOf(context.Background()), reflect.ValueOf(id)})
+		err := out[0]
+		if !err.IsNil() {
+			fmt.Printf("Error: %s", err.Interface().(error))
+		} else {
+			fmt.Printf("Removed: %s \n", id)
+		}
+	}
+	return nil
+}
