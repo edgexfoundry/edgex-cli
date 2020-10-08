@@ -1,9 +1,6 @@
 pmezard/go-difflib (MIT ?) https://github.com/pmezard/go-difflib
 https://github.com/pmezard/go-difflib/blob/master/LICENSE
 
-gopkg.in/yaml.v3 (MIT) https://github.com/go-yaml/yaml/tree/v3
-https://github.com/go-yaml/yaml/blob/v3/LICENSE
-
 subosito/gotenv (MIT) https://github.com/subosito/gotenv
 https://github.com/subosito/gotenv/blob/master/LICENSE
 
@@ -82,6 +79,9 @@ https://github.com/stretchr/testify/blob/master/LICENSE
 gopkg.in/check.v1 (Simplified Free BSD) https://github.com/go-check/check/
 https://github.com/go-check/check/blob/v1/LICENSE
 
-gopkg.in/yaml.v2 (Apache 2.0) https://github.com/go-yaml/yaml/
-https://github.com/go-yaml/yaml/blob/v2.2.2/LICENSE
+gopkg.in/yaml.v2 (Apache 2.0) https://github.com/go-yaml/yaml/tree/v2.3.0
+https://github.com/go-yaml/yaml/blob/v2.3.0/LICENSE
+
+gopkg.in/yaml.v3 (MIT) https://github.com/go-yaml/yaml/tree/v3
+https://github.com/go-yaml/yaml/blob/v3/LICENSE
 
