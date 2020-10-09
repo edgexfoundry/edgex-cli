@@ -41,10 +41,10 @@ var frequency string
 
 var file string
 
-const IntervalTempl = `[{{range $interval := .}}` + baseIntervalTemp +
+const intervalTempl = `[{{range $interval := .}}` + BaseIntervalTemp +
 	`{{end}}]`
 
-const baseIntervalTemp = `{
+const BaseIntervalTemp = `{
 	"Name" : "{{.Name}}",
 	"start" : "{{.Start}}",
 	"end" : "{{.End}}",
@@ -53,6 +53,23 @@ const baseIntervalTemp = `{
 	"frequency" : "{{.Frequency}}"
 }
 `
+
+const IntervalStartUsage = "Interval Start time in format YYYYMMDD'T'HHmmss."
+const IntervalEndUsage = "Interval End time in format YYYYMMDD'T'HHmmss."
+const CronIntervalUsage = "Styled regular expression indicating " +
+	"how often the action under interval should occur. Use either runOnce, frequency or cron and not all."
+const RunOnceIntervalUsage = "RunOnce - boolean indicating that this interval " +
+	"runs one time - at the time indicated by the start."
+const FrequencyIntervalUsage = "Interval frequency - indicates how frequent the " +
+	"event should occur. It is a sequence of decimal numbers, each with optional fraction and a unit suffix, " +
+	"such as \"300ms\", \"1.5h\" or \"2h45m\" or \"1h15m30s10us9ns\".\n" +
+	"// Valid time units are: " +
+	"\"ns\" (nanoseconds), " +
+	"\"us\" (or \"µs\" for microseconds), " +
+	"\"ms\"(for milliseconds), " +
+	"\"s\"(seconds), " +
+	"\"m\"(minutes), " +
+	"\"h\"(hours)"
 
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
@@ -64,22 +81,11 @@ func NewCommand() *cobra.Command {
 	cmd.Flags().BoolVarP(&interactiveMode, editor.InteractiveModeLabel, "i", false, "Open a default "+
 		"editor to customize the Interval information")
 	cmd.Flags().StringVarP(&name, "name", "n", "", "Interval name")
-	cmd.Flags().StringVarP(&start, "start", "s", "", "Interval Start time in format YYYYMMDD'T'HHmmss")
-	cmd.Flags().StringVarP(&end, "end", "e", "", "Interval End time in format YYYYMMDD'T'HHmmss")
-	cmd.Flags().StringVarP(&cron, "cron", "c", "", "Styled regular expression indicating "+
-		"how often the action under interval should occur. Use either runOnce, frequency or cron and not all.")
-	cmd.Flags().BoolVar(&runOnce, "runOnce", false, "runOnce - boolean indicating that this interval "+
-		"runs one time - at the time indicated by the start")
-	cmd.Flags().StringVar(&frequency, "frequency", "", "Interval frequency - how frequently should the\n"+
-		"event occur. It is a sequence of decimal numbers, each with optional fraction and a unit suffix,"+
-		"such as \"300ms\", \"1.5h\" or \"2h45m\" or \"1h15m30s10us9ns\".\n"+
-		"// Valid time units are:"+
-		" \"ns\" (nanoseconds),"+
-		"\"us\" (or \"µs\" for microseconds),"+
-		"\"ms\"(for milliseconds), "+
-		"\"s\"(seconds),"+
-		"\"m\"(minutes),"+
-		" \"h\"(hours)")
+	cmd.Flags().StringVarP(&start, "start", "s", "", IntervalStartUsage)
+	cmd.Flags().StringVarP(&end, "end", "e", "", IntervalEndUsage)
+	cmd.Flags().StringVarP(&cron, "cron", "c", "", CronIntervalUsage)
+	cmd.Flags().BoolVar(&runOnce, "runOnce", false, RunOnceIntervalUsage)
+	cmd.Flags().StringVar(&frequency, "frequency", "", FrequencyIntervalUsage)
 
 	cmd.Flags().StringVarP(&file, "file", "f", "", "Json file containing interval(s) configuration")
 	return cmd
@@ -148,7 +154,7 @@ func parseInterval(interactiveMode bool) ([]models.Interval, error) {
 
 	var updatedIntervalBytes []byte
 	if interactiveMode {
-		updatedIntervalBytes, err = editor.OpenInteractiveEditor(intervals, IntervalTempl, nil)
+		updatedIntervalBytes, err = editor.OpenInteractiveEditor(intervals, intervalTempl, nil)
 	} else {
 		updatedIntervalBytes, err = json.Marshal(intervals)
 	}

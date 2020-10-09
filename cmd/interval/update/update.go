@@ -17,11 +17,14 @@ package update
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"html/template"
 	"io/ioutil"
-	"os"
 
+	"github.com/edgexfoundry/edgex-cli/cmd/interval/add"
 	"github.com/edgexfoundry/edgex-cli/config"
+	"github.com/edgexfoundry/edgex-cli/pkg/editor"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 	"github.com/edgexfoundry/go-mod-core-contracts/clients/scheduler"
@@ -31,60 +34,117 @@ import (
 	"github.com/spf13/cobra"
 )
 
-type IntervalFile struct {
-	Intervals []models.Interval
-}
+var name string
+var file string
 
+// NewCommand returns the update Interval command
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "update",
 		Short: "Update interval",
-		Long:  `Update the intervals described in the given TOML files.`,
-		Run:   updateIntervalHandler,
+		Long: "Update interval(s) described in the given JSON file or use the interactive mode enabled by providing " +
+			"name of existing interval. \n" +
+			"Parameters description: \n" +
+			fmt.Sprintf("%s\n%s\n%s\n%s\n%s\n", add.IntervalStartUsage, add.IntervalEndUsage, add.RunOnceIntervalUsage, add.CronIntervalUsage, add.FrequencyIntervalUsage),
+		RunE: intervalHandler,
 	}
+	cmd.Flags().StringVarP(&name, "name", "n", "", "Interval name. Interval with given name is loaded into default editor, ready to be customized")
+	cmd.Flags().StringVarP(&file, "file", "f", "", "Json file containing interval configuration to update")
 	return cmd
 }
 
-func updateIntervalHandler(cmd *cobra.Command, args []string) {
-	for _, fname := range args {
-		intervals, err := parseJson(fname)
+func intervalHandler(cmd *cobra.Command, args []string) error {
+	if name != "" && file != "" {
+		return errors.New("Interval could be updated by providing a file, or by specifying interval name to be updated using interactive mode. ")
+	}
+
+	if name == "" && file == "" {
+		return errors.New("Please, provide file or interval name ")
+	}
+
+	if file != "" {
+		return updateIntervalFromFile()
+	}
+
+	updatedInterval, err := parseInterval(name)
+	if err != nil {
+		return err
+	}
+
+	client := local.New(config.Conf.Clients["Scheduler"].Url() + clients.ApiIntervalRoute)
+	err = scheduler.NewIntervalClient(client).Update(context.Background(), updatedInterval)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+//parseInterval loads a Interval to be updated and open a default editor for customization
+func parseInterval(name string) (models.Interval, error) {
+	var err error
+	client := local.New(config.Conf.Clients["Scheduler"].Url() + clients.ApiIntervalRoute)
+	i, err := scheduler.NewIntervalClient(client).IntervalForName(context.Background(), name)
+	if err != nil {
+		return models.Interval{}, err
+	}
+
+	updatedIntervalBytes, err := editor.OpenInteractiveEditor(i, add.BaseIntervalTemp, template.FuncMap{
+		"lastElem": editor.IsLastElementOfSlice,
+	})
+
+	if err != nil {
+		return models.Interval{}, err
+	}
+	var updatedInterval models.Interval
+	err = json.Unmarshal(updatedIntervalBytes, &updatedInterval)
+	if err != nil {
+		return models.Interval{}, errors.New("Unable to execute the command. The provided information is invalid: " + err.Error())
+	}
+	return updatedInterval, err
+}
+
+func updateIntervalFromFile() error {
+	intervals, err := LoadDSFromFile(file)
+	if err != nil {
+		return err
+	}
+
+	client := local.New(config.Conf.Clients["Scheduler"].Url() + clients.ApiIntervalRoute)
+	for _, ds := range intervals {
+		err = scheduler.NewIntervalClient(client).Update(context.Background(), ds)
 		if err != nil {
 			fmt.Println("Error: ", err.Error())
-			continue
-		}
-
-		for _, i := range intervals {
-			updateInterval(i)
 		}
 	}
+	return nil
 }
 
-func updateInterval(n models.Interval) {
-	url := config.Conf.Clients["Scheduler"].Url()
-	client := scheduler.NewIntervalClient(
-		local.New(url + clients.ApiIntervalRoute),
-	)
-
-	err := client.Update(context.Background(), n)
+//loadJsonFile could read a file that contains single Interval or list of Intervals
+func LoadDSFromFile(filePath string) ([]models.Interval, error) {
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Println("Error: Invalid Json")
+		}
+	}()
+	file, err := ioutil.ReadFile(filePath)
 	if err != nil {
-		fmt.Println(err)
+		return nil, err
+	}
+
+	var intervals []models.Interval
+
+	//check if the file contains just one Interval
+	var ds models.Interval
+	err = json.Unmarshal(file, &ds)
+	if err != nil {
+		//check if the file contains list of Interval
+		err = json.Unmarshal(file, &intervals)
+		if err != nil {
+			return nil, err
+		}
 	} else {
-		fmt.Printf("Interval successfully created: %s\n", n.Name)
+		intervals = append(intervals, ds)
 	}
-}
-
-func parseJson(fname string) ([]models.Interval, error) {
-	file, err := os.Open(fname)
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-	byteValue, _ := ioutil.ReadAll(file)
-
-	fileContent := &IntervalFile{}
-	err = json.Unmarshal([]byte(byteValue), &fileContent)
-	if err != nil {
-		return nil, err
-	}
-	return fileContent.Intervals, nil
+	return intervals, nil
 }
