@@ -2,7 +2,7 @@ module github.com/edgexfoundry/edgex-cli
 
 require (
 	github.com/BurntSushi/toml v0.3.1
-	github.com/edgexfoundry/go-mod-core-contracts v0.1.96
+	github.com/edgexfoundry/go-mod-core-contracts v0.1.97
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/pelletier/go-toml v1.8.1
 	github.com/spf13/afero v1.4.1
