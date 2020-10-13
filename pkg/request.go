@@ -76,7 +76,7 @@ func DeleteByIds(i interface{}, ids []string) error {
 	} else if methodVal.Type().In(0) != reflect.TypeOf((*context.Context)(nil)).Elem() {
 		return fmt.Errorf("client method's first input parameter is %q, want `context.Context`", methodVal.Type().In(0))
 	} else if methodVal.Type().In(1) != reflect.TypeOf((*string)(nil)).Elem() {
-		return fmt.Errorf("client method's first input parameter is %q, want `context.Context`", methodVal.Type().In(1))
+		return fmt.Errorf("client method's first input parameter is %q, want `string`", methodVal.Type().In(1))
 	} else if methodVal.Type().NumOut() != 1 {
 		return fmt.Errorf("client method has %q output parameters, want 1", methodVal.Type().NumOut())
 	}
