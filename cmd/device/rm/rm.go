@@ -18,11 +18,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/edgexfoundry/go-mod-core-contracts/clients"
-	"github.com/edgexfoundry/go-mod-core-contracts/clients/metadata"
 
 	"github.com/edgexfoundry/edgex-cli/config"
+	request "github.com/edgexfoundry/edgex-cli/pkg"
+
+	"github.com/edgexfoundry/go-mod-core-contracts/clients"
+	"github.com/edgexfoundry/go-mod-core-contracts/clients/metadata"
 	"github.com/edgexfoundry/go-mod-core-contracts/clients/urlclient/local"
+
 	"github.com/spf13/cobra"
 )
 
@@ -52,12 +55,10 @@ You can use: '$ edgex device list' to find a device's name and ID.`,
 				return err
 			}
 
-			deviceID := args[0]
-			err = mdc.Delete(ctx, deviceID)
-			if err == nil {
-				fmt.Printf("Removed: %s\n", deviceID)
+			if len(args[0]) != 0 {
+				return request.DeleteByIds(mdc, args)
 			}
-			return err
+			return nil
 		},
 	}
 	cmd.Flags().StringVarP(&name, "name", "n", "", "Delete Device by name")
