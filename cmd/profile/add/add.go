@@ -19,6 +19,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"gopkg.in/yaml.v2"
 	"html/template"
 	"io/ioutil"
 	"strings"
@@ -66,10 +67,10 @@ func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "add",
 		Short: "Add profiles",
-		Long:  `Create device profiles described in a given JSON file or use the interactive mode with additional flags.`,
+		Long:  `Create device profiles described in a given JSON/YAML file or use the interactive mode with additional flags(supports JSON format only).`,
 		RunE:  handler,
 	}
-	cmd.Flags().BoolVarP(&interactiveMode, editor.InteractiveModeLabel, "i", false, "Open a default editor to customize the Event information")
+	cmd.Flags().BoolVarP(&interactiveMode, editor.InteractiveModeLabel, "i", false, "Open a default editor to customize the Profile information")
 	cmd.Flags().StringVarP(&name, "name", "n", "", "Name")
 	cmd.Flags().StringVarP(&description, "description", "d", "", "Description")
 	cmd.Flags().StringVar(&manufacturer, "manufacturer", "", "Manufacturer")
@@ -166,7 +167,7 @@ func populateProfile(profiles *[]models.DeviceProfile) {
 func LoadProfilesFromFile(filePath string) ([]models.DeviceProfile, error) {
 	defer func() {
 		if r := recover(); r != nil {
-			fmt.Println("Error: Invalid Json")
+			fmt.Println("Error: Invalid file format - json/yaml")
 		}
 	}()
 	file, err := ioutil.ReadFile(filePath)
@@ -175,18 +176,24 @@ func LoadProfilesFromFile(filePath string) ([]models.DeviceProfile, error) {
 	}
 
 	var profiles []models.DeviceProfile
-
-	//check if the file contains just one DeviceProfile
 	var p models.DeviceProfile
-	err = json.Unmarshal(file, &p)
+	//First check if the file contains Yaml
+	err = yaml.Unmarshal(file, &p)
 	if err != nil {
-		//check if the file contains list of DeviceProfile
-		err = json.Unmarshal(file, &profiles)
+		//check if the file contains just one DeviceProfile
+		err = json.Unmarshal(file, &p)
 		if err != nil {
-			return nil, err
+			//check if the file contains list of DeviceProfile
+			err = json.Unmarshal(file, &profiles)
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			profiles = append(profiles, p)
 		}
 	} else {
 		profiles = append(profiles, p)
 	}
+
 	return profiles, nil
 }
