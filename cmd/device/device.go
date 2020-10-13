@@ -18,6 +18,7 @@ import (
 	"github.com/edgexfoundry/edgex-cli/cmd/device/add"
 	"github.com/edgexfoundry/edgex-cli/cmd/device/adminstate"
 	"github.com/edgexfoundry/edgex-cli/cmd/device/list"
+	"github.com/edgexfoundry/edgex-cli/cmd/device/operstatus"
 	"github.com/edgexfoundry/edgex-cli/cmd/device/rm"
 	"github.com/edgexfoundry/edgex-cli/cmd/device/update"
 
@@ -36,6 +37,6 @@ func NewCommand() *cobra.Command {
 	cmd.AddCommand(add.NewCommand())
 	cmd.AddCommand(update.NewCommand())
 	cmd.AddCommand(adminstate.NewCommand())
-	//cmd.AddCommand(operstate.NewCommand())
+	cmd.AddCommand(operstatus.NewCommand())
 	return cmd
 }
