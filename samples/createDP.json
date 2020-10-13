@@ -1,0 +1,54 @@
+{
+  "name":"DeviceProfileCLI",
+  "manufacturer":"CLI-Manufacturer",
+  "model":"cliModel",
+  "labels":[
+    "bacnet",
+    "thermostat",
+    "Honeywell"
+  ],
+  "description":"This device profile has link in device.",
+  "deviceCommands":[
+    {
+      "get":[
+        {
+          "parameter":"CurrentHumidity",
+          "property":"presentValue",
+          "operation":"get",
+          "object":"AnalogValue_22"
+        }
+      ]
+    }
+  ],
+  "origin":1471806386919,
+  "coreCommands":[
+    {
+      "name":"testCommand1",
+      "get":{
+        "path":"/testCommand1",
+        "responses":[{
+          "code":"200",
+          "errorDescription":"not a float",
+          "expectedValues":[
+            "temperature"
+          ]
+        }]
+      },
+      "put":{
+        "parameterNames":[
+         "testCommand1",
+          "float"
+        ],
+        "path":"/testCommand1",
+        "responses":[
+          {
+          "code":"200",
+          "errorDescription":"not a float",
+          "expectedValues":["temperature"]
+        }
+        ]
+      },
+      "origin":1471806386919
+    }
+  ]
+}
