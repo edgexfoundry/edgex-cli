@@ -92,6 +92,7 @@ no `EDITOR` is specified. Some examples of editors:
 - vscode
 - atom
 
+
 ### Developers
 
 Follow the installation instructions to create a configuration file and edit as necessary.
@@ -121,6 +122,22 @@ This will generate a coverage.out file in the root directory of the repo which y
 ```
 $ go tool cover -html=coverage.out
 ```
+
+#### Code Organization
+All CLI go code lives under the "cmd" directory, who sub-directories map one is to one to the toplevel commands, namely
+addressable, command, db, device, ... version.
+The children of the above map to the sub-commands supported by each of these.
+Use the -f flag to provide file input, while n is reserved for names of objects.
+There are command specific and global flags such as verbose respectively. 
+Read the Cobra and Viper documentation for additional help.
+
+
+#### Sample templates
+Sample template files are in the "samples" directory for device profile (createDP.json and yaml),
+device (createDevice.toml), intervals (createInterval.toml and json) and for updateInterval.
+Edit these should data structures change. Add more should you want to ease defining other objects.
+Occasionally samples are multiple formats, this was to support for legacy formats. Going forward we may 
+only support json format.
 
 ## Supported commands and sub-commands
 
