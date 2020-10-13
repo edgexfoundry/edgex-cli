@@ -20,6 +20,7 @@ import (
 	"fmt"
 
 	"github.com/edgexfoundry/edgex-cli/config"
+	request "github.com/edgexfoundry/edgex-cli/pkg"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 	"github.com/edgexfoundry/go-mod-core-contracts/clients/metadata"
@@ -51,15 +52,10 @@ func NewCommand() *cobra.Command {
 					fmt.Printf("Removed: %s\n", name)
 				}
 				return
+			} else if len(args) != 0 {
+				return request.DeleteByIds(mdc, args)
 			}
-
-			deviceID := args[0]
-			err = mdc.Delete(ctx, deviceID)
-			if err == nil {
-				fmt.Printf("Removed: %s\n", deviceID)
-				return
-			}
-			return
+			return nil
 		},
 	}
 	cmd.Flags().StringVarP(&name, "name", "n", "", "Delete device profile by name")
