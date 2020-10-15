@@ -50,8 +50,8 @@ Use "edgex-cli [command] --help" for more information about a command.
 
 ## Installation
 
-In order to run this tool, you will need an accessible **running EdgeX instance** running locally, accessible via localhost.
- and Go 1.12 or higher installed on your machine.
+In order to run this tool, you will need a **locally running EdgeX instance**, accessible via localhost,
+and Go 1.12 or higher installed on your machine.
 
 * Clone the git repo:
 
@@ -92,10 +92,10 @@ no `EDITOR` is specified. Some examples of editors:
 - vscode
 - atom
 
-### Developers
 
-Follow the installation instructions to create a configuration file and edit as necessary.
-To try out your changes, you can either build the binary and execute or by calling `go run`.
+### CLI Developers 
+
+To try out your changes you have two options, one using 'make build', the other 'go run'. Also, we share how to launch tests.
 
 * Build and run:
 
@@ -116,11 +116,28 @@ $ go run main.go [COMMAND]
 $ make test
 ```
 
-This will generate a coverage.out file in the root directory of the repo which you can use to see test coverage of code by running
+This will generate the file coverage.out in the repository root directory. TO view the results, execute:
 
 ```
 $ go tool cover -html=coverage.out
 ```
+
+#### Code Organization
+All CLI go code lives under the "cmd" directory. Its sub-directories map to the supported toplevel commands, such as 
+addressable, command, db, device, ... version. To obtain a full list of supported commands type 'edgex-cli --help'.
+
+Our convention has been to use the -f flag to pass in a file argument.  -n is typically used to provide a name. 
+Both command specific and global flags exist. 
+Refer to the Cobra (https://godoc.org/github.com/spf13/cobra) and Viper (https://godoc.org/github.com/spf13/viper) documentation for additional help.
+
+
+#### Sample Templates
+The "samples" directory holds templates for device profile (createDP.json and yaml),
+device (createDevice.toml), intervals (createInterval.toml and json), and for updateInterval. 
+CLI in Interactive mode opens the relevant template in the configured editor.
+
+Edit these should data structures change. 
+For legacy reasons we support multiple formats in the case of some objects. Going forward most likely only json format will be supported.
 
 ## Supported commands and sub-commands
 
