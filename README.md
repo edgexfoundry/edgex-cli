@@ -51,7 +51,7 @@ Use "edgex-cli [command] --help" for more information about a command.
 ## Installation
 
 In order to run this tool, you will need a **locally running EdgeX instance**, accessible via localhost,
- and Go 1.12 or higher installed on your machine.
+and Go 1.12 or higher installed on your machine.
 
 * Clone the git repo:
 
