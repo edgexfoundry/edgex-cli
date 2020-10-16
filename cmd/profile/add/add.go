@@ -19,8 +19,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"gopkg.in/yaml.v2"
 	"html/template"
 	"io/ioutil"
+	"path/filepath"
 	"strings"
 
 	"github.com/edgexfoundry/edgex-cli/config"
@@ -47,9 +49,9 @@ const ProfileTemplate = `{
       "{{$l}}" {{if not (lastElem $idx $labelsLenght)}},{{end}} 
     {{- end}}
     ],
-    "DeviceResources": {{.DeviceResources}},
-    "DeviceCommands": {{.DeviceCommands}},
-    "CoreCommands": {{.CoreCommands}}
+    "DeviceResources": {{if .DeviceResources}}{{EscapeHTML .DeviceResources}}{{end}} {{if not .DeviceResources}}[]{{end}},
+    "DeviceCommands":  {{if .DeviceCommands}}{{EscapeHTML .DeviceCommands}}{{end}} {{if not .DeviceCommands}}[]{{end}},
+    "CoreCommands":  {{if .CoreCommands}}{{EscapeHTML .CoreCommands}}{{end}} {{if not .CoreCommands}}[]{{end}}
  }`
 
 var interactiveMode bool
@@ -61,7 +63,7 @@ var manufacturer string
 var model string
 var labels string
 
-// NewCommand returns the update deviceprofile command
+// NewCommand returns the update device profile command
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "add",
@@ -106,7 +108,7 @@ func handler(cmd *cobra.Command, args []string) error {
 }
 
 func createProfilesFromFile() error {
-	profiles, err := LoadProfilesFromFile(file)
+	profiles, err := LoadFromFile(file)
 	if err != nil {
 		return err
 	}
@@ -133,7 +135,8 @@ func parseProfile(interactiveMode bool) ([]models.DeviceProfile, error) {
 			"inc": func(i int) int {
 				return i + 1
 			},
-			"lastElem": editor.IsLastElementOfSlice,
+			"lastElem":   editor.IsLastElementOfSlice,
+			"EscapeHTML": editor.EscapeHTML,
 		})
 	}
 	if err != nil {
@@ -162,31 +165,59 @@ func populateProfile(profiles *[]models.DeviceProfile) {
 	*profiles = append(*profiles, d)
 }
 
-//LoadProfilesFromFile could read a file that contains single DeviceProfile or list of DeviceProfile
-func LoadProfilesFromFile(filePath string) ([]models.DeviceProfile, error) {
+//LoadFromFile could read a file (json/yaml) that contains single DeviceProfile or list of DeviceProfile
+func LoadFromFile(fPath string) ([]models.DeviceProfile, error) {
 	defer func() {
 		if r := recover(); r != nil {
-			fmt.Println("Error: Invalid Json")
+			fmt.Println("Error: Invalid Json/Yaml")
 		}
 	}()
-	file, err := ioutil.ReadFile(filePath)
+	file, err := ioutil.ReadFile(fPath)
 	if err != nil {
 		return nil, err
 	}
 
 	var profiles []models.DeviceProfile
+	fExtension := strings.ToLower(filepath.Ext(fPath))
+	err = errors.New("supported file format are yaml and json")
+	if fExtension == ".yaml" || fExtension == ".yml" {
+		err = unmarshalYaml(file, &profiles)
+	}
 
-	//check if the file contains just one DeviceProfile
+	if fExtension == ".json" {
+		err = unmarshalJSON(file, &profiles)
+	}
+	return profiles, err
+}
+
+//unmarshalJSON checks if the file contains just one Device Profile or list of Device Profiles in json format
+func unmarshalJSON(file []byte, profiles *[]models.DeviceProfile) error {
 	var p models.DeviceProfile
-	err = json.Unmarshal(file, &p)
-	if err != nil {
-		//check if the file contains list of DeviceProfile
-		err = json.Unmarshal(file, &profiles)
-		if err != nil {
-			return nil, err
+	var err error
+	//check if the file contains a Device Profile in Json format
+	if err = json.Unmarshal(file, &p); err != nil {
+		//check if the file contains list of Device Profiles in Json format
+		if err = json.Unmarshal(file, profiles); err != nil {
+			return err
 		}
 	} else {
-		profiles = append(profiles, p)
+		*profiles = append(*profiles, p)
 	}
-	return profiles, nil
+	return nil
+}
+
+//unmarshalYaml checks if the file contains just one Device Profile or list of Device Profiles in yaml format
+func unmarshalYaml(file []byte, profiles *[]models.DeviceProfile) error {
+	var p models.DeviceProfile
+	var err error
+	//Then check if the file contains a Device Profile in Yaml format
+	if err = yaml.Unmarshal(file, &p); err != nil {
+		//Then check if the file contains list of Device Profiles in Yaml format
+		if err = yaml.Unmarshal(file, profiles); err != nil {
+			return err
+		}
+	} else {
+		*profiles = append(*profiles, p)
+	}
+	return nil
 }

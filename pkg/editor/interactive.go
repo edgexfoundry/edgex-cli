@@ -17,6 +17,7 @@ package editor
 
 import (
 	"bytes"
+	"encoding/json"
 	"html/template"
 	"io/ioutil"
 	"os"
@@ -99,7 +100,6 @@ func OpenInteractiveEditor(o interface{}, temp string, funcMap template.FuncMap)
 	if err != nil {
 		return nil, err
 	}
-
 	buff := bytes.NewBuffer([]byte{})
 	err = dsJsonTemplate.Execute(buff, o)
 	if err != nil {
@@ -112,4 +112,14 @@ func OpenInteractiveEditor(o interface{}, temp string, funcMap template.FuncMap)
 // isLastElementOfSlice is a function which is used in HTML templates to determine the last element in a slice
 func IsLastElementOfSlice(index int, lenght int) bool {
 	return index == lenght-1
+}
+
+// EscapeHTML is a function which marshal `s` applying Intent and returns template.HTML. This makes hmtl.Template to
+// escape HTML codes
+func EscapeHTML(s interface{}) (template.HTML, error) {
+	data, err := json.MarshalIndent(s, "", "    ")
+	if err != nil {
+		return "", err
+	}
+	return template.HTML(data), nil
 }
