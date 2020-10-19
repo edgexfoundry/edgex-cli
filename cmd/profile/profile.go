@@ -15,9 +15,10 @@
 package profile
 
 import (
-	addprofile "github.com/edgexfoundry/edgex-cli/cmd/profile/add"
-	listprofile "github.com/edgexfoundry/edgex-cli/cmd/profile/list"
-	rmprofile "github.com/edgexfoundry/edgex-cli/cmd/profile/rm"
+	"github.com/edgexfoundry/edgex-cli/cmd/profile/add"
+	"github.com/edgexfoundry/edgex-cli/cmd/profile/list"
+	"github.com/edgexfoundry/edgex-cli/cmd/profile/rm"
+	"github.com/edgexfoundry/edgex-cli/cmd/profile/update"
 
 	"github.com/spf13/cobra"
 )
@@ -37,8 +38,9 @@ requests made to Core Command's command endpoint.
 `,
 	}
 
-	cmd.AddCommand(rmprofile.NewCommand())
-	cmd.AddCommand(listprofile.NewCommand())
-	cmd.AddCommand(addprofile.NewCommand())
+	cmd.AddCommand(rm.NewCommand())
+	cmd.AddCommand(list.NewCommand())
+	cmd.AddCommand(add.NewCommand())
+	cmd.AddCommand(update.NewCommand())
 	return cmd
 }
