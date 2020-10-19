@@ -62,4 +62,4 @@ uninstall:
 
 clean:
 	-rm $(BINARY)
-	-rm -rf $(ARTIFACT_ROOT)
+	-rm -rf $(ARTIFACT_ROOT)/$(BINARY)
