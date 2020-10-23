@@ -35,10 +35,10 @@ build-all:
 	GOOS=darwin GOARCH=amd64 $(GO) build -o ${ARTIFACT_ROOT}/$(BINARY)-mac $(GOFLAGS)
 	GOOS=windows GOARCH=amd64 $(GO) build -o ${ARTIFACT_ROOT}/$(BINARY)-win.exe $(GOFLAGS)
 
-	tar -czvf ${ARTIFACT_ROOT}/$(BINARY)-linux-amd64-$(VERSION).tar.gz -C ${ARTIFACT_ROOT} $(BINARY)-linux-amd64
-	tar -czvf ${ARTIFACT_ROOT}/$(BINARY)-linux-arm64-$(VERSION).tar.gz -C ${ARTIFACT_ROOT} $(BINARY)-linux-arm64
-	tar -czvf ${ARTIFACT_ROOT}/$(BINARY)-mac-$(VERSION).tar.gz -C ${ARTIFACT_ROOT} $(BINARY)-mac
-	zip -j ${ARTIFACT_ROOT}/$(BINARY)-win-$(VERSION).zip ${ARTIFACT_ROOT}/$(BINARY)-win.exe
+	tar -czvf ${ARTIFACT_ROOT}/$(BINARY)-linux-amd64-$(VERSION).tar.gz Attribution.txt LICENSE -C ${ARTIFACT_ROOT} $(BINARY)-linux-amd64
+	tar -czvf ${ARTIFACT_ROOT}/$(BINARY)-linux-arm64-$(VERSION).tar.gz Attribution.txt LICENSE -C ${ARTIFACT_ROOT} $(BINARY)-linux-arm64
+	tar -czvf ${ARTIFACT_ROOT}/$(BINARY)-mac-$(VERSION).tar.gz Attribution.txt LICENSE -C ${ARTIFACT_ROOT} $(BINARY)-mac
+	zip -j ${ARTIFACT_ROOT}/$(BINARY)-win-$(VERSION).zip ${ARTIFACT_ROOT}/$(BINARY)-win.exe Attribution.txt LICENSE
 
 
 test:
