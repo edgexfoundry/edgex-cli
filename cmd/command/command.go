@@ -14,7 +14,10 @@
 package command
 
 import (
-	listcommand "github.com/edgexfoundry/edgex-cli/cmd/command/list"
+	"github.com/edgexfoundry/edgex-cli/cmd/command/exec/get"
+	"github.com/edgexfoundry/edgex-cli/cmd/command/exec/put"
+	"github.com/edgexfoundry/edgex-cli/cmd/command/list"
+
 	"github.com/spf13/cobra"
 )
 
@@ -25,6 +28,8 @@ func NewCommand() *cobra.Command {
 		Short: "`Command` command",
 		Long:  `Actions related to commands.`,
 	}
-	cmd.AddCommand(listcommand.NewCommand())
+	cmd.AddCommand(list.NewCommand())
+	cmd.AddCommand(get.NewCommand())
+	cmd.AddCommand(put.NewCommand())
 	return cmd
 }
