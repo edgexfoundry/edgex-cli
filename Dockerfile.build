@@ -16,7 +16,7 @@
 ARG BASE=golang:1.15-alpine
 FROM ${BASE}
 
-ARG ALPINE_PKG_BASE="make git zip"
+ARG ALPINE_PKG_BASE="make git zip tar"
 ARG ALPINE_PKG_EXTRA=""
 
 LABEL license='SPDX-License-Identifier: Apache-2.0' \
