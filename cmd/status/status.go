@@ -41,11 +41,10 @@ const statusTemplate = "Service Name\tURL\tStatus\n" +
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "status",
-		Short: "Checks the current status of each microservice.",
+		Short: "Checks the current status of each microservice",
 		Long: `Status
 		
-This command pings each edgex microservice and prints their status.
-This command is not stable yet.
+This command pings each edgex microservice defined in CLI 'configuration.toml' file usually placed within '$HOME/.edgex-cli' directory and prints their status.
 `,
 		Run: func(cmd *cobra.Command, args []string) {
 			var clientStatuses []clientStatus
