@@ -109,14 +109,17 @@ $ ./edgex-cli
 ```
 $ go run main.go [COMMAND]
 ```
-
+* Build artifacts and create tar files for different OS
+```
+make build-all
+```
 * Running tests:
 
 ```
 $ make test
 ```
 
-This will generate the file coverage.out in the repository root directory. TO view the results, execute:
+This will generate the file coverage.out in the repository root directory. To view the results, execute:
 
 ```
 $ go tool cover -html=coverage.out
@@ -147,7 +150,9 @@ For legacy reasons we support multiple formats in the case of some objects. Goin
 ```   
 ```
     command
+      get         Issue GET command
       list        A list of device supported commands
+      put         Issue PUT command
 ```   
 ```
     db
@@ -159,6 +164,7 @@ For legacy reasons we support multiple formats in the case of some objects. Goin
       add         Add devices
       adminstate  Device admin state 
       list        A list of all devices
+      operstate   Update deviceName operating state
       rm          Removes device by name or ID
       update      Update a device
 ```
@@ -197,6 +203,7 @@ For legacy reasons we support multiple formats in the case of some objects. Goin
       add         Add profiles
       list        Returns a list of device profiles
       rm          Remove profile by name or ID
+      update      Update device profile
 ```  
 ```
     reading
@@ -204,8 +211,7 @@ For legacy reasons we support multiple formats in the case of some objects. Goin
       list        A list of readings across devices or pertaining to a specified device
 ```  
 ```
-    status        This command pings each edgex microservice and prints their status.
-                  This command is not stable yet.
+    status        Checks the current status of each microservice
 ``` 
 ```
     subscription

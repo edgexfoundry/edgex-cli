@@ -30,7 +30,7 @@ var labels string
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "update",
-		Short: "Update device service",
+		Short: "Update device profile",
 		Long: `Update device profile(s) described in the given JSON/YAML file or use the interactive mode enabled by providing 
  name of existing device profile`,
 		RunE: handler,
@@ -41,13 +41,13 @@ func NewCommand() *cobra.Command {
 	cmd.Flags().StringVar(&model, "model", "", "Model")
 	cmd.Flags().StringVar(&labels, "labels", "", "Comma separated strings")
 
-	cmd.Flags().StringVarP(&file, "file", "f", "", "Json/YAML file containing device service configuration to update")
+	cmd.Flags().StringVarP(&file, "file", "f", "", "Json/YAML file containing device profile configuration to update")
 	return cmd
 }
 
 func handler(cmd *cobra.Command, args []string) error {
 	if name != "" && file != "" {
-		return errors.New("Profile could be updated by providing a file, or by specifying device service name to be updated using interactive mode. ")
+		return errors.New("Profile could be updated by providing a file, or by specifying device profile name to be updated using interactive mode. ")
 	}
 
 	if name == "" && file == "" {
