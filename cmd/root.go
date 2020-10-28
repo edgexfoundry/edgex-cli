@@ -32,6 +32,7 @@ import (
 	"github.com/edgexfoundry/edgex-cli/cmd/status"
 	"github.com/edgexfoundry/edgex-cli/cmd/subscription"
 	"github.com/edgexfoundry/edgex-cli/cmd/version"
+	"github.com/edgexfoundry/edgex-cli/cmd/watcher"
 	"github.com/edgexfoundry/edgex-cli/config"
 	"github.com/edgexfoundry/edgex-cli/pkg/pager"
 
@@ -115,6 +116,7 @@ https://www.edgexfoundry.org/
 	cmd.AddCommand(notification.NewCommand())
 	cmd.AddCommand(subscription.NewCommand())
 	cmd.AddCommand(interval.NewCommand())
+	cmd.AddCommand(watcher.NewCommand())
 	cmd.AddCommand(version.NewCommand())
 
 	// global flags
