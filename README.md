@@ -222,3 +222,9 @@ For legacy reasons we support multiple formats in the case of some objects. Goin
 ```
     version       Version command
 ```
+```  
+    watcher       
+      add         Add watcher(s)
+      list        A list of watchers
+      rm          Remove watcher(s) by ID(s)
+```
