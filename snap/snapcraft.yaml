@@ -1,0 +1,80 @@
+name: edgex-cli
+base: core18
+type: app
+adopt-info: version
+summary: A command-line client for EdgeX Foundry
+description: |
+  A command-line client for EdgeX Foundry.
+
+grade: stable
+confinement: strict
+
+apps:
+  edgex-cli:
+    adapter: none
+    command: bin/edgex-cli
+    command-chain:
+      - bin/edgex-cli-wrapper.sh
+    plugs: [home, network]
+
+parts:
+  version:
+    plugin: nil
+    # the source dir is unrelated to this part and is used since it
+    # changes rarely and therefore will not trigger a new pull
+    source: snap/local
+    override-pull: |
+      cd $SNAPCRAFT_PROJECT_DIR
+      if [ -f VERSION ]; then
+        PROJECT_VERSION=$(cat VERSION)
+      else
+        PROJECT_VERSION=local-dev
+      fi
+
+      snapcraftctl set-version ${PROJECT_VERSION}
+
+  config-common:
+    plugin: dump
+    source: snap/local/runtime-helpers
+
+  go:
+    plugin: nil
+    source: snap/local
+    build-packages: [curl]
+    override-build: |
+      # use dpkg architecture to figure out our target arch
+      # note - we specifically don't use arch
+      case "$(dpkg --print-architecture)" in
+        amd64)
+          FILE_NAME=go1.15.2.linux-amd64.tar.gz
+          FILE_HASH=b49fda1ca29a1946d6bb2a5a6982cf07ccd2aba849289508ee0f9918f6bb4552
+          ;;
+        arm64)
+          FILE_NAME=go1.15.2.linux-arm64.tar.gz
+          FILE_HASH=c8ec460cc82d61604b048f9439c06bd591722efce5cd48f49e19b5f6226bd36d
+          ;;
+      esac
+      # download the archive, failing on ssl cert problems
+      curl https://dl.google.com/go/$FILE_NAME -O
+      echo "$FILE_HASH $FILE_NAME" > sha256
+      sha256sum -c sha256 | grep OK
+      tar -C $SNAPCRAFT_STAGE -xf go*.tar.gz --strip-components=1
+    prime:
+      - "-*"
+
+  edgex-cli:
+    source: .
+    source-type: git
+    plugin: make
+    build-packages: [git]
+    after: [go]
+    override-build: |
+      cd $SNAPCRAFT_PART_SRC
+      make build
+
+      install -DT "./edgex-cli" "$SNAPCRAFT_PART_INSTALL/bin/edgex-cli"
+      install -DT "./res/configuration.toml" "$SNAPCRAFT_PART_INSTALL/res/configuration.toml"
+      install -DT "./Attribution.txt" \
+         "$SNAPCRAFT_PART_INSTALL/usr/share/doc/edgex-cli/Attribution.txt"
+      install -DT "./LICENSE" \
+         "$SNAPCRAFT_PART_INSTALL/usr/share/doc/edgex-cli/LICENSE"
