@@ -1,7 +1,6 @@
 package update
 
 import (
-	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -64,16 +63,16 @@ func deviceServiceHandler(cmd *cobra.Command, args []string) error {
 	}
 
 	if file != "" {
-		return updateDeviceServiceFromFile()
+		return updateDeviceServiceFromFile(cmd)
 	}
 
-	updatedDeviceService, err := parseDeviceService(name)
+	updatedDeviceService, err := parseDeviceService(cmd, name)
 	if err != nil {
 		return err
 	}
 
 	client := local.New(config.Conf.Clients["Metadata"].Url() + clients.ApiDeviceServiceRoute)
-	err = metadata.NewDeviceServiceClient(client).Update(context.Background(), updatedDeviceService)
+	err = metadata.NewDeviceServiceClient(client).Update(cmd.Context(), updatedDeviceService)
 	if err != nil {
 		return err
 	}
@@ -82,10 +81,10 @@ func deviceServiceHandler(cmd *cobra.Command, args []string) error {
 }
 
 //parseDeviceService loads a device service to be updated and open a default editor for customization
-func parseDeviceService(name string) (models.DeviceService, error) {
+func parseDeviceService(cmd *cobra.Command, name string) (models.DeviceService, error) {
 	var err error
 	client := local.New(config.Conf.Clients["Metadata"].Url() + clients.ApiDeviceServiceRoute)
-	ds, err := metadata.NewDeviceServiceClient(client).DeviceServiceForName(context.Background(), name)
+	ds, err := metadata.NewDeviceServiceClient(client).DeviceServiceForName(cmd.Context(), name)
 	if err != nil {
 		return models.DeviceService{}, err
 	}
@@ -105,7 +104,7 @@ func parseDeviceService(name string) (models.DeviceService, error) {
 	return updatedDeviceService, err
 }
 
-func updateDeviceServiceFromFile() error {
+func updateDeviceServiceFromFile(cmd *cobra.Command) error {
 	deviceServices, err := LoadDSFromFile(file)
 	if err != nil {
 		return err
@@ -113,7 +112,7 @@ func updateDeviceServiceFromFile() error {
 
 	client := local.New(config.Conf.Clients["Metadata"].Url() + clients.ApiDeviceServiceRoute)
 	for _, ds := range deviceServices {
-		err = metadata.NewDeviceServiceClient(client).Update(context.Background(), ds)
+		err = metadata.NewDeviceServiceClient(client).Update(cmd.Context(), ds)
 		if err != nil {
 			fmt.Println("Error: ", err.Error())
 		}

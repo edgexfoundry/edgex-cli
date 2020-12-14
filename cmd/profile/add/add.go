@@ -15,7 +15,6 @@
 package add
 
 import (
-	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -88,7 +87,7 @@ func handler(cmd *cobra.Command, args []string) error {
 	}
 
 	if file != "" {
-		return createProfilesFromFile()
+		return createProfilesFromFile(cmd)
 	}
 
 	profiles, err := parseProfile(interactiveMode)
@@ -98,7 +97,7 @@ func handler(cmd *cobra.Command, args []string) error {
 
 	client := local.New(config.Conf.Clients["Metadata"].Url() + clients.ApiDeviceProfileRoute)
 	for _, p := range profiles {
-		_, err = metadata.NewDeviceProfileClient(client).Add(context.Background(), &p)
+		_, err = metadata.NewDeviceProfileClient(client).Add(cmd.Context(), &p)
 		if err != nil {
 			return err
 		}
@@ -107,7 +106,7 @@ func handler(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func createProfilesFromFile() error {
+func createProfilesFromFile(cmd *cobra.Command) error {
 	profiles, err := LoadFromFile(file)
 	if err != nil {
 		return err
@@ -115,7 +114,7 @@ func createProfilesFromFile() error {
 
 	client := local.New(config.Conf.Clients["Metadata"].Url() + clients.ApiDeviceProfileRoute)
 	for _, d := range profiles {
-		_, err = metadata.NewDeviceProfileClient(client).Add(context.Background(), &d)
+		_, err = metadata.NewDeviceProfileClient(client).Add(cmd.Context(), &d)
 		if err != nil {
 			fmt.Println("Error: ", err.Error())
 		}

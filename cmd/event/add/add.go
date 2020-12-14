@@ -16,7 +16,6 @@ package add
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -80,7 +79,7 @@ func NewCommand() *cobra.Command {
 		Use:   "add",
 		Short: "Create an event",
 		Long:  `Create a new event`,
-		RunE: func(command *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, args []string) error {
 
 			url := config.Conf.Clients["CoreData"].Url() + clients.ApiEventRoute
 			newEvent := models.Event{}
@@ -105,7 +104,7 @@ func NewCommand() *cobra.Command {
 
 			client := local.New(url)
 			ec := coredata.NewEventClient(client)
-			_, err = ec.Add(context.Background(), &newEvent)
+			_, err = ec.Add(cmd.Context(), &newEvent)
 			if err != nil {
 				return err
 			}

@@ -1,7 +1,6 @@
 package update
 
 import (
-	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -69,16 +68,16 @@ func deviceHandler(cmd *cobra.Command, args []string) error {
 	}
 
 	if file != "" {
-		return updateDevicesFromFile()
+		return updateDevicesFromFile(cmd)
 	}
 	//Update the device provided by name using interactive mode to alter it
-	d, err := parseDevice(name)
+	d, err := parseDevice(cmd, name)
 	if err != nil {
 		return err
 	}
 
 	client := local.New(config.Conf.Clients["Metadata"].Url() + clients.ApiDeviceRoute)
-	err = metadata.NewDeviceClient(client).Update(context.Background(), d)
+	err = metadata.NewDeviceClient(client).Update(cmd.Context(), d)
 	if err != nil {
 		return err
 	}
@@ -86,7 +85,7 @@ func deviceHandler(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func updateDevicesFromFile() error {
+func updateDevicesFromFile(cmd *cobra.Command) error {
 	devices, err := LoadDevicesFromFile(file)
 	if err != nil {
 		return err
@@ -94,7 +93,7 @@ func updateDevicesFromFile() error {
 
 	client := local.New(config.Conf.Clients["Metadata"].Url() + clients.ApiDeviceRoute)
 	for _, d := range devices {
-		err = metadata.NewDeviceClient(client).Update(context.Background(), d)
+		err = metadata.NewDeviceClient(client).Update(cmd.Context(), d)
 		if err != nil {
 			fmt.Println("Error: ", err.Error())
 		}
@@ -103,10 +102,10 @@ func updateDevicesFromFile() error {
 }
 
 //loads a device service to be updated and open a default editor for customization
-func parseDevice(name string) (models.Device, error) {
+func parseDevice(cmd *cobra.Command, name string) (models.Device, error) {
 	//load Device from database
 	client := local.New(config.Conf.Clients["Metadata"].Url() + clients.ApiDeviceRoute)
-	device, err := metadata.NewDeviceClient(client).DeviceForName(context.Background(), name)
+	device, err := metadata.NewDeviceClient(client).DeviceForName(cmd.Context(), name)
 	if err != nil {
 		return models.Device{}, err
 	}

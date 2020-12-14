@@ -1,7 +1,6 @@
 package count
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/edgexfoundry/edgex-cli/config"
@@ -30,7 +29,7 @@ func countHandler(cmd *cobra.Command, args []string) (err error) {
 	client := coredata.NewReadingClient(
 		local.New(config.Conf.Clients["CoreData"].Url() + clients.ApiReadingRoute),
 	)
-	count, err := client.ReadingCount(context.Background())
+	count, err := client.ReadingCount(cmd.Context())
 	if err != nil {
 		return
 	}

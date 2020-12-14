@@ -1,7 +1,6 @@
 package operstatus
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"strings"
@@ -46,9 +45,9 @@ func updateOperStatusHandler(cmd *cobra.Command, args []string) error {
 	)
 	var err error
 	if deviceName != "" {
-		err = mdc.UpdateOpStateByName(context.Background(), deviceName, operating.UpdateRequest{OperatingState: models.OperatingState(state)})
+		err = mdc.UpdateOpStateByName(cmd.Context(), deviceName, operating.UpdateRequest{OperatingState: models.OperatingState(state)})
 	} else {
-		err = mdc.UpdateOpState(context.Background(), deviceId, operating.UpdateRequest{OperatingState: models.OperatingState(state)})
+		err = mdc.UpdateOpState(cmd.Context(), deviceId, operating.UpdateRequest{OperatingState: models.OperatingState(state)})
 	}
 	return err
 }

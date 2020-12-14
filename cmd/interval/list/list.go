@@ -15,8 +15,6 @@
 package list
 
 import (
-	"context"
-
 	"github.com/edgexfoundry/edgex-cli/config"
 	"github.com/edgexfoundry/edgex-cli/pkg/formatters"
 
@@ -40,9 +38,9 @@ func listHandler(cmd *cobra.Command, args []string) (err error) {
 
 	var intervals []models.Interval
 	if len(args) == 0 {
-		intervals, err = client.Intervals(context.Background())
+		intervals, err = client.Intervals(cmd.Context())
 	} else {
-		intervals, err = getInterval(client, args[0])
+		intervals, err = getInterval(cmd, client, args[0])
 	}
 	if err != nil {
 		return err
@@ -53,8 +51,8 @@ func listHandler(cmd *cobra.Command, args []string) (err error) {
 	return
 }
 
-func getInterval(client scheduler.IntervalClient, id string) ([]models.Interval, error) {
-	interval, err := client.Interval(context.Background(), id)
+func getInterval(cmd *cobra.Command, client scheduler.IntervalClient, id string) ([]models.Interval, error) {
+	interval, err := client.Interval(cmd.Context(), id)
 	if err != nil {
 		return nil, err
 	}

@@ -1,7 +1,6 @@
 package get
 
 import (
-	"context"
 	"fmt"
 	"github.com/edgexfoundry/edgex-cli/config"
 
@@ -33,7 +32,7 @@ func NewCommand() *cobra.Command {
 
 func handler(cmd *cobra.Command, args []string) error {
 	client := local.New(config.Conf.Clients["Command"].Url() + clients.ApiDeviceRoute)
-	res, err := command.NewCommandClient(client).GetDeviceCommandByNames(context.Background(), deviceName, cmdName)
+	res, err := command.NewCommandClient(client).GetDeviceCommandByNames(cmd.Context(), deviceName, cmdName)
 	if err == nil {
 		fmt.Printf("%s\n", res)
 	}

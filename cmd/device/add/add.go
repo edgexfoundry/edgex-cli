@@ -5,7 +5,6 @@
 package add
 
 import (
-	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -60,17 +59,17 @@ func deviceHandler(cmd *cobra.Command, args []string) error {
 	}
 
 	if file != "" {
-		return createDevicesFromFile()
+		return createDevicesFromFile(cmd)
 	}
 
-	devices, err := parseDevice(interactiveMode)
+	devices, err := parseDevice(cmd, interactiveMode)
 	if err != nil {
 		return err
 	}
 
 	client := local.New(config.Conf.Clients["Metadata"].Url() + clients.ApiDeviceRoute)
 	for _, d := range devices {
-		_, err = metadata.NewDeviceClient(client).Add(context.Background(), &d)
+		_, err = metadata.NewDeviceClient(client).Add(cmd.Context(), &d)
 		if err != nil {
 			return err
 		}
@@ -79,7 +78,7 @@ func deviceHandler(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func createDevicesFromFile() error {
+func createDevicesFromFile(cmd *cobra.Command) error {
 	devices, err := update.LoadDevicesFromFile(file)
 	if err != nil {
 		return err
@@ -87,7 +86,7 @@ func createDevicesFromFile() error {
 
 	client := local.New(config.Conf.Clients["Metadata"].Url() + clients.ApiDeviceRoute)
 	for _, d := range devices {
-		_, err = metadata.NewDeviceClient(client).Add(context.Background(), &d)
+		_, err = metadata.NewDeviceClient(client).Add(cmd.Context(), &d)
 		if err != nil {
 			fmt.Println("Error: ", err.Error())
 		}
@@ -95,13 +94,13 @@ func createDevicesFromFile() error {
 	return nil
 }
 
-func parseDevice(interactiveMode bool) ([]models.Device, error) {
+func parseDevice(cmd *cobra.Command, interactiveMode bool) ([]models.Device, error) {
 	//parse Device based on interactive mode and the other provided flags
 	var err error
 	var devices []models.Device
 	if name != "" {
 		client := local.New(config.Conf.Clients["Metadata"].Url() + clients.ApiDeviceRoute)
-		from, _ := metadata.NewDeviceClient(client).DeviceForName(context.Background(), name)
+		from, _ := metadata.NewDeviceClient(client).DeviceForName(cmd.Context(), name)
 		devices = append(devices, from)
 	} else {
 		populateDevice(&devices)

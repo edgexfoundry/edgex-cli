@@ -1,7 +1,6 @@
 package adminstate
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"strings"
@@ -46,9 +45,9 @@ func updateAdminStatusHandler(cmd *cobra.Command, args []string) error {
 	)
 	var err error
 	if deviceName != "" {
-		err = mdc.UpdateAdminStateByName(context.Background(), deviceName, admin.UpdateRequest{AdminState: models.AdminState(state)})
+		err = mdc.UpdateAdminStateByName(cmd.Context(), deviceName, admin.UpdateRequest{AdminState: models.AdminState(state)})
 	} else {
-		err = mdc.UpdateAdminState(context.Background(), deviceId, admin.UpdateRequest{AdminState: models.AdminState(state)})
+		err = mdc.UpdateAdminState(cmd.Context(), deviceId, admin.UpdateRequest{AdminState: models.AdminState(state)})
 	}
 	return err
 }

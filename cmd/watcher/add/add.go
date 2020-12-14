@@ -14,7 +14,6 @@
 package add
 
 import (
-	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -101,7 +100,7 @@ func handler(cmd *cobra.Command, args []string) (err error) {
 
 	client := local.New(config.Conf.Clients["Metadata"].Url() + clients.ApiProvisionWatcherRoute)
 	for _, w := range watchers {
-		_, err = metadata.NewProvisionWatcherClient(client).Add(context.Background(), &w)
+		_, err = metadata.NewProvisionWatcherClient(client).Add(cmd.Context(), &w)
 		if err != nil {
 			fmt.Println("Error: ", err.Error())
 		}

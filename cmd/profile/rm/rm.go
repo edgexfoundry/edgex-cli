@@ -15,7 +15,6 @@
 package rm
 
 import (
-	"context"
 	"errors"
 	"fmt"
 
@@ -42,12 +41,11 @@ func NewCommand() *cobra.Command {
 				return errors.New("no profile id/name provided.\n")
 			}
 
-			ctx := context.Background()
 			mdc := metadata.NewDeviceProfileClient(
 				local.New(config.Conf.Clients["Metadata"].Url() + clients.ApiDeviceProfileRoute),
 			)
 			if name != "" {
-				err = mdc.DeleteByName(ctx, name)
+				err = mdc.DeleteByName(cmd.Context(), name)
 				if err == nil {
 					fmt.Printf("Removed: %s\n", name)
 				}

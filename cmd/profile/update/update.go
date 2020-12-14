@@ -1,7 +1,6 @@
 package update
 
 import (
-	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -55,16 +54,16 @@ func handler(cmd *cobra.Command, args []string) error {
 	}
 
 	if file != "" {
-		return updateProfileFromFile()
+		return updateProfileFromFile(cmd)
 	}
 
-	updatedProfile, err := parseProfile(name)
+	updatedProfile, err := parseProfile(cmd, name)
 	if err != nil {
 		return err
 	}
 
 	client := local.New(config.Conf.Clients["Metadata"].Url() + clients.ApiDeviceProfileRoute)
-	err = metadata.NewDeviceProfileClient(client).Update(context.Background(), updatedProfile)
+	err = metadata.NewDeviceProfileClient(client).Update(cmd.Context(), updatedProfile)
 	if err != nil {
 		return err
 	}
@@ -73,10 +72,10 @@ func handler(cmd *cobra.Command, args []string) error {
 }
 
 //parseProfile loads a DeviceProfile to be updated and open a default editor for customization
-func parseProfile(name string) (models.DeviceProfile, error) {
+func parseProfile(cmd *cobra.Command, name string) (models.DeviceProfile, error) {
 	var err error
 	client := local.New(config.Conf.Clients["Metadata"].Url() + clients.ApiDeviceProfileRoute)
-	ds, err := metadata.NewDeviceProfileClient(client).DeviceProfileForName(context.Background(), name)
+	ds, err := metadata.NewDeviceProfileClient(client).DeviceProfileForName(cmd.Context(), name)
 	if err != nil {
 		return models.DeviceProfile{}, err
 	}
@@ -96,7 +95,7 @@ func parseProfile(name string) (models.DeviceProfile, error) {
 	return updatedProfile, err
 }
 
-func updateProfileFromFile() error {
+func updateProfileFromFile(cmd *cobra.Command) error {
 	profiles, err := add.LoadFromFile(file)
 	if err != nil {
 		return err
@@ -104,7 +103,7 @@ func updateProfileFromFile() error {
 
 	client := local.New(config.Conf.Clients["Metadata"].Url() + clients.ApiDeviceServiceRoute)
 	for _, ds := range profiles {
-		err = metadata.NewDeviceProfileClient(client).Update(context.Background(), ds)
+		err = metadata.NewDeviceProfileClient(client).Update(cmd.Context(), ds)
 		if err != nil {
 			fmt.Println("Error: ", err.Error())
 		}

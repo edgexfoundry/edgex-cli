@@ -15,7 +15,6 @@
 package list
 
 import (
-	"context"
 	"html/template"
 
 	"github.com/edgexfoundry/edgex-cli/config"
@@ -51,7 +50,7 @@ func listHandler(cmd *cobra.Command, args []string) (err error) {
 		local.New(url + clients.ApiDeviceProfileRoute),
 	)
 
-	profiles, err := mdc.DeviceProfiles(context.Background())
+	profiles, err := mdc.DeviceProfiles(cmd.Context())
 	if err != nil {
 		return
 	}

@@ -15,7 +15,6 @@
 package update
 
 import (
-	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -63,16 +62,16 @@ func intervalHandler(cmd *cobra.Command, args []string) error {
 	}
 
 	if file != "" {
-		return updateIntervalFromFile()
+		return updateIntervalFromFile(cmd)
 	}
 
-	updatedInterval, err := parseInterval(name)
+	updatedInterval, err := parseInterval(cmd, name)
 	if err != nil {
 		return err
 	}
 
 	client := local.New(config.Conf.Clients["Scheduler"].Url() + clients.ApiIntervalRoute)
-	err = scheduler.NewIntervalClient(client).Update(context.Background(), updatedInterval)
+	err = scheduler.NewIntervalClient(client).Update(cmd.Context(), updatedInterval)
 	if err != nil {
 		return err
 	}
@@ -81,10 +80,10 @@ func intervalHandler(cmd *cobra.Command, args []string) error {
 }
 
 //parseInterval loads a Interval to be updated and open a default editor for customization
-func parseInterval(name string) (models.Interval, error) {
+func parseInterval(cmd *cobra.Command, name string) (models.Interval, error) {
 	var err error
 	client := local.New(config.Conf.Clients["Scheduler"].Url() + clients.ApiIntervalRoute)
-	i, err := scheduler.NewIntervalClient(client).IntervalForName(context.Background(), name)
+	i, err := scheduler.NewIntervalClient(client).IntervalForName(cmd.Context(), name)
 	if err != nil {
 		return models.Interval{}, err
 	}
@@ -104,7 +103,7 @@ func parseInterval(name string) (models.Interval, error) {
 	return updatedInterval, err
 }
 
-func updateIntervalFromFile() error {
+func updateIntervalFromFile(cmd *cobra.Command) error {
 	intervals, err := LoadDSFromFile(file)
 	if err != nil {
 		return err
@@ -112,7 +111,7 @@ func updateIntervalFromFile() error {
 
 	client := local.New(config.Conf.Clients["Scheduler"].Url() + clients.ApiIntervalRoute)
 	for _, ds := range intervals {
-		err = scheduler.NewIntervalClient(client).Update(context.Background(), ds)
+		err = scheduler.NewIntervalClient(client).Update(cmd.Context(), ds)
 		if err != nil {
 			fmt.Println("Error: ", err.Error())
 		}
