@@ -1,0 +1,27 @@
+[
+  {
+    "AddressableName": "TestAddressable",
+    "AutoEvents": [],
+    "Description": "my test",
+    "Labels": [
+      "car",
+      "rev-counter",
+      "tachometer"
+    ],
+    "Name": "Car-001",
+    "Profile": "car tachometer profile",
+    "Service": "car tachometer device service",
+    "Protocols": {
+      "modbus-http": {
+        "host": "localhost",
+        "port": "1029",
+        "unitID": "1"
+      },
+      "modbus-tcp": {
+        "host": "localhost",
+        "port": "1029",
+        "unitID": "1"
+      }
+    }
+  }
+]

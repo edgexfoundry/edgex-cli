@@ -25,7 +25,7 @@ test_deviceService() {
 test_device() {
 #TODO add device fails because there is no deviceservice.
     declare -a commands=("device  list --no-pager"
-#                         "device  add -f samples/createDevice.toml"
+#                         "device  add -f samples/createDevice.json"
 #                         "device  rm --name Car-001"
                          )
     execute "Device" "${commands[@]}"
@@ -33,14 +33,14 @@ test_device() {
 
 test_dp() {
     declare -a commands=("profile list --no-pager"
-                         "profile add samples/createDP.yaml"
-                         "profile rm --name Simple-Device-1")
+                         "profile add -f samples/createDP.json"
+                         "profile rm --name DeviceProfileCLI")
     execute "DeviceProfile" "${commands[@]}"
 }
 
 
 test_intervals(){
-    declare -a commands=("interval add samples/createInterval.toml"
+    declare -a commands=("interval add -f samples/createInterval.json"
                          "interval list --no-pager" \
                          "interval rm --name noon"\
                          "interval rm --name fourteen-hundrend-hours")
@@ -49,10 +49,12 @@ test_intervals(){
 
 
 test_notifications(){
-    declare -a commands=("notification add samples/createNotifications.toml"
-                         "notification list --no-pager" \
+    declare -a commands=("notification add -f samples/createNotification.json"
+                         "notification list --new --no-pager" \
+                         "notification list --sender SystemManagement" \
                          "notification list --slug notice-001" \
-                         "notification list --labels=temperature")
+                         "notification list --labels=temperature" \
+                         "notification rm --slug notice-001")
     execute "Notification" "${commands[@]}"
 }
 
