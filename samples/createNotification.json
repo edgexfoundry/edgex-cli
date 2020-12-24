@@ -1,0 +1,13 @@
+[
+  {
+    "category": "HW_HEALTH",
+    "content": " [ Notification ] Room's temperature is 82 °F",
+    "labels": [
+      "room",
+      "temperature"
+    ],
+    "sender": "SystemManagement",
+    "severity": "NORMAL",
+    "slug": "notice-001"
+  }
+]
