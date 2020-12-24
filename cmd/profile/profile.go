@@ -30,12 +30,8 @@ func NewCommand() *cobra.Command {
 		Short: "Device profile command.",
 		Long: `Device profile
 		
-Device profiles describe the attributes of a common class of devices 
-managed by a specific DS. A device profile is made up of one or more 
-device resources, optional resources, and optional commands. 
-Commands are added to Core Metadata, and are used to validate REST API 
-requests made to Core Command's command endpoint. 
-`,
+Device profiles define general characteristics about devices, 
+the data they provide, and how to command them.`,
 	}
 
 	cmd.AddCommand(rm.NewCommand())
