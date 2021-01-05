@@ -51,7 +51,7 @@ func NewCommand() *cobra.Command {
 				}
 				return
 			} else if len(args) != 0 {
-				return request.DeleteByIds(mdc, args)
+				return request.DeleteByIds(cmd.Context(), mdc, args)
 			}
 			return nil
 		},

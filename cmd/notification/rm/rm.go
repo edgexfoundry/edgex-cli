@@ -59,7 +59,7 @@ func removeNotificationHandler(cmd *cobra.Command, args []string) (err error) {
 	if err != nil {
 		return err
 	}
-	return request.DeletePrt(url, deletedBy)
+	return request.DeletePrt(cmd.Context(), url, deletedBy)
 }
 
 func constructUrl() (string, string, error) {

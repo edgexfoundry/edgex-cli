@@ -54,7 +54,7 @@ You can use: '$ edgex device list' to find a device's name and ID.`,
 			}
 
 			if len(args[0]) != 0 {
-				return request.DeleteByIds(mdc, args)
+				return request.DeleteByIds(cmd.Context(), mdc, args)
 			}
 			return nil
 		},

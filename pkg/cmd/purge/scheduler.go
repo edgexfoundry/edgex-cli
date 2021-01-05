@@ -1,6 +1,7 @@
 package purge
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/edgexfoundry/edgex-cli/config"
@@ -12,13 +13,15 @@ import (
 
 type schedulerCleaner struct {
 	baseUrl string
+	ctx     context.Context
 }
 
 // NewSchedulerCleaner creates an instance of SchedulerCleaner
-func NewSchedulerCleaner() Purgeable {
+func NewSchedulerCleaner(ctx context.Context) Purgeable {
 	fmt.Println("\n * Scheduler")
 	return &schedulerCleaner{
 		baseUrl: config.Conf.Clients["Scheduler"].Url(),
+		ctx:     ctx,
 	}
 }
 
@@ -30,7 +33,7 @@ func (d *schedulerCleaner) Purge() {
 func (d *schedulerCleaner) cleanIntervals() {
 	url := d.baseUrl + clients.ApiIntervalRoute
 	var intervals []models.Interval
-	err := request.Get(url, &intervals)
+	err := request.Get(d.ctx, url, &intervals)
 	if err != nil {
 		fmt.Printf("Error: %s\n", err.Error())
 		return
@@ -38,7 +41,7 @@ func (d *schedulerCleaner) cleanIntervals() {
 
 	var count int
 	for _, interval := range intervals {
-		err = request.Delete(url + "/" + interval.ID)
+		err = request.Delete(d.ctx, url+"/"+interval.ID)
 		if err == nil {
 			count = count + 1
 		}
@@ -49,7 +52,7 @@ func (d *schedulerCleaner) cleanIntervals() {
 func (d *schedulerCleaner) cleanIntervalActions() {
 	url := d.baseUrl + clients.ApiIntervalActionRoute
 	var intervalActions []models.IntervalAction
-	err := request.Get(url, &intervalActions)
+	err := request.Get(d.ctx, url, &intervalActions)
 	if err != nil {
 		fmt.Printf("Error: %s\n", err.Error())
 		return
@@ -57,7 +60,7 @@ func (d *schedulerCleaner) cleanIntervalActions() {
 
 	var count int
 	for _, intervalAction := range intervalActions {
-		err = request.Delete(url + "/" + intervalAction.ID)
+		err = request.Delete(d.ctx, url+"/"+intervalAction.ID)
 		if err == nil {
 			count = count + 1
 		}

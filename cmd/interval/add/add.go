@@ -15,6 +15,7 @@
 package add
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -97,7 +98,7 @@ func newIntervalHandler(cmd *cobra.Command, args []string) error {
 	}
 
 	if file != "" {
-		return createIntervalsFromFile(cmd)
+		return createIntervalsFromFile(cmd.Context())
 	}
 
 	intervals, err := parseInterval(interactiveMode)
@@ -128,7 +129,7 @@ func populateInterval(intervals *[]models.Interval) {
 	*intervals = append(*intervals, i)
 }
 
-func createIntervalsFromFile(cmd *cobra.Command) error {
+func createIntervalsFromFile(ctx context.Context) error {
 	intervals, err := loadIntervalFromFile(file)
 	if err != nil {
 		return err
@@ -138,7 +139,7 @@ func createIntervalsFromFile(cmd *cobra.Command) error {
 		local.New(config.Conf.Clients["Scheduler"].Url() + clients.ApiIntervalRoute),
 	)
 	for _, i := range intervals {
-		_, err = client.Add(cmd.Context(), &i)
+		_, err = client.Add(ctx, &i)
 		if err != nil {
 			fmt.Println("Error: ", err.Error())
 		}

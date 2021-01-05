@@ -15,13 +15,15 @@ import (
 
 type metadataCleaner struct {
 	baseUrl string
+	ctx     context.Context
 }
 
 // NewMetadataCleaner creates an instance of MetadataCleaner
-func NewMetadataCleaner() Purgeable {
+func NewMetadataCleaner(ctx context.Context) Purgeable {
 	fmt.Println("\n * core-metadata")
 	return &metadataCleaner{
 		baseUrl: config.Conf.Clients["Metadata"].Url(),
+		ctx:     ctx,
 	}
 }
 
@@ -44,7 +46,7 @@ func (d *metadataCleaner) cleanDevices() {
 
 	var count int
 	for _, device := range devices {
-		err = request.Delete(url + config.PathId + device.Id)
+		err = request.Delete(d.ctx, url+config.PathId+device.Id)
 		if err == nil {
 			count = count + 1
 		}
@@ -55,7 +57,7 @@ func (d *metadataCleaner) cleanDevices() {
 func (d *metadataCleaner) cleanDeviceServices() {
 	url := d.baseUrl + clients.ApiDeviceServiceRoute
 	var deviceServices []models.DeviceService
-	err := request.Get(url, &deviceServices)
+	err := request.Get(d.ctx, url, &deviceServices)
 	if err != nil {
 		fmt.Printf("Error: %s\n", err.Error())
 		return
@@ -63,7 +65,7 @@ func (d *metadataCleaner) cleanDeviceServices() {
 
 	var count int
 	for _, deviceService := range deviceServices {
-		err = request.Delete(url + config.PathId + deviceService.Id)
+		err = request.Delete(d.ctx, url+config.PathId+deviceService.Id)
 		if err == nil {
 			count = count + 1
 		}
@@ -75,7 +77,7 @@ func (d *metadataCleaner) cleanDeviceServices() {
 func (d *metadataCleaner) cleanDeviceProfiles() {
 	url := d.baseUrl + clients.ApiDeviceProfileRoute
 	var deviceProfiles []models.DeviceProfile
-	err := request.Get(url, &deviceProfiles)
+	err := request.Get(d.ctx, url, &deviceProfiles)
 	if err != nil {
 		fmt.Printf("Error: %s\n", err.Error())
 		return
@@ -83,7 +85,7 @@ func (d *metadataCleaner) cleanDeviceProfiles() {
 
 	var count int
 	for _, deviceProfile := range deviceProfiles {
-		err = request.Delete(url + config.PathId + deviceProfile.Id)
+		err = request.Delete(d.ctx, url+config.PathId+deviceProfile.Id)
 		if err == nil {
 			count = count + 1
 		}
@@ -94,7 +96,7 @@ func (d *metadataCleaner) cleanDeviceProfiles() {
 func (d *metadataCleaner) cleanAddressables() {
 	url := d.baseUrl + clients.ApiAddressableRoute
 	var addressables []models.Addressable
-	err := request.Get(url, &addressables)
+	err := request.Get(d.ctx, url, &addressables)
 	if err != nil {
 		fmt.Printf("Error: %s\n", err.Error())
 		return
@@ -102,7 +104,7 @@ func (d *metadataCleaner) cleanAddressables() {
 
 	var count int
 	for _, addr := range addressables {
-		err = request.Delete(url + config.PathId + addr.Id)
+		err = request.Delete(d.ctx, url+config.PathId+addr.Id)
 		if err == nil {
 			count = count + 1
 		}

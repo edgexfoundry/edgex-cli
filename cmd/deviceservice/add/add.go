@@ -1,6 +1,7 @@
 package add
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -53,7 +54,7 @@ func newDeviceServiceHandler(cmd *cobra.Command, args []string) error {
 	}
 
 	if file != "" {
-		return createDeviceServicesFromFile(cmd)
+		return createDeviceServicesFromFile(cmd.Context())
 	}
 
 	deviceServices, err := parseDeviceService(interactiveMode)
@@ -81,7 +82,7 @@ func populateDeviceService(deviceServices *[]models.DeviceService) {
 	*deviceServices = append(*deviceServices, ds)
 }
 
-func createDeviceServicesFromFile(cmd *cobra.Command) error {
+func createDeviceServicesFromFile(ctx context.Context) error {
 	deviceServices, err := update.LoadDSFromFile(file)
 	if err != nil {
 		return err
@@ -89,7 +90,7 @@ func createDeviceServicesFromFile(cmd *cobra.Command) error {
 
 	client := local.New(config.Conf.Clients["Metadata"].Url() + clients.ApiDeviceServiceRoute)
 	for _, ds := range deviceServices {
-		_, err = metadata.NewDeviceServiceClient(client).Add(cmd.Context(), &ds)
+		_, err = metadata.NewDeviceServiceClient(client).Add(ctx, &ds)
 		if err != nil {
 			fmt.Println("Error: ", err.Error())
 		}

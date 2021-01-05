@@ -14,6 +14,7 @@
 package list
 
 import (
+	"context"
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
 	"github.com/edgexfoundry/go-mod-core-contracts/clients/metadata"
 	"github.com/edgexfoundry/go-mod-core-contracts/clients/urlclient/local"
@@ -51,7 +52,7 @@ func listHandler(cmd *cobra.Command, args []string) (err error) {
 	if len(args) == 0 {
 		watchers, err = client.ProvisionWatchers(cmd.Context())
 	} else {
-		watchers, err = provisionWatchers(cmd, client, args[0])
+		watchers, err = provisionWatchers(cmd.Context(), client, args[0])
 	}
 	if err != nil {
 		return err
@@ -62,8 +63,8 @@ func listHandler(cmd *cobra.Command, args []string) (err error) {
 	return
 }
 
-func provisionWatchers(cmd *cobra.Command, client metadata.ProvisionWatcherClient, id string) ([]models.ProvisionWatcher, error) {
-	watcher, err := client.ProvisionWatcher(cmd.Context(), id)
+func provisionWatchers(ctx context.Context, client metadata.ProvisionWatcherClient, id string) ([]models.ProvisionWatcher, error) {
+	watcher, err := client.ProvisionWatcher(ctx, id)
 	if err != nil {
 		return nil, err
 	}

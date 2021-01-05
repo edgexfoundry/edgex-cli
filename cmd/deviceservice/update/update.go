@@ -1,6 +1,7 @@
 package update
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -63,10 +64,10 @@ func deviceServiceHandler(cmd *cobra.Command, args []string) error {
 	}
 
 	if file != "" {
-		return updateDeviceServiceFromFile(cmd)
+		return updateDeviceServiceFromFile(cmd.Context())
 	}
 
-	updatedDeviceService, err := parseDeviceService(cmd, name)
+	updatedDeviceService, err := parseDeviceService(cmd.Context(), name)
 	if err != nil {
 		return err
 	}
@@ -81,10 +82,10 @@ func deviceServiceHandler(cmd *cobra.Command, args []string) error {
 }
 
 //parseDeviceService loads a device service to be updated and open a default editor for customization
-func parseDeviceService(cmd *cobra.Command, name string) (models.DeviceService, error) {
+func parseDeviceService(ctx context.Context, name string) (models.DeviceService, error) {
 	var err error
 	client := local.New(config.Conf.Clients["Metadata"].Url() + clients.ApiDeviceServiceRoute)
-	ds, err := metadata.NewDeviceServiceClient(client).DeviceServiceForName(cmd.Context(), name)
+	ds, err := metadata.NewDeviceServiceClient(client).DeviceServiceForName(ctx, name)
 	if err != nil {
 		return models.DeviceService{}, err
 	}
@@ -104,7 +105,7 @@ func parseDeviceService(cmd *cobra.Command, name string) (models.DeviceService, 
 	return updatedDeviceService, err
 }
 
-func updateDeviceServiceFromFile(cmd *cobra.Command) error {
+func updateDeviceServiceFromFile(ctx context.Context) error {
 	deviceServices, err := LoadDSFromFile(file)
 	if err != nil {
 		return err
@@ -112,7 +113,7 @@ func updateDeviceServiceFromFile(cmd *cobra.Command) error {
 
 	client := local.New(config.Conf.Clients["Metadata"].Url() + clients.ApiDeviceServiceRoute)
 	for _, ds := range deviceServices {
-		err = metadata.NewDeviceServiceClient(client).Update(cmd.Context(), ds)
+		err = metadata.NewDeviceServiceClient(client).Update(ctx, ds)
 		if err != nil {
 			fmt.Println("Error: ", err.Error())
 		}

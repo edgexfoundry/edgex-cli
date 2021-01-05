@@ -61,7 +61,7 @@ func listHandler(cmd *cobra.Command, args []string) (err error) {
 	}
 
 	var readings []models.Reading
-	err = request.Get(url, &readings)
+	err = request.Get(cmd.Context(), url, &readings)
 	if err != nil {
 		return
 	}

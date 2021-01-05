@@ -40,7 +40,7 @@ func NewCommand() *cobra.Command {
 			}
 			url := config.Conf.Clients["Metadata"].Url() + clients.ApiDeviceServiceRoute
 			url, deletedBy := constructUrl(url, args)
-			return request.DeletePrt(url, deletedBy)
+			return request.DeletePrt(cmd.Context(), url, deletedBy)
 		},
 	}
 	cmd.Flags().StringVar(&name, "name", "", "Delete Device Service by given name")

@@ -47,7 +47,7 @@ func removeIntervalHandler(cmd *cobra.Command, args []string) (err error) {
 		}
 		fmt.Printf("Removed: %s\n", deletedBy)
 	} else if len(args[0]) != 0 {
-		return request.DeleteByIds(sc, args)
+		return request.DeleteByIds(cmd.Context(), sc, args)
 	}
 	return nil
 }

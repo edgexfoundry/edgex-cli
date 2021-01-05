@@ -52,20 +52,20 @@ func listHandler(cmd *cobra.Command, args []string) (err error) {
 	var deviceServices []models.DeviceService
 	var ds models.DeviceService
 	if name != "" {
-		err = request.Get(url+"/name/"+name, &ds)
+		err = request.Get(cmd.Context(), url+"/name/"+name, &ds)
 		if err != nil {
 			return
 		}
 		deviceServices = append(deviceServices, ds)
 	} else if len(args) != 0 {
 		var ds models.DeviceService
-		err = request.Get(url+"/"+args[0], &ds)
+		err = request.Get(cmd.Context(), url+"/"+args[0], &ds)
 		if err != nil {
 			return err
 		}
 		deviceServices = append(deviceServices, ds)
 	} else {
-		err = request.Get(url, &deviceServices)
+		err = request.Get(cmd.Context(), url, &deviceServices)
 		if err != nil {
 			return
 		}

@@ -15,6 +15,7 @@
 package list
 
 import (
+	"context"
 	"html/template"
 
 	"github.com/edgexfoundry/edgex-cli/config"
@@ -60,7 +61,7 @@ func listHandler(cmd *cobra.Command, args []string) (err error) {
 	if device != "" {
 		events, err = client.EventsForDevice(cmd.Context(), device, limit)
 	} else if len(args) > 0 {
-		events, err = getEvent(cmd, client, args[0])
+		events, err = getEvent(cmd.Context(), client, args[0])
 	} else {
 		events, err = client.Events(cmd.Context())
 	}
@@ -73,8 +74,8 @@ func listHandler(cmd *cobra.Command, args []string) (err error) {
 	return
 }
 
-func getEvent(cmd *cobra.Command, client coredata.EventClient, id string) ([]models.Event, error) {
-	event, err := client.Event(cmd.Context(), id)
+func getEvent(ctx context.Context, client coredata.EventClient, id string) ([]models.Event, error) {
+	event, err := client.Event(ctx, id)
 	if err != nil {
 		return nil, err
 	}
