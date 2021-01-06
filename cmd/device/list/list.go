@@ -15,8 +15,6 @@
 package list
 
 import (
-	"context"
-
 	"github.com/edgexfoundry/edgex-cli/config"
 	"github.com/edgexfoundry/edgex-cli/pkg/formatters"
 
@@ -56,13 +54,13 @@ func listHandler(cmd *cobra.Command, args []string) (err error) {
 	var device models.Device
 
 	if name != "" {
-		device, err = mdc.DeviceForName(context.Background(), name)
+		device, err = mdc.DeviceForName(cmd.Context(), name)
 		if err != nil {
 			return
 		}
 		devices = append(devices, device)
 	} else {
-		devices, err = mdc.Devices(context.Background())
+		devices, err = mdc.Devices(cmd.Context())
 		if err != nil {
 			return
 		}

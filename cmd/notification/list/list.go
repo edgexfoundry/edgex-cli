@@ -101,9 +101,9 @@ func listHandler(cmd *cobra.Command, args []string) (err error) {
 	var notifications []models.Notification
 	var aNotification models.Notification
 	if !multi {
-		err = request.Get(url, &aNotification)
+		err = request.Get(cmd.Context(), url, &aNotification)
 	} else {
-		err = request.Get(url, &notifications)
+		err = request.Get(cmd.Context(), url, &notifications)
 	}
 	if err != nil {
 		return

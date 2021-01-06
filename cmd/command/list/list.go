@@ -14,6 +14,7 @@
 package list
 
 import (
+	"context"
 	"html/template"
 	"strings"
 
@@ -52,9 +53,9 @@ func NewCommand() *cobra.Command {
 func listHandler(cmd *cobra.Command, args []string) (err error) {
 	var responses []models.CommandResponse
 	if device != "" {
-		responses, err = getCommandsByDeviceName(device)
+		responses, err = getCommandsByDeviceName(cmd.Context(), device)
 	} else {
-		responses, err = getCommands()
+		responses, err = getCommands(cmd.Context())
 	}
 	if err != nil {
 		return
@@ -64,17 +65,17 @@ func listHandler(cmd *cobra.Command, args []string) (err error) {
 	return
 }
 
-func getCommands() ([]models.CommandResponse, error) {
+func getCommands(ctx context.Context) ([]models.CommandResponse, error) {
 	var responses []models.CommandResponse
 	url := config.Conf.Clients["Command"].Url() + clients.ApiDeviceRoute
-	err := request.Get(url, &responses)
+	err := request.Get(ctx, url, &responses)
 	return responses, err
 }
 
-func getCommandsByDeviceName(d string) ([]models.CommandResponse, error) {
+func getCommandsByDeviceName(ctx context.Context, d string) ([]models.CommandResponse, error) {
 	var response models.CommandResponse
 	url := config.Conf.Clients["Command"].Url() + clients.ApiDeviceRoute + "/name/" + device
-	err := request.Get(url, &response)
+	err := request.Get(ctx, url, &response)
 	responses := []models.CommandResponse{response}
 	return responses, err
 }

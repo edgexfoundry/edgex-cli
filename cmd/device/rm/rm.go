@@ -15,7 +15,6 @@
 package rm
 
 import (
-	"context"
 	"errors"
 	"fmt"
 
@@ -46,9 +45,8 @@ You can use: '$ edgex device list' to find a device's name and ID.`,
 				local.New(config.Conf.Clients["Metadata"].Url() + clients.ApiDeviceRoute),
 			)
 
-			ctx := context.Background()
 			if name != "" {
-				err = mdc.DeleteByName(ctx, name)
+				err = mdc.DeleteByName(cmd.Context(), name)
 				if err == nil {
 					fmt.Printf("Removed: %s\n", name)
 				}
@@ -56,7 +54,7 @@ You can use: '$ edgex device list' to find a device's name and ID.`,
 			}
 
 			if len(args[0]) != 0 {
-				return request.DeleteByIds(mdc, args)
+				return request.DeleteByIds(cmd.Context(), mdc, args)
 			}
 			return nil
 		},

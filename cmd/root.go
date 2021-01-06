@@ -15,6 +15,7 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"os"
@@ -36,6 +37,9 @@ import (
 	"github.com/edgexfoundry/edgex-cli/config"
 	"github.com/edgexfoundry/edgex-cli/pkg/pager"
 
+	"github.com/edgexfoundry/go-mod-core-contracts/clients"
+
+	"github.com/google/uuid"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -143,7 +147,9 @@ func Execute() {
 	if err := config.LoadConfig(env); err != nil {
 		os.Exit(1)
 	}
-	if err := NewCommand().Execute(); err != nil {
+
+	ctx := context.WithValue(context.Background(), clients.CorrelationHeader, uuid.New().String())
+	if err := NewCommand().ExecuteContext(ctx); err != nil {
 		defer os.Exit(1)
 	}
 	defer closeWriter()

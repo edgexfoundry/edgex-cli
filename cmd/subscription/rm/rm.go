@@ -46,7 +46,7 @@ func removeSubscriptionHandler(cmd *cobra.Command, args []string) (err error) {
 	}
 	url := config.Conf.Clients["Notification"].Url() + clients.ApiSubscriptionRoute
 	url, deletedBy := constructUrl(url, args)
-	return request.DeletePrt(url, deletedBy)
+	return request.DeletePrt(cmd.Context(), url, deletedBy)
 }
 
 func constructUrl(url string, args []string) (string, string) {

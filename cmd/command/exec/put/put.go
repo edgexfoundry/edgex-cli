@@ -1,7 +1,6 @@
 package put
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -50,7 +49,7 @@ func handler(cmd *cobra.Command, args []string) (err error) {
 	}
 
 	client := local.New(config.Conf.Clients["Command"].Url() + clients.ApiDeviceRoute)
-	res, err := command.NewCommandClient(client).PutDeviceCommandByNames(context.Background(), device, cmdName, body)
+	res, err := command.NewCommandClient(client).PutDeviceCommandByNames(cmd.Context(), device, cmdName, body)
 	if res != "" {
 		fmt.Printf("%s\n", res)
 	}

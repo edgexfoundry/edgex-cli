@@ -44,7 +44,7 @@ func NewCommand() *cobra.Command {
 func listHandler(cmd *cobra.Command, args []string) (err error) {
 	url := config.Conf.Clients["Notification"].Url() + clients.ApiSubscriptionRoute
 	var subscriptions []models.Subscription
-	err = request.Get(url, &subscriptions)
+	err = request.Get(cmd.Context(), url, &subscriptions)
 	if err != nil {
 		return
 	}

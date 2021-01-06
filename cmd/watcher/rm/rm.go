@@ -45,5 +45,5 @@ func removeHandler(cmd *cobra.Command, args []string) error {
 	client := metadata.NewProvisionWatcherClient(
 		local.New(config.Conf.Clients["Metadata"].Url() + clients.ApiProvisionWatcherRoute),
 	)
-	return request.DeleteByIds(client, args)
+	return request.DeleteByIds(cmd.Context(), client, args)
 }

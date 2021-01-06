@@ -55,16 +55,16 @@ func handler(cmd *cobra.Command, args []string) error {
 	}
 
 	if file != "" {
-		return updateProfileFromFile()
+		return updateProfileFromFile(cmd.Context())
 	}
 
-	updatedProfile, err := parseProfile(name)
+	updatedProfile, err := parseProfile(cmd.Context(), name)
 	if err != nil {
 		return err
 	}
 
 	client := local.New(config.Conf.Clients["Metadata"].Url() + clients.ApiDeviceProfileRoute)
-	err = metadata.NewDeviceProfileClient(client).Update(context.Background(), updatedProfile)
+	err = metadata.NewDeviceProfileClient(client).Update(cmd.Context(), updatedProfile)
 	if err != nil {
 		return err
 	}
@@ -73,10 +73,10 @@ func handler(cmd *cobra.Command, args []string) error {
 }
 
 //parseProfile loads a DeviceProfile to be updated and open a default editor for customization
-func parseProfile(name string) (models.DeviceProfile, error) {
+func parseProfile(ctx context.Context, name string) (models.DeviceProfile, error) {
 	var err error
 	client := local.New(config.Conf.Clients["Metadata"].Url() + clients.ApiDeviceProfileRoute)
-	ds, err := metadata.NewDeviceProfileClient(client).DeviceProfileForName(context.Background(), name)
+	ds, err := metadata.NewDeviceProfileClient(client).DeviceProfileForName(ctx, name)
 	if err != nil {
 		return models.DeviceProfile{}, err
 	}
@@ -96,7 +96,7 @@ func parseProfile(name string) (models.DeviceProfile, error) {
 	return updatedProfile, err
 }
 
-func updateProfileFromFile() error {
+func updateProfileFromFile(ctx context.Context) error {
 	profiles, err := add.LoadFromFile(file)
 	if err != nil {
 		return err
@@ -104,7 +104,7 @@ func updateProfileFromFile() error {
 
 	client := local.New(config.Conf.Clients["Metadata"].Url() + clients.ApiDeviceServiceRoute)
 	for _, ds := range profiles {
-		err = metadata.NewDeviceProfileClient(client).Update(context.Background(), ds)
+		err = metadata.NewDeviceProfileClient(client).Update(ctx, ds)
 		if err != nil {
 			fmt.Println("Error: ", err.Error())
 		}

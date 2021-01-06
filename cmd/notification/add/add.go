@@ -15,6 +15,7 @@
 package add
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -95,7 +96,7 @@ func addNotificationHandler(cmd *cobra.Command, args []string) error {
 	}
 
 	if file != "" {
-		return createNotificationsFromFile()
+		return createNotificationsFromFile(cmd.Context())
 	}
 
 	notifications, err := parseNotification(interactiveMode)
@@ -103,7 +104,7 @@ func addNotificationHandler(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	createNotification(notifications)
+	createNotification(cmd.Context(), notifications)
 	return nil
 }
 
@@ -150,13 +151,13 @@ func populateNotification(notifications *[]models.Notification) {
 	*notifications = append(*notifications, i)
 }
 
-func createNotificationsFromFile() error {
+func createNotificationsFromFile(ctx context.Context) error {
 	notifications, err := LoadNotificationFromFile(file)
 	if err != nil {
 		return err
 	}
 
-	createNotification(notifications)
+	createNotification(ctx, notifications)
 	return nil
 }
 
@@ -189,9 +190,9 @@ func LoadNotificationFromFile(filePath string) ([]models.Notification, error) {
 	return notifications, nil
 }
 
-func createNotification(notifications []models.Notification) {
+func createNotification(ctx context.Context, notifications []models.Notification) {
 	url := config.Conf.Clients["Notification"].Url() + clients.ApiNotificationRoute
 	for _, n := range notifications {
-		request.Post(url, n)
+		request.Post(ctx, url, n)
 	}
 }

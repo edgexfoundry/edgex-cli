@@ -15,7 +15,6 @@
 package rm
 
 import (
-	"context"
 	"errors"
 	"fmt"
 
@@ -42,13 +41,13 @@ func removeIntervalHandler(cmd *cobra.Command, args []string) (err error) {
 	var deletedBy string
 	if name != "" {
 		deletedBy = name
-		err = sc.DeleteByName(context.Background(), name)
+		err = sc.DeleteByName(cmd.Context(), name)
 		if err != nil {
 			return
 		}
 		fmt.Printf("Removed: %s\n", deletedBy)
 	} else if len(args[0]) != 0 {
-		return request.DeleteByIds(sc, args)
+		return request.DeleteByIds(cmd.Context(), sc, args)
 	}
 	return nil
 }

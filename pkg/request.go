@@ -13,20 +13,20 @@ import (
 	"github.com/spf13/viper"
 )
 
-func Get(url string, items interface{}) (err error) {
+func Get(ctx context.Context, url string, items interface{}) (err error) {
 	printURL(url, http.MethodGet)
-	resp, err := clients.GetRequest(context.Background(), "", local.New(url))
+	resp, err := clients.GetRequest(ctx, "", local.New(url))
 	if err != nil {
 		return err
 	}
 	return json.Unmarshal(resp, &items)
 }
-func Delete(url string) error {
+func Delete(ctx context.Context, url string) error {
 	printURL(url, http.MethodDelete)
-	return clients.DeleteRequest(context.Background(), "", local.New(url))
+	return clients.DeleteRequest(ctx, "", local.New(url))
 }
-func DeletePrt(url string, deletedBy string) error {
-	err := Delete(url)
+func DeletePrt(ctx context.Context, url string, deletedBy string) error {
+	err := Delete(ctx, url)
 	if err == nil && deletedBy != "" {
 		fmt.Printf("Removed: %s \n", deletedBy)
 		return nil
@@ -34,10 +34,10 @@ func DeletePrt(url string, deletedBy string) error {
 	return err
 }
 
-func Post(url string, item interface{}) {
+func Post(ctx context.Context, url string, item interface{}) {
 	printURL(url, http.MethodPost)
 	printData(item)
-	resp, err := clients.PostJSONRequest(context.Background(), "", item, local.New(url))
+	resp, err := clients.PostJSONRequest(ctx, "", item, local.New(url))
 	name := getType(item)
 	if err != nil {
 		fmt.Printf("Failed to create %s because of error: %s", name, err)
@@ -67,7 +67,7 @@ func getType(item interface{}) string {
 	}
 }
 
-func DeleteByIds(i interface{}, ids []string) error {
+func DeleteByIds(ctx context.Context, i interface{}, ids []string) error {
 	methodVal := reflect.ValueOf(i).MethodByName("Delete")
 	if !methodVal.IsValid() {
 		return fmt.Errorf("unsupported method: %s", "Delete")
@@ -82,7 +82,7 @@ func DeleteByIds(i interface{}, ids []string) error {
 	}
 
 	for _, id := range ids {
-		out := methodVal.Call([]reflect.Value{reflect.ValueOf(context.Background()), reflect.ValueOf(id)})
+		out := methodVal.Call([]reflect.Value{reflect.ValueOf(ctx), reflect.ValueOf(id)})
 		err := out[0]
 		if !err.IsNil() {
 			fmt.Printf("Error: %s", err.Interface().(error))

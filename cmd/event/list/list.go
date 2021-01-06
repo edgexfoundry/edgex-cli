@@ -59,11 +59,11 @@ func listHandler(cmd *cobra.Command, args []string) (err error) {
 
 	var events []models.Event
 	if device != "" {
-		events, err = client.EventsForDevice(context.Background(), device, limit)
+		events, err = client.EventsForDevice(cmd.Context(), device, limit)
 	} else if len(args) > 0 {
-		events, err = getEvent(client, args[0])
+		events, err = getEvent(cmd.Context(), client, args[0])
 	} else {
-		events, err = client.Events(context.Background())
+		events, err = client.Events(cmd.Context())
 	}
 	if err != nil {
 		return err
@@ -74,8 +74,8 @@ func listHandler(cmd *cobra.Command, args []string) (err error) {
 	return
 }
 
-func getEvent(client coredata.EventClient, id string) ([]models.Event, error) {
-	event, err := client.Event(context.Background(), id)
+func getEvent(ctx context.Context, client coredata.EventClient, id string) ([]models.Event, error) {
+	event, err := client.Event(ctx, id)
 	if err != nil {
 		return nil, err
 	}
