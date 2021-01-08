@@ -54,7 +54,7 @@ func newDeviceServiceHandler(cmd *cobra.Command, args []string) error {
 	}
 
 	if file != "" {
-		return createDeviceServicesFromFile()
+		return createDeviceServicesFromFile(cmd.Context())
 	}
 
 	deviceServices, err := parseDeviceService(interactiveMode)
@@ -64,7 +64,7 @@ func newDeviceServiceHandler(cmd *cobra.Command, args []string) error {
 
 	client := local.New(config.Conf.Clients["Metadata"].Url() + clients.ApiDeviceServiceRoute)
 	for _, ds := range deviceServices {
-		_, err = metadata.NewDeviceServiceClient(client).Add(context.Background(), &ds)
+		_, err = metadata.NewDeviceServiceClient(client).Add(cmd.Context(), &ds)
 		if err != nil {
 			return err
 		}
@@ -82,7 +82,7 @@ func populateDeviceService(deviceServices *[]models.DeviceService) {
 	*deviceServices = append(*deviceServices, ds)
 }
 
-func createDeviceServicesFromFile() error {
+func createDeviceServicesFromFile(ctx context.Context) error {
 	deviceServices, err := update.LoadDSFromFile(file)
 	if err != nil {
 		return err
@@ -90,7 +90,7 @@ func createDeviceServicesFromFile() error {
 
 	client := local.New(config.Conf.Clients["Metadata"].Url() + clients.ApiDeviceServiceRoute)
 	for _, ds := range deviceServices {
-		_, err = metadata.NewDeviceServiceClient(client).Add(context.Background(), &ds)
+		_, err = metadata.NewDeviceServiceClient(client).Add(ctx, &ds)
 		if err != nil {
 			fmt.Println("Error: ", err.Error())
 		}

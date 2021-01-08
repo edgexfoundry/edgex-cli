@@ -19,13 +19,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/edgexfoundry/edgex-cli/pkg/editor"
-	"github.com/edgexfoundry/go-mod-core-contracts/clients/scheduler"
-	"github.com/edgexfoundry/go-mod-core-contracts/clients/urlclient/local"
 	"io/ioutil"
 
 	"github.com/edgexfoundry/edgex-cli/config"
+	"github.com/edgexfoundry/edgex-cli/pkg/editor"
+
 	"github.com/edgexfoundry/go-mod-core-contracts/clients"
+	"github.com/edgexfoundry/go-mod-core-contracts/clients/scheduler"
+	"github.com/edgexfoundry/go-mod-core-contracts/clients/urlclient/local"
 	"github.com/edgexfoundry/go-mod-core-contracts/models"
 
 	"github.com/spf13/cobra"
@@ -97,7 +98,7 @@ func newIntervalHandler(cmd *cobra.Command, args []string) error {
 	}
 
 	if file != "" {
-		return createIntervalsFromFile()
+		return createIntervalsFromFile(cmd.Context())
 	}
 
 	intervals, err := parseInterval(interactiveMode)
@@ -109,7 +110,7 @@ func newIntervalHandler(cmd *cobra.Command, args []string) error {
 		local.New(config.Conf.Clients["Scheduler"].Url() + clients.ApiIntervalRoute),
 	)
 	for _, interval := range intervals {
-		_, err = client.Add(context.Background(), &interval)
+		_, err = client.Add(cmd.Context(), &interval)
 		if err != nil {
 			return err
 		}
@@ -128,7 +129,7 @@ func populateInterval(intervals *[]models.Interval) {
 	*intervals = append(*intervals, i)
 }
 
-func createIntervalsFromFile() error {
+func createIntervalsFromFile(ctx context.Context) error {
 	intervals, err := loadIntervalFromFile(file)
 	if err != nil {
 		return err
@@ -138,7 +139,7 @@ func createIntervalsFromFile() error {
 		local.New(config.Conf.Clients["Scheduler"].Url() + clients.ApiIntervalRoute),
 	)
 	for _, i := range intervals {
-		_, err = client.Add(context.Background(), &i)
+		_, err = client.Add(ctx, &i)
 		if err != nil {
 			fmt.Println("Error: ", err.Error())
 		}

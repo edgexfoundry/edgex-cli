@@ -47,7 +47,7 @@ func scrubHandler(cmd *cobra.Command, args []string) (err error) {
 		return
 	}
 
-	err = request.Delete(url)
+	err = request.Delete(cmd.Context(), url)
 	if err != nil {
 		return err
 	}

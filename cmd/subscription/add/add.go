@@ -49,7 +49,7 @@ func addSubscriptionHandler(cmd *cobra.Command, args []string) {
 			fmt.Println("Error: ", err.Error())
 		}
 		for _, s := range subscriptions {
-			request.Post(config.Conf.Clients["Notification"].Url()+clients.ApiSubscriptionRoute, &s)
+			request.Post(cmd.Context(), config.Conf.Clients["Notification"].Url()+clients.ApiSubscriptionRoute, &s)
 		}
 	}
 }

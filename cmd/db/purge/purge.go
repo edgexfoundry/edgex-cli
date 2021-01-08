@@ -19,6 +19,7 @@
 package purgedb
 
 import (
+	"context"
 	"fmt"
 	"strconv"
 	"time"
@@ -51,36 +52,36 @@ database.
 			if !confirmation.New().Confirm() {
 				return
 			}
-			purge()
+			purge(cmd.Context())
 			return
 		},
 	}
 	return cmd
 }
 
-func purge() {
-	cleaners.NewMetadataCleaner().Purge()
-	cleaners.NewCoredataCleaner().Purge()
-	removeLogs()
-	cleaners.NewSchedulerCleaner().Purge()
-	removeNotifications()
+func purge(ctx context.Context) {
+	cleaners.NewMetadataCleaner(ctx).Purge()
+	cleaners.NewCoredataCleaner(ctx).Purge()
+	removeLogs(ctx)
+	cleaners.NewSchedulerCleaner(ctx).Purge()
+	removeNotifications(ctx)
 }
 
-func removeLogs() {
+func removeLogs(ctx context.Context) {
 	fmt.Println("\n * Logs")
 	ts := time.Now().Unix() * 1000
 	url := config.Conf.Clients["Logging"].Url() + clients.ApiLoggingRoute + "/0/" + strconv.FormatInt(ts, 10)
-	err := request.Delete(url)
+	err := request.Delete(ctx, url)
 	if err == nil {
 		//TODO fix the message
 		fmt.Print("Logs have been removed\n")
 	}
 }
 
-func removeNotifications() {
+func removeNotifications(ctx context.Context) {
 	fmt.Println("\n * Notifications")
 	url := config.Conf.Clients["Notification"].Url() + "/api/v1/cleanup"
-	err := request.Delete(url)
+	err := request.Delete(ctx, url)
 	if err == nil {
 		//TODO fix the message
 		fmt.Println("Notifications have been removed")

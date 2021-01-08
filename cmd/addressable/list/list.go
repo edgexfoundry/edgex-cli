@@ -42,7 +42,7 @@ func NewCommand() *cobra.Command {
 func listHandler(cmd *cobra.Command, args []string) (err error) {
 	url := config.Conf.Clients["Metadata"].Url() + clients.ApiAddressableRoute
 	var addr []models.Addressable
-	err = request.Get(url, &addr)
+	err = request.Get(cmd.Context(), url, &addr)
 	if err != nil {
 		return
 	}

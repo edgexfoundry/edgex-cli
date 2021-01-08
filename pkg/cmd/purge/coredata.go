@@ -1,6 +1,7 @@
 package purge
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/edgexfoundry/edgex-cli/config"
@@ -12,13 +13,15 @@ import (
 
 type coredataCleaner struct {
 	baseUrl string
+	ctx     context.Context
 }
 
 // NewCoredataCleaner creates an instance of CoreDataCleaner
-func NewCoredataCleaner() Purgeable {
+func NewCoredataCleaner(ctx context.Context) Purgeable {
 	fmt.Println("\n * core-data")
 	return &coredataCleaner{
 		baseUrl: config.Conf.Clients["CoreData"].Url(),
+		ctx:     ctx,
 	}
 }
 func (d *coredataCleaner) Purge() {
@@ -29,7 +32,7 @@ func (d *coredataCleaner) Purge() {
 func (d *coredataCleaner) cleanValueDescriptors() {
 	url := d.baseUrl + clients.ApiValueDescriptorRoute
 	var valueDescriptors []models.ValueDescriptor
-	err := request.Get(url, valueDescriptors)
+	err := request.Get(d.ctx, url, valueDescriptors)
 	if err != nil {
 		fmt.Printf("Error: %s\n", err.Error())
 		return
@@ -37,7 +40,7 @@ func (d *coredataCleaner) cleanValueDescriptors() {
 
 	var count int
 	for _, valueDescriptor := range valueDescriptors {
-		err = request.Delete(url + config.PathId + valueDescriptor.Id)
+		err = request.Delete(d.ctx, url+config.PathId+valueDescriptor.Id)
 		if err == nil {
 			count = count + 1
 		}
@@ -47,7 +50,7 @@ func (d *coredataCleaner) cleanValueDescriptors() {
 
 func (d *coredataCleaner) cleanEventsAndReadings() {
 	url := d.baseUrl + clients.ApiEventRoute + "/scruball"
-	err := request.Delete(url)
+	err := request.Delete(d.ctx, url)
 	if err == nil {
 		fmt.Print("All Events and Readings have been removed \n")
 	}
