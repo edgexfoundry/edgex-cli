@@ -72,13 +72,6 @@ func TestGetConfig(t *testing.T) {
 			expectError:       true,
 			expectedErrorType: Error,
 		},
-		{
-			name:              "Unsuccessful GetConfig",
-			env:               getConfigFileMockEnvError(),
-			configFilePath:    NonExistentConfigFile,
-			expectError:       true,
-			expectedErrorType: Error, //&os.PathError{"stat", NonExistentConfigFile, syscall.Errno(2)},
-		},
 	}
 
 	for _, test := range tests {

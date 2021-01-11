@@ -32,20 +32,16 @@ build:
 # initial impl. Feel free to override. Please keep ARTIFACT_ROOT coming from env though. CI/CD pipeline relies on this
 build-all:
 	echo "GOPATH=$(GOPATH)"
-	mkdir -p ${ARTIFACT_ROOT}
-	mkdir -p ${ARTIFACT_ROOT_AMD64}
-	mkdir -p ${ARTIFACT_ROOT_ARM64}
-	mkdir -p ${ARTIFACT_ROOT_MAC}
-	mkdir -p ${ARTIFACT_ROOT_WIN}
-	GOOS=linux GOARCH=amd64 $(GO) build -o ${ARTIFACT_ROOT_AMD64}/$(BINARY)-linux-amd64 $(GOFLAGS); cd ${ARTIFACT_ROOT_AMD64}; ln -s $(BINARY)-linux-amd64  $(BINARY)
-	GOOS=linux GOARCH=arm64 $(GO) build -o ${ARTIFACT_ROOT_ARM64}/$(BINARY)-linux-arm64 $(GOFLAGS); cd ${ARTIFACT_ROOT_ARM64}; ln -s $(BINARY)-linux-arm64 $(BINARY)
-	GOOS=darwin GOARCH=amd64 $(GO) build -o ${ARTIFACT_ROOT_MAC}/$(BINARY)-mac $(GOFLAGS); cd ${ARTIFACT_ROOT_MAC}; ln -s $(BINARY)-mac $(BINARY)
-	GOOS=windows GOARCH=amd64 $(GO) build -o ${ARTIFACT_ROOT_WIN}/$(BINARY)-win.exe $(GOFLAGS); cd ${ARTIFACT_ROOT_WIN}; ln -s  $(BINARY)-win.exe $(BINARY).exe
 
-	tar -czvf ${ARTIFACT_ROOT}/$(BINARY)-linux-amd64-$(VERSION).tar.gz Attribution.txt LICENSE -C ${ARTIFACT_ROOT_AMD64} $(BINARY)-linux-amd64 $(BINARY)
-	tar -czvf ${ARTIFACT_ROOT}/$(BINARY)-linux-arm64-$(VERSION).tar.gz Attribution.txt LICENSE -C ${ARTIFACT_ROOT_ARM64} $(BINARY)-linux-arm64 $(BINARY)
-	tar -czvf ${ARTIFACT_ROOT}/$(BINARY)-mac-$(VERSION).tar.gz Attribution.txt LICENSE -C ${ARTIFACT_ROOT_MAC} $(BINARY)-mac $(BINARY)
-	zip -j --symlinks ${ARTIFACT_ROOT}/$(BINARY)-win-$(VERSION).zip ${ARTIFACT_ROOT_WIN}/$(BINARY)-win.exe ${ARTIFACT_ROOT_WIN}/$(BINARY).exe Attribution.txt LICENSE
+	GOOS=linux GOARCH=amd64 $(GO) build -o ${ARTIFACT_ROOT}/$(BINARY)-linux-amd64 $(GOFLAGS)
+	GOOS=linux GOARCH=arm64 $(GO) build -o ${ARTIFACT_ROOT}/$(BINARY)-linux-arm64 $(GOFLAGS)
+	GOOS=darwin GOARCH=amd64 $(GO) build -o ${ARTIFACT_ROOT}/$(BINARY)-mac $(GOFLAGS)
+	GOOS=windows GOARCH=amd64 $(GO) build -o ${ARTIFACT_ROOT}/$(BINARY).exe $(GOFLAGS)
+
+	tar -czvf ${ARTIFACT_ROOT}/$(BINARY)-linux-amd64-$(VERSION).tar.gz Attribution.txt LICENSE res/.sample-configuration.toml  ${ARTIFACT_ROOT}/$(BINARY)-linux-amd64 --transform 's/-linux-amd64//'
+	tar -czvf ${ARTIFACT_ROOT}/$(BINARY)-linux-arm64-$(VERSION).tar.gz Attribution.txt LICENSE res/.sample-configuration.toml  ${ARTIFACT_ROOT}/$(BINARY)-linux-arm64 --transform 's/-linux-arm64//'
+	tar -czvf ${ARTIFACT_ROOT}/$(BINARY)-mac-$(VERSION).tar.gz Attribution.txt LICENSE res/.sample-configuration.toml ${ARTIFACT_ROOT}/$(BINARY)-mac --transform 's/-mac//'
+	zip  ${ARTIFACT_ROOT}/$(BINARY)-win-$(VERSION).zip ${ARTIFACT_ROOT}/$(BINARY).exe Attribution.txt LICENSE res/.sample-configuration.toml
 
 
 test:
@@ -55,6 +51,7 @@ test:
 	[ "`gofmt -l .`" = "" ]
 	./bin/test-go-mod-tidy.sh
 	./bin/test-attribution-txt.sh
+
 install:
 	echo "GOBIN=$(GOBIN)"
 	$(GO) install $(GOFLAGS)
@@ -65,7 +62,6 @@ uninstall:
 	echo "GOBIN=$(GOBIN)"
 	rm $(GOBIN)/$(BINARY)
 	rm -rf $(HOME)/.edgex-cli
-
 
 clean:
 	-rm $(BINARY)*
