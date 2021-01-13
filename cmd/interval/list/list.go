@@ -32,7 +32,8 @@ const intervalTemplate = "Interval ID\tName\tStart\tEnd\tFrequency\tCron\tRunOnc
 	"{{.ID}}\t{{.Name}}\t{{.Start}}\t{{.End}}\t{{.Frequency}}\t{{.Cron}}\t{{.RunOnce}}\n" +
 	"{{end}}"
 
-func listHandler(cmd *cobra.Command, args []string) (err error) {
+//Handler list Intervals and display them
+func Handler(cmd *cobra.Command, args []string) (err error) {
 	client := scheduler.NewIntervalClient(
 		local.New(config.Conf.Clients["Scheduler"].Url() + clients.ApiIntervalRoute),
 	)
@@ -66,7 +67,7 @@ func NewCommand() *cobra.Command {
 		Short: "A list of all intervals",
 		Long:  `Return a list of all intervals or retrieve an interval by id`,
 		Args:  cobra.MaximumNArgs(1),
-		RunE:  listHandler,
+		RunE:  Handler,
 	}
 	return cmd
 }

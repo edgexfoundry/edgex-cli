@@ -15,9 +15,8 @@
 package addressable
 
 import (
-	// addsubscription "github.com/edgexfoundry/edgex-cli/cmd/subscription/add"
-	listaddressable "github.com/edgexfoundry/edgex-cli/cmd/addressable/list"
-	// rmsubscription "github.com/edgexfoundry/edgex-cli/cmd/subscription/rm"
+	list "github.com/edgexfoundry/edgex-cli/cmd/addressable/list"
+
 	"github.com/spf13/cobra"
 )
 
@@ -27,9 +26,8 @@ func NewCommand() *cobra.Command {
 		Use:   "addressable",
 		Short: "Addressable command",
 		Long:  `Actions related to addressable.`,
+		RunE:  list.Handler,
 	}
-	cmd.AddCommand(listaddressable.NewCommand())
-	// cmd.AddCommand(rmsubscription.NewCommand())
-	// cmd.AddCommand(listsubscription.NewCommand())
+	cmd.AddCommand(list.NewCommand())
 	return cmd
 }

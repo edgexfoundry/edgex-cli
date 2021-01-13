@@ -31,6 +31,7 @@ func NewCommand() *cobra.Command {
 		Use:   "device",
 		Short: "Device command",
 		Long:  `Actions related to devices.`,
+		RunE:  list.Handler,
 	}
 	cmd.AddCommand(rm.NewCommand())
 	cmd.AddCommand(list.NewCommand())

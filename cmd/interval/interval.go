@@ -28,6 +28,7 @@ func NewCommand() *cobra.Command {
 		Use:   "interval",
 		Short: "Interval command",
 		Long:  `Actions related to intervals (scheduler).`,
+		RunE:  list.Handler,
 	}
 	cmd.AddCommand(add.NewCommand())
 	cmd.AddCommand(rm.NewCommand())

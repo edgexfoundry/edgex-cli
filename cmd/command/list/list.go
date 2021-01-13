@@ -44,13 +44,14 @@ func NewCommand() *cobra.Command {
 		Use:   "list",
 		Short: "A list of device supported commands",
 		Long:  "Return a list of all device `commands`",
-		RunE:  listHandler,
+		RunE:  Handler,
 	}
 	cmd.Flags().StringVarP(&device, "device", "d", "", "List commands associated with device specified by name")
 	return cmd
 }
 
-func listHandler(cmd *cobra.Command, args []string) (err error) {
+//Handler list Commands and display them
+func Handler(cmd *cobra.Command, args []string) (err error) {
 	var responses []models.CommandResponse
 	if device != "" {
 		responses, err = getCommandsByDeviceName(cmd.Context(), device)

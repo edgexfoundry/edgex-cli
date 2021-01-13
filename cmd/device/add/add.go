@@ -40,7 +40,7 @@ func NewCommand() *cobra.Command {
 		Use:   "add",
 		Short: "Add devices",
 		Long:  `Create devices described in a given JSON file or use the interactive mode with additional flags.`,
-		RunE:  deviceHandler,
+		RunE:  Handler,
 	}
 	cmd.Flags().BoolVarP(&interactiveMode, editor.InteractiveModeLabel, "i", false, "Open a default editor to customize the Event information")
 	cmd.Flags().StringVarP(&name, "name", "n", "", "Name")
@@ -54,7 +54,7 @@ func NewCommand() *cobra.Command {
 	return cmd
 }
 
-func deviceHandler(cmd *cobra.Command, args []string) error {
+func Handler(cmd *cobra.Command, args []string) error {
 	if interactiveMode && file != "" {
 		return errors.New("you could work with interactive mode or file, but not with both")
 	}

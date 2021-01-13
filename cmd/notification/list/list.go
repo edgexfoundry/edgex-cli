@@ -49,7 +49,7 @@ func NewCommand() *cobra.Command {
 		Short:              "A list of all notifications",
 		Long:               `Return a list of all notifications filtered by slug/sender/labels/start/end/new and limited by limit. Defaults to new notifications.`,
 		Args:               cobra.MaximumNArgs(3),
-		RunE:               listHandler,
+		RunE:               Handler,
 		FParseErrWhitelist: cobra.FParseErrWhitelist{},
 	}
 
@@ -64,7 +64,8 @@ func NewCommand() *cobra.Command {
 	return cmd
 }
 
-func listHandler(cmd *cobra.Command, args []string) (err error) {
+//Handler list Notifications and display them
+func Handler(cmd *cobra.Command, args []string) (err error) {
 	var url string
 	multi := true
 	url = config.Conf.Clients["Notification"].Url() + clients.ApiNotificationRoute

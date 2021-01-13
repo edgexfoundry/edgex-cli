@@ -48,6 +48,7 @@ sensors, actuators, and other IoT objects through protocols native to the IoT ob
 The DS Layer converts the data produced and communicated by the IoT object, into a 
 common EdgeX Foundry data structure, and sends that converted data into the Core Services 
 layer, and to other microservices in other layers of EdgeX Foundry.`,
+		RunE: list.Handler,
 	}
 	cmd.AddCommand(rm.NewCommand())
 	cmd.AddCommand(list.NewCommand())

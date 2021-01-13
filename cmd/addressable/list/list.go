@@ -35,11 +35,13 @@ func NewCommand() *cobra.Command {
 		Use:   "list",
 		Short: "A list of all addressable",
 		Long:  `Return all addressable sorted by id.`,
-		RunE:  listHandler,
+		RunE:  Handler,
 	}
 	return cmd
 }
-func listHandler(cmd *cobra.Command, args []string) (err error) {
+
+//Handler list all Addressable and display them
+func Handler(cmd *cobra.Command, args []string) (err error) {
 	url := config.Conf.Clients["Metadata"].Url() + clients.ApiAddressableRoute
 	var addr []models.Addressable
 	err = request.Get(cmd.Context(), url, &addr)

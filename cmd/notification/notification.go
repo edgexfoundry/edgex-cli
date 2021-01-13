@@ -15,9 +15,9 @@
 package notification
 
 import (
-	addnotification "github.com/edgexfoundry/edgex-cli/cmd/notification/add"
-	listnotification "github.com/edgexfoundry/edgex-cli/cmd/notification/list"
-	rmdnotification "github.com/edgexfoundry/edgex-cli/cmd/notification/rm"
+	add "github.com/edgexfoundry/edgex-cli/cmd/notification/add"
+	list "github.com/edgexfoundry/edgex-cli/cmd/notification/list"
+	rm "github.com/edgexfoundry/edgex-cli/cmd/notification/rm"
 
 	"github.com/spf13/cobra"
 )
@@ -27,9 +27,10 @@ func NewCommand() *cobra.Command {
 		Use:   "notification",
 		Short: "Notification command",
 		Long:  `Actions related to notifications.`,
+		RunE:  list.Handler,
 	}
-	cmd.AddCommand(rmdnotification.NewCommand())
-	cmd.AddCommand(addnotification.NewCommand())
-	cmd.AddCommand(listnotification.NewCommand())
+	cmd.AddCommand(rm.NewCommand())
+	cmd.AddCommand(add.NewCommand())
+	cmd.AddCommand(list.NewCommand())
 	return cmd
 }

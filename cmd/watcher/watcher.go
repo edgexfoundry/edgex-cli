@@ -27,6 +27,7 @@ func NewCommand() *cobra.Command {
 		Use:   "watcher",
 		Short: "Watcher command",
 		Long:  `Actions related to watchers.`,
+		RunE:  list.Handler,
 	}
 	cmd.AddCommand(list.NewCommand())
 	cmd.AddCommand(rm.NewCommand())

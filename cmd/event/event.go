@@ -15,10 +15,10 @@
 package event
 
 import (
-	addevent "github.com/edgexfoundry/edgex-cli/cmd/event/add"
+	add "github.com/edgexfoundry/edgex-cli/cmd/event/add"
 	"github.com/edgexfoundry/edgex-cli/cmd/event/count"
-	listevent "github.com/edgexfoundry/edgex-cli/cmd/event/list"
-	rmevent "github.com/edgexfoundry/edgex-cli/cmd/event/rm"
+	list "github.com/edgexfoundry/edgex-cli/cmd/event/list"
+	rm "github.com/edgexfoundry/edgex-cli/cmd/event/rm"
 	"github.com/edgexfoundry/edgex-cli/cmd/event/scrub"
 
 	"github.com/spf13/cobra"
@@ -30,10 +30,11 @@ func NewCommand() *cobra.Command {
 		Use:   "event",
 		Short: "Event command",
 		Long:  `Actions related to device-generated events.`,
+		RunE:  list.Handler,
 	}
-	cmd.AddCommand(rmevent.NewCommand())
-	cmd.AddCommand(addevent.NewCommand())
-	cmd.AddCommand(listevent.NewCommand())
+	cmd.AddCommand(rm.NewCommand())
+	cmd.AddCommand(add.NewCommand())
+	cmd.AddCommand(list.NewCommand())
 	cmd.AddCommand(count.NewCommand())
 	cmd.AddCommand(scrub.NewCommand())
 	return cmd

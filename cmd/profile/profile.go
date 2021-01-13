@@ -32,6 +32,7 @@ func NewCommand() *cobra.Command {
 		
 Device profiles define general characteristics about devices, 
 the data they provide, and how to command them.`,
+		RunE: list.Handler,
 	}
 
 	cmd.AddCommand(rm.NewCommand())

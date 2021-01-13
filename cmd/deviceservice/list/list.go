@@ -41,13 +41,14 @@ func NewCommand() *cobra.Command {
 		Use:   "list [<id>]\",",
 		Short: "Lists existing devices services",
 		Long:  `Return the list of current device services or Device Service matching the given id`,
-		RunE:  listHandler,
+		RunE:  Handler,
 	}
 	cmd.Flags().StringVarP(&name, "name", "n", "", "Returns Device Service matching the given name")
 	return cmd
 }
 
-func listHandler(cmd *cobra.Command, args []string) (err error) {
+//Handler list DeviceServices and display them
+func Handler(cmd *cobra.Command, args []string) (err error) {
 	url := config.Conf.Clients["Metadata"].Url() + clients.ApiDeviceServiceRoute
 	var deviceServices []models.DeviceService
 	var ds models.DeviceService

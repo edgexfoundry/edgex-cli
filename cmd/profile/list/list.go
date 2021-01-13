@@ -39,12 +39,13 @@ func NewCommand() *cobra.Command {
 		Use:   "list",
 		Short: "Returns a list of device profiles",
 		Long:  `Returns the list of device profiles currently in the core-metadata database.`,
-		RunE:  listHandler,
+		RunE:  Handler,
 	}
 	return cmd
 }
 
-func listHandler(cmd *cobra.Command, args []string) (err error) {
+//Handler list Profiles and display them
+func Handler(cmd *cobra.Command, args []string) (err error) {
 	url := config.Conf.Clients["Metadata"].Url()
 	mdc := metadata.NewDeviceProfileClient(
 		local.New(url + clients.ApiDeviceProfileRoute),

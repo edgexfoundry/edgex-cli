@@ -16,7 +16,7 @@ package reading
 
 import (
 	"github.com/edgexfoundry/edgex-cli/cmd/reading/count"
-	listevent "github.com/edgexfoundry/edgex-cli/cmd/reading/list"
+	list "github.com/edgexfoundry/edgex-cli/cmd/reading/list"
 
 	"github.com/spf13/cobra"
 )
@@ -27,8 +27,9 @@ func NewCommand() *cobra.Command {
 		Use:   "reading",
 		Short: "Reading command",
 		Long:  `Actions related to device-generated readings.`,
+		RunE:  list.Handler,
 	}
-	cmd.AddCommand(listevent.NewCommand())
+	cmd.AddCommand(list.NewCommand())
 	cmd.AddCommand(count.NewCommand())
 	return cmd
 }

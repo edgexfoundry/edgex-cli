@@ -27,6 +27,7 @@ func NewCommand() *cobra.Command {
 		Use:   "command",
 		Short: "`Command` command",
 		Long:  `Actions related to commands.`,
+		RunE:  list.Handler,
 	}
 	cmd.AddCommand(list.NewCommand())
 	cmd.AddCommand(get.NewCommand())

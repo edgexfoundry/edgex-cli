@@ -36,12 +36,13 @@ func NewCommand() *cobra.Command {
 		Use:   "list",
 		Short: "A list of all subscriptions",
 		Long:  `Return all Subscriptions`,
-		RunE:  listHandler,
+		RunE:  Handler,
 	}
 	return cmd
 }
 
-func listHandler(cmd *cobra.Command, args []string) (err error) {
+//Handler list Subscriptions and display them
+func Handler(cmd *cobra.Command, args []string) (err error) {
 	url := config.Conf.Clients["Notification"].Url() + clients.ApiSubscriptionRoute
 	var subscriptions []models.Subscription
 	err = request.Get(cmd.Context(), url, &subscriptions)

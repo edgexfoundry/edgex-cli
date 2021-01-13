@@ -38,12 +38,13 @@ func NewCommand() *cobra.Command {
 		Short: "A list of watchers",
 		Long:  `Return a list of watchers or retrieve a watcher by id`,
 		Args:  cobra.MaximumNArgs(1),
-		RunE:  listHandler,
+		RunE:  Handler,
 	}
 	return cmd
 }
 
-func listHandler(cmd *cobra.Command, args []string) (err error) {
+//Handler list Watchers and display them
+func Handler(cmd *cobra.Command, args []string) (err error) {
 	client := metadata.NewProvisionWatcherClient(
 		local.New(config.Conf.Clients["Metadata"].Url() + clients.ApiProvisionWatcherRoute),
 	)

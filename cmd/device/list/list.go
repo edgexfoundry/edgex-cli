@@ -39,13 +39,14 @@ func NewCommand() *cobra.Command {
 		Use:   "list",
 		Short: "A list of all devices",
 		Long:  `Return all devices sorted by id.`,
-		RunE:  listHandler,
+		RunE:  Handler,
 	}
 	cmd.Flags().StringVarP(&name, "name", "n", "", "Returns Device matching the given name")
 	return cmd
 }
 
-func listHandler(cmd *cobra.Command, args []string) (err error) {
+//Handler list Devices and display them
+func Handler(cmd *cobra.Command, args []string) (err error) {
 	url := config.Conf.Clients["Metadata"].Url() + clients.ApiDeviceRoute
 	mdc := metadata.NewDeviceClient(
 		local.New(url),
