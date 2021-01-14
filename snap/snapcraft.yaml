@@ -13,8 +13,6 @@ apps:
   edgex-cli:
     adapter: none
     command: bin/edgex-cli
-    command-chain:
-      - bin/edgex-cli-wrapper.sh
     plugs: [home, network]
 
 parts:
@@ -73,7 +71,7 @@ parts:
       make build
 
       install -DT "./edgex-cli" "$SNAPCRAFT_PART_INSTALL/bin/edgex-cli"
-      install -DT "./res/configuration.toml" "$SNAPCRAFT_PART_INSTALL/res/configuration.toml"
+      install -DT "./res/sample-configuration.toml" "$SNAPCRAFT_PART_INSTALL/res/sample-configuration.toml"
       install -DT "./Attribution.txt" \
          "$SNAPCRAFT_PART_INSTALL/usr/share/doc/edgex-cli/Attribution.txt"
       install -DT "./LICENSE" \
