@@ -25,7 +25,7 @@ import (
 
 const PathId = "/id/"
 const PathName = "/name/"
-const SampleConfigFileName = ".sample-configuration.toml"
+const SampleConfigFileName = "sample-configuration.toml"
 const ConfigFileName = "configuration.toml"
 
 var DefaultConfigFile = filepath.Join(os.Getenv("HOME"), ".edgex-cli", ConfigFileName)
