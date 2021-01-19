@@ -29,5 +29,5 @@ RUN apk add --no-cache ${ALPINE_PKG_BASE} ${ALPINE_PKG_EXTRA}
 WORKDIR /edgex-cli
 
 COPY go.mod .
-COPY ./res/configuration.toml /root/.edgex-cli/configuration.toml
+COPY ./res/sample-configuration.toml /root/.edgex-cli/sample-configuration.toml
 RUN go mod download

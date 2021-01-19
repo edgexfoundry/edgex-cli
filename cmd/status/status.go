@@ -42,10 +42,10 @@ func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "status",
 		Short: "Checks the current status of each microservice",
-		Long: `Status
+		Long: fmt.Sprintf(`Status
 		
-This command pings each edgex microservice defined in CLI 'configuration.toml' file usually placed within '$HOME/.edgex-cli' directory and prints their status.
-`,
+This command pings each edgex microservice defined in CLI '%s' file placed within '$HOME/.edgex-cli' directory and prints their status.
+`, config.ConfigFileName),
 		Run: func(cmd *cobra.Command, args []string) {
 			var clientStatuses []clientStatus
 			for clientName, client := range config.Conf.Clients {

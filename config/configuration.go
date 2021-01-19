@@ -18,14 +18,17 @@ import (
 	"errors"
 	"fmt"
 	"github.com/BurntSushi/toml"
+	"io"
 	"os"
 	"path/filepath"
 )
 
 const PathId = "/id/"
 const PathName = "/name/"
+const SampleConfigFileName = "sample-configuration.toml"
+const ConfigFileName = "configuration.toml"
 
-var DefaultConfigFile = filepath.Join(os.Getenv("HOME"), ".edgex-cli", "configuration.toml")
+var DefaultConfigFile = filepath.Join(os.Getenv("HOME"), ".edgex-cli", ConfigFileName)
 var Conf Configuration
 
 // Configuration struct will use this to write config file eventually
@@ -59,9 +62,53 @@ func LoadConfig(env Environment) error {
 	} else {
 		configFilePath = DefaultConfigFile
 	}
+
+	_, err := os.Stat(configFilePath)
+	//Relative path differs depending on if the application is run from IDE or from distributed archive
+	if os.IsNotExist(err) {
+		_, err := copy("../res/"+SampleConfigFileName, configFilePath)
+		if err != nil {
+			_, err1 := copy("./res/"+SampleConfigFileName, configFilePath)
+			if err1 != nil {
+				fmt.Printf("failed to create configuration file '%s'. \n "+
+					"%s\n %s\n ", configFilePath, err, err1)
+				return errors.New(err.Error())
+			}
+		}
+		fmt.Printf("Configuration file %s created\n", configFilePath)
+	}
+
 	if _, err := toml.DecodeFile(configFilePath, &Conf); err != nil {
 		fmt.Printf("Error occurred while parsing %s: %s", configFilePath, err)
 		return errors.New(err.Error())
 	}
 	return nil
+}
+
+func copy(src, dst string) (int64, error) {
+	sourceFileStat, err := os.Stat(src)
+	if err != nil {
+		return 0, err
+	}
+
+	if !sourceFileStat.Mode().IsRegular() {
+		return 0, fmt.Errorf("%s is not a regular file", src)
+	}
+
+	source, err := os.Open(src)
+	if err != nil {
+		return 0, err
+	}
+	defer source.Close()
+
+	if _, err := os.Stat(dst); os.IsNotExist(err) {
+		os.MkdirAll(filepath.Dir(dst), 0744)
+	}
+	destination, err := os.Create(dst)
+	if err != nil {
+		return 0, err
+	}
+	defer destination.Close()
+	nBytes, err := io.Copy(destination, source)
+	return nBytes, err
 }
