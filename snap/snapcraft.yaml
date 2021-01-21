@@ -13,6 +13,8 @@ apps:
   edgex-cli:
     adapter: none
     command: bin/edgex-cli
+    command-chain:
+      - bin/edgex-cli-wrapper.sh
     plugs: [home, network]
 
 parts:
@@ -30,6 +32,10 @@ parts:
       fi
 
       snapcraftctl set-version ${PROJECT_VERSION}
+
+  config-common:
+    plugin: dump
+    source: snap/local/runtime-helpers
 
   go:
     plugin: nil
