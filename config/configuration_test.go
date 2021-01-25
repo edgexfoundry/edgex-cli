@@ -27,7 +27,7 @@ import (
 )
 
 var workDir, _ = os.Getwd()
-var ValidConfigFile = filepath.Join(workDir, "..", "res", "configuration.toml")
+var ValidConfigFile = filepath.Join(workDir, "..", "res", "sample-configuration.toml")
 var NonExistentConfigFile = filepath.Join(workDir, "testdata", "nonExistentConfig.toml")
 var InvalidTomlConfigFile = filepath.Join(workDir, "testdata", "invalidConfig.toml")
 var Error = errors.New("test error")
@@ -72,13 +72,6 @@ func TestGetConfig(t *testing.T) {
 			expectError:       true,
 			expectedErrorType: Error,
 		},
-		{
-			name:              "Unsuccessful GetConfig",
-			env:               getConfigFileMockEnvError(),
-			configFilePath:    NonExistentConfigFile,
-			expectError:       true,
-			expectedErrorType: Error, //&os.PathError{"stat", NonExistentConfigFile, syscall.Errno(2)},
-		},
 	}
 
 	for _, test := range tests {
@@ -116,15 +109,6 @@ func getConfigFileMockEnvSuccess() Environment {
 
 	dbMock.On("SetConfigFile", ValidConfigFile).Return(nil)
 	dbMock.On("GetString", "config-file").Return(ValidConfigFile)
-	dbMock.On("IsSet", mock.Anything).Return(true)
-	return &dbMock
-}
-
-func getConfigFileMockEnvError() Environment {
-	dbMock := mocks.Environment{}
-
-	dbMock.On("SetConfigFile", NonExistentConfigFile).Return(nil)
-	dbMock.On("GetString", "config-file").Return(NonExistentConfigFile)
 	dbMock.On("IsSet", mock.Anything).Return(true)
 	return &dbMock
 }
