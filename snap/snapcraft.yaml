@@ -22,7 +22,7 @@ parts:
     plugin: nil
     # the source dir is unrelated to this part and is used since it
     # changes rarely and therefore will not trigger a new pull
-    source: snap/local
+    source: .
     override-pull: |
       cd $SNAPCRAFT_PROJECT_DIR
       if [ -f VERSION ]; then
@@ -39,7 +39,7 @@ parts:
 
   go:
     plugin: nil
-    source: snap/local
+    source: .
     build-packages: [curl]
     override-build: |
       # use dpkg architecture to figure out our target arch
@@ -73,7 +73,7 @@ parts:
       make build
 
       install -DT "./edgex-cli" "$SNAPCRAFT_PART_INSTALL/bin/edgex-cli"
-      install -DT "./res/configuration.toml" "$SNAPCRAFT_PART_INSTALL/res/configuration.toml"
+      install -DT "./res/sample-configuration.toml" "$SNAPCRAFT_PART_INSTALL/res/sample-configuration.toml"
       install -DT "./Attribution.txt" \
          "$SNAPCRAFT_PART_INSTALL/usr/share/doc/edgex-cli/Attribution.txt"
       install -DT "./LICENSE" \
