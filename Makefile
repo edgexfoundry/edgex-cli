@@ -21,12 +21,12 @@ GOFLAGS=-ldflags "-X github.com/edgexfoundry/edgex-cli/cmd/version.Version=$(VER
 ARTIFACT_ROOT?=bin
 
 build:
-	echo "GOPATH=$(GOPATH)"
+	@echo "GOPATH=$(GOPATH)"
 	$(GO) build -o $(BINARY) $(GOFLAGS)
 
 # initial impl. Feel free to override. Please keep ARTIFACT_ROOT coming from env though. CI/CD pipeline relies on this
 build-all:
-	echo "GOPATH=$(GOPATH)"
+	@echo "GOPATH=$(GOPATH)"
 
 	GOOS=linux GOARCH=amd64 $(GO) build -o ${ARTIFACT_ROOT}/$(BINARY)-linux-amd64 $(GOFLAGS)
 	GOOS=linux GOARCH=arm64 $(GO) build -o ${ARTIFACT_ROOT}/$(BINARY)-linux-arm64 $(GOFLAGS)
@@ -47,15 +47,16 @@ test:
 	./bin/test-attribution-txt.sh
 
 install:
-	echo "GOBIN=$(GOBIN)"
+	@echo "GOBIN=$(GOBIN)"
 	$(GO) install $(GOFLAGS)
-	mkdir -p $(GOBIN)/res
-	cp ./res/sample-configuration.toml $(GOBIN)/res
+	mkdir -p $(HOME)/.edgex-cli
+	cp ./res/sample-configuration.toml $(HOME)/.edgex-cli/configuration.toml
+	@echo "Configuration file $(HOME)/.edgex-cli/configuration.toml created"
 
 uninstall:
-	echo "GOBIN=$(GOBIN)"
+	@echo "GOBIN=$(GOBIN)"
 	rm -f $(GOBIN)/$(BINARY)
-	rm -rf $(GOBIN)/$(BINARY)/res $(HOME)/.edgex-cli
+	rm -rf $(HOME)/.edgex-cli
 
 
 clean: uninstall
