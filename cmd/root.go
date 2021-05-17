@@ -20,24 +20,28 @@ import (
 	"io"
 	"os"
 
-	"github.com/edgexfoundry/edgex-cli/cmd/addressable"
-	"github.com/edgexfoundry/edgex-cli/cmd/command"
-	"github.com/edgexfoundry/edgex-cli/cmd/db"
-	"github.com/edgexfoundry/edgex-cli/cmd/device"
-	"github.com/edgexfoundry/edgex-cli/cmd/deviceservice"
-	"github.com/edgexfoundry/edgex-cli/cmd/event"
-	"github.com/edgexfoundry/edgex-cli/cmd/interval"
-	"github.com/edgexfoundry/edgex-cli/cmd/notification"
-	"github.com/edgexfoundry/edgex-cli/cmd/profile"
-	"github.com/edgexfoundry/edgex-cli/cmd/reading"
+	// TODO (jpw) - put back in
+	// "github.com/edgexfoundry/edgex-cli/cmd/addressable"
+	// "github.com/edgexfoundry/edgex-cli/cmd/command"
+	// "github.com/edgexfoundry/edgex-cli/cmd/db"
+	// "github.com/edgexfoundry/edgex-cli/cmd/device"
+	// "github.com/edgexfoundry/edgex-cli/cmd/deviceservice"
+	// "github.com/edgexfoundry/edgex-cli/cmd/event"
+	// "github.com/edgexfoundry/edgex-cli/cmd/interval"
+	// "github.com/edgexfoundry/edgex-cli/cmd/notification"
+	// "github.com/edgexfoundry/edgex-cli/cmd/profile"
+	// "github.com/edgexfoundry/edgex-cli/cmd/reading"
 	"github.com/edgexfoundry/edgex-cli/cmd/status"
-	"github.com/edgexfoundry/edgex-cli/cmd/subscription"
-	"github.com/edgexfoundry/edgex-cli/cmd/version"
-	"github.com/edgexfoundry/edgex-cli/cmd/watcher"
 	"github.com/edgexfoundry/edgex-cli/config"
 	"github.com/edgexfoundry/edgex-cli/pkg/pager"
 
-	"github.com/edgexfoundry/go-mod-core-contracts/clients"
+	// "github.com/edgexfoundry/edgex-cli/cmd/subscription"
+	"github.com/edgexfoundry/edgex-cli/cmd/version"
+	// "github.com/edgexfoundry/edgex-cli/cmd/watcher"
+	// "github.com/edgexfoundry/edgex-cli/config"
+	// "github.com/edgexfoundry/edgex-cli/pkg/pager"
+
+	"github.com/edgexfoundry/go-mod-core-contracts/v2/clients"
 
 	"github.com/google/uuid"
 	"github.com/spf13/cobra"
@@ -106,21 +110,22 @@ https://www.edgexfoundry.org/
 	`,
 	}
 
+	// TODO (jpw) - put back in
 	// Add all subcommands below:
-	cmd.AddCommand(device.NewCommand())
-	cmd.AddCommand(deviceservice.NewCommand())
-	cmd.AddCommand(profile.NewCommand())
-	cmd.AddCommand(event.NewCommand())
-	cmd.AddCommand(reading.NewCommand())
+	// cmd.AddCommand(device.NewCommand())
+	// cmd.AddCommand(deviceservice.NewCommand())
+	// cmd.AddCommand(profile.NewCommand())
+	// cmd.AddCommand(event.NewCommand())
+	// cmd.AddCommand(reading.NewCommand())
 	cmd.AddCommand(status.NewCommand())
-	cmd.AddCommand(db.NewCommand())
-	cmd.AddCommand(addressable.NewCommand())
-	cmd.AddCommand(command.NewCommand())
+	// cmd.AddCommand(db.NewCommand())
+	// cmd.AddCommand(addressable.NewCommand())
+	// cmd.AddCommand(command.NewCommand())
 	// --- Support Services Commands ---
-	cmd.AddCommand(notification.NewCommand())
-	cmd.AddCommand(subscription.NewCommand())
-	cmd.AddCommand(interval.NewCommand())
-	cmd.AddCommand(watcher.NewCommand())
+	// cmd.AddCommand(notification.NewCommand())
+	// cmd.AddCommand(subscription.NewCommand())
+	// cmd.AddCommand(interval.NewCommand())
+	// cmd.AddCommand(watcher.NewCommand())
 	cmd.AddCommand(version.NewCommand())
 
 	// global flags
