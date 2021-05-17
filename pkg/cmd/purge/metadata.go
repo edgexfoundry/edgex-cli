@@ -7,10 +7,10 @@ import (
 	"github.com/edgexfoundry/edgex-cli/config"
 	request "github.com/edgexfoundry/edgex-cli/pkg"
 
-	"github.com/edgexfoundry/go-mod-core-contracts/clients"
-	"github.com/edgexfoundry/go-mod-core-contracts/clients/metadata"
-	"github.com/edgexfoundry/go-mod-core-contracts/clients/urlclient/local"
-	"github.com/edgexfoundry/go-mod-core-contracts/models"
+	"github.com/edgexfoundry/go-mod-core-contracts/v2/clients"
+	"github.com/edgexfoundry/go-mod-core-contracts/v2/clients/metadata"
+	"github.com/edgexfoundry/go-mod-core-contracts/v2/clients/urlclient/local"
+	"github.com/edgexfoundry/go-mod-core-contracts/v2/v2/models"
 )
 
 type metadataCleaner struct {
@@ -31,7 +31,7 @@ func (d *metadataCleaner) Purge() {
 	d.cleanDevices()
 	d.cleanDeviceServices()
 	d.cleanDeviceProfiles()
-	d.cleanAddressables()
+	//d.cleanAddressables()
 }
 
 func (d *metadataCleaner) cleanDevices() {
@@ -93,21 +93,22 @@ func (d *metadataCleaner) cleanDeviceProfiles() {
 	fmt.Printf("Removed %d Device Profiles from %d \n", count, len(deviceProfiles))
 }
 
-func (d *metadataCleaner) cleanAddressables() {
-	url := d.baseUrl + clients.ApiAddressableRoute
-	var addressables []models.Addressable
-	err := request.Get(d.ctx, url, &addressables)
-	if err != nil {
-		fmt.Printf("Error: %s\n", err.Error())
-		return
-	}
+// TODO (jpw) - rid
+// func (d *metadataCleaner) cleanAddressables() {
+// 	url := d.baseUrl + clients.ApiAddressableRoute
+// 	var addressables []models.Addressable
+// 	err := request.Get(d.ctx, url, &addressables)
+// 	if err != nil {
+// 		fmt.Printf("Error: %s\n", err.Error())
+// 		return
+// 	}
 
-	var count int
-	for _, addr := range addressables {
-		err = request.Delete(d.ctx, url+config.PathId+addr.Id)
-		if err == nil {
-			count = count + 1
-		}
-	}
-	fmt.Printf("Removed %d Addressables from %d \n", count, len(addressables))
-}
+// 	var count int
+// 	for _, addr := range addressables {
+// 		err = request.Delete(d.ctx, url+config.PathId+addr.Id)
+// 		if err == nil {
+// 			count = count + 1
+// 		}
+// 	}
+// 	fmt.Printf("Removed %d Addressables from %d \n", count, len(addressables))
+// }
