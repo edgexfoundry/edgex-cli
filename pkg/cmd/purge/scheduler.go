@@ -7,8 +7,8 @@ import (
 	"github.com/edgexfoundry/edgex-cli/config"
 	request "github.com/edgexfoundry/edgex-cli/pkg"
 
-	"github.com/edgexfoundry/go-mod-core-contracts/clients"
-	"github.com/edgexfoundry/go-mod-core-contracts/models"
+	"github.com/edgexfoundry/go-mod-core-contracts/v2/clients"
+	"github.com/edgexfoundry/go-mod-core-contracts/v2/v2/models"
 )
 
 type schedulerCleaner struct {
@@ -41,7 +41,7 @@ func (d *schedulerCleaner) cleanIntervals() {
 
 	var count int
 	for _, interval := range intervals {
-		err = request.Delete(d.ctx, url+"/"+interval.ID)
+		err = request.Delete(d.ctx, url+"/"+interval.Id)
 		if err == nil {
 			count = count + 1
 		}
@@ -60,7 +60,7 @@ func (d *schedulerCleaner) cleanIntervalActions() {
 
 	var count int
 	for _, intervalAction := range intervalActions {
-		err = request.Delete(d.ctx, url+"/"+intervalAction.ID)
+		err = request.Delete(d.ctx, url+"/"+intervalAction.Id)
 		if err == nil {
 			count = count + 1
 		}
