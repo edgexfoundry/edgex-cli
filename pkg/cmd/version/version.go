@@ -6,7 +6,7 @@ import (
 
 	"github.com/edgexfoundry/edgex-cli/config"
 
-	"github.com/edgexfoundry/go-mod-core-contracts/clients"
+	"github.com/edgexfoundry/go-mod-core-contracts/v2/clients"
 )
 
 type Version struct {
