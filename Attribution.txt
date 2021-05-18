@@ -52,9 +52,6 @@ https://github.com/mitchellh/mapstructure/blob/master/LICENSE
 BurntSushi/toml (MIT) https://github.com/BurntSushi/toml
 https://github.com/BurntSushi/toml/blob/master/COPYING
 
-edgexfoundry/go-mod-core-contracts (Apache 2.0) https://github.com/edgexfoundry/go-mod-core-contracts
-https://github.com/edgexfoundry/go-mod-core-contracts/blob/master/LICENSE
-
 edgexfoundry/go-mod-core-contracts (Apache 2.0) https://github.com/edgexfoundry/go-mod-core-contracts/v2
 https://github.com/edgexfoundry/go-mod-core-contracts/blob/master/LICENSE
 
