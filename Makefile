@@ -15,23 +15,27 @@ ifndef GOBIN
 endif
 
 BINARY=edgex-cli
-
+ 
 VERSION=$(shell cat ./VERSION 2>/dev/null || echo 0.0.0)
-GOFLAGS=-ldflags "-X github.com/edgexfoundry/edgex-cli/cmd/version.Version=$(VERSION)"
+TIME=$(shell date)
+GOFLAGS=-ldflags "-X 'github.com/edgexfoundry/edgex-cli.BuildVersion=$(VERSION)' -X 'github.com/edgexfoundry/edgex-cli.BuildTime=$(TIME)'"
 ARTIFACT_ROOT?=bin
 
 build:
 	@echo "GOPATH=$(GOPATH)"
-	$(GO) build -o $(BINARY) $(GOFLAGS)
+	$(GO) build -o ${ARTIFACT_ROOT}/$(BINARY) $(GOFLAGS) ./cmd/edgex-cli
+
+tidy:
+	go mod tidy
 
 # initial impl. Feel free to override. Please keep ARTIFACT_ROOT coming from env though. CI/CD pipeline relies on this
 build-all:
 	@echo "GOPATH=$(GOPATH)"
 
-	GOOS=linux GOARCH=amd64 $(GO) build -o ${ARTIFACT_ROOT}/$(BINARY)-linux-amd64 $(GOFLAGS)
-	GOOS=linux GOARCH=arm64 $(GO) build -o ${ARTIFACT_ROOT}/$(BINARY)-linux-arm64 $(GOFLAGS)
-	GOOS=darwin GOARCH=amd64 $(GO) build -o ${ARTIFACT_ROOT}/$(BINARY)-mac $(GOFLAGS)
-	GOOS=windows GOARCH=amd64 $(GO) build -o ${ARTIFACT_ROOT}/$(BINARY).exe $(GOFLAGS)
+	GOOS=linux GOARCH=amd64 $(GO) build -o ${ARTIFACT_ROOT}/$(BINARY)-linux-amd64 $(GOFLAGS) ./cmd/edgex-cli
+	GOOS=linux GOARCH=arm64 $(GO) build -o ${ARTIFACT_ROOT}/$(BINARY)-linux-arm64 $(GOFLAGS) ./cmd/edgex-cli
+	GOOS=darwin GOARCH=amd64 $(GO) build -o ${ARTIFACT_ROOT}/$(BINARY)-mac $(GOFLAGS) ./cmd/edgex-cli
+	GOOS=windows GOARCH=amd64 $(GO) build -o ${ARTIFACT_ROOT}/$(BINARY).exe $(GOFLAGS) ./cmd/edgex-cli
 
 	tar -czvf ${ARTIFACT_ROOT}/$(BINARY)-linux-amd64-$(VERSION).tar.gz Attribution.txt LICENSE res/sample-configuration.toml  ${ARTIFACT_ROOT}/$(BINARY)-linux-amd64 --transform 's/-linux-amd64//'
 	tar -czvf ${ARTIFACT_ROOT}/$(BINARY)-linux-arm64-$(VERSION).tar.gz Attribution.txt LICENSE res/sample-configuration.toml  ${ARTIFACT_ROOT}/$(BINARY)-linux-arm64 --transform 's/-linux-arm64//'
@@ -49,9 +53,6 @@ test:
 install:
 	@echo "GOBIN=$(GOBIN)"
 	$(GO) install $(GOFLAGS)
-	mkdir -p $(HOME)/.edgex-cli
-	cp ./res/sample-configuration.toml $(HOME)/.edgex-cli/configuration.toml
-	@echo "Configuration file $(HOME)/.edgex-cli/configuration.toml created"
 
 uninstall:
 	@echo "GOBIN=$(GOBIN)"
