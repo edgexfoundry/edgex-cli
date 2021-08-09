@@ -1,7 +1,7 @@
 module github.com/edgexfoundry/edgex-cli
 
 require (
-	github.com/BurntSushi/toml v0.3.1
+	github.com/BurntSushi/toml v0.4.1
 	github.com/edgexfoundry/go-mod-core-contracts/v2 v2.0.0-dev.89
 	github.com/google/uuid v1.2.0
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
