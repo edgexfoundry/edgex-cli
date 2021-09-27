@@ -18,6 +18,7 @@ package cmd
 
 import (
 	jsonpkg "encoding/json"
+	"fmt"
 
 	"github.com/spf13/cobra"
 )
@@ -48,22 +49,22 @@ func showConfig(cmd *cobra.Command) error {
 			if json {
 				return err
 			} else if verbose {
-				cmd.Printf("%s: %s: %s\n", serviceName, url, err.Error())
+				fmt.Printf("%s: %s: %s\n", serviceName, url, err.Error())
 			}
 		} else {
 			if json {
-				cmd.Println(jsonValue)
+				fmt.Println(jsonValue)
 			} else if verbose {
-				cmd.Printf("%s: %s: %s\n", serviceName, url, jsonValue)
+				fmt.Printf("%s: %s: %s\n", serviceName, url, jsonValue)
 			} else {
-				cmd.Println(serviceName + ":")
+				fmt.Println(serviceName + ":")
 				var result map[string]interface{}
 				jsonpkg.Unmarshal([]byte(jsonValue), &result)
 				b, err := jsonpkg.MarshalIndent(result["config"], "", "    ")
 				if err != nil {
 					return err
 				}
-				cmd.Println(string(b))
+				fmt.Println(string(b))
 			}
 		}
 	}
