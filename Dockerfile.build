@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-ARG BASE=golang:1.16-alpine3.12
+ARG BASE=golang:1.16-alpine3.14
 FROM ${BASE}
 
 ARG ALPINE_PKG_BASE="make git zip tar"
@@ -28,6 +28,6 @@ RUN apk add --no-cache ${ALPINE_PKG_BASE} ${ALPINE_PKG_EXTRA}
 
 WORKDIR /edgex-cli
 
-COPY go.mod .
+COPY . .
+RUN [ ! -d "vendor" ] && go mod download all || echo "skipping..."
 COPY ./res/sample-configuration.toml /root/.edgex-cli/sample-configuration.toml
-RUN go mod download
