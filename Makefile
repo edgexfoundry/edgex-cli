@@ -21,12 +21,12 @@ TIME=$(shell date)
 GOFLAGS=-ldflags "-X 'github.com/edgexfoundry/edgex-cli.BuildVersion=$(VERSION)' -X 'github.com/edgexfoundry/edgex-cli.BuildTime=$(TIME)'"
 ARTIFACT_ROOT?=bin
 
+tidy:
+	go mod tidy
+
 build:
 	@echo "GOPATH=$(GOPATH)"
 	$(GO) build -o ${ARTIFACT_ROOT}/$(BINARY) $(GOFLAGS) ./cmd/edgex-cli
-
-tidy:
-	go mod tidy
 
 # initial impl. Feel free to override. Please keep ARTIFACT_ROOT coming from env though. CI/CD pipeline relies on this
 build-all:
@@ -45,9 +45,8 @@ build-all:
 test:
 	$(GO) test ./... -coverprofile coverage.out
 	GO111MODULE=on go vet ./...
-	gofmt -l .
-	[ "`gofmt -l .`" = "" ]
-	./bin/test-go-mod-tidy.sh
+	gofmt -l $$(find . -type f -name '*.go'| grep -v "/vendor/")
+	[ "`gofmt -l $$(find . -type f -name '*.go'| grep -v "/vendor/")`" = "" ]
 	./bin/test-attribution-txt.sh
 
 install:
@@ -63,4 +62,7 @@ uninstall:
 clean: uninstall
 	rm -f $(BINARY)*
 	rm -rf $(ARTIFACT_ROOT)/$(BINARY)*
+
+vendor:
+	$(GO) mod vendor
 

@@ -1,5 +1,4 @@
-edgex-cli 
-go.sum
+edgex-cli
 coverage.out
 
 .idea/
