@@ -17,6 +17,8 @@
 package cmd
 
 import (
+	"strings"
+
 	"github.com/edgexfoundry/edgex-cli/internal/config"
 	"github.com/edgexfoundry/edgex-cli/internal/service"
 	"github.com/edgexfoundry/go-mod-core-contracts/v2/common"
@@ -24,6 +26,8 @@ import (
 )
 
 var verbose, metadata, data, command, notifications, scheduler, json bool
+var limit, offset int
+var labels string
 
 func getSelectedServiceKey() string {
 	if metadata {
@@ -39,6 +43,10 @@ func getSelectedServiceKey() string {
 	} else {
 		return ""
 	}
+}
+
+func getCoreMetaDataService() service.Service {
+	return config.GetCoreService(common.CoreMetaDataServiceKey)
 }
 
 func getCoreDataService() service.Service {
@@ -63,12 +71,29 @@ func getSelectedServices() map[string]service.Service {
 }
 
 func addVerboseFlag(cmd *cobra.Command) {
-	cmd.Flags().BoolVarP(&verbose, "verbose", "v", false, "show verbose/debug output")
+	cmd.Flags().BoolVarP(&verbose, "verbose", "v", false, "Show verbose output")
 }
 
 func addFormatFlags(cmd *cobra.Command) {
-	cmd.Flags().BoolVarP(&json, "json", "j", false, "show the raw JSON response")
+	cmd.Flags().BoolVarP(&json, "json", "j", false, "Show the raw JSON response")
 
+}
+
+func addLimitOffsetFlags(cmd *cobra.Command) {
+	cmd.Flags().IntVarP(&limit, "limit", "l", 50, "The number of items to return. Specifying -1 will return all remaining items")
+	cmd.Flags().IntVarP(&offset, "offset", "o", 0, "The number of items to skip")
+}
+
+func addLabelsFlag(cmd *cobra.Command) {
+	cmd.Flags().StringVarP(&labels, "labels", "", "", "Comma-delimited list of user-defined labels")
+}
+
+func getLabels() []string {
+	var aLabels []string
+	if len(labels) > 0 {
+		aLabels = strings.Split(labels, ",")
+	}
+	return aLabels
 }
 
 func addStandardFlags(cmd *cobra.Command) {

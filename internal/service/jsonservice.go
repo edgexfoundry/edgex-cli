@@ -27,6 +27,50 @@ import (
 	"github.com/edgexfoundry/go-mod-core-contracts/v2/common"
 )
 
+// GetProvisionWatcherByNameJSON returns the request URL and response for the 'provisoonwatcher/name' endpoint.
+func (c Service) GetProvisionWatcherByNameJSON(provisionWatcherName string) (json string, urlString string, err error) {
+	endpoint := strings.Replace(common.ApiProvisionWatcherByNameRoute, "{name}", provisionWatcherName, 1)
+	return c.callEndpoint(endpoint)
+}
+
+// GetDeviceByNameJSON returns the request URL and response for the 'device/name' endpoint.
+func (c Service) GetDeviceByNameJSON(name string) (json string, urlString string, err error) {
+	endpoint := strings.Replace(common.ApiDeviceByNameRoute, "{name}", name, 1)
+	return c.callEndpoint(endpoint)
+}
+
+// GetDeviceServiceByNameJSON returns the request URL and response for the 'deviceservice/name' endpoint.
+func (c Service) GetDeviceServiceByNameJSON(name string) (json string, urlString string, err error) {
+	endpoint := strings.Replace(common.ApiDeviceServiceByNameRoute, "{name}", name, 1)
+	return c.callEndpoint(endpoint)
+}
+
+// GetDeviceProfileByNameJSON returns the request URL and response for the 'deviceprofile/name' endpoint.
+func (c Service) GetDeviceProfileByNameJSON(name string) (json string, urlString string, err error) {
+	endpoint := strings.Replace(common.ApiDeviceProfileByNameRoute, "{name}", name, 1)
+	return c.callEndpoint(endpoint)
+}
+
+// ListAllDeviceProfileJSON returns the request URL and response for the 'devicesprofile/all' endpoint.
+func (c Service) ListAllDeviceProfilesJSON(offset, limit int, labels string) (json string, urlString string, err error) {
+	return c.getList(offset, limit, labels, common.ApiAllDeviceProfileRoute)
+}
+
+// ListAllDevicesJSON returns the request URL and response for the 'device/all' endpoint.
+func (c Service) ListAllDevicesJSON(offset, limit int, labels string) (json string, urlString string, err error) {
+	return c.getList(offset, limit, labels, common.ApiAllDeviceRoute)
+}
+
+// ListAllDeviceServicesJSON returns the request URL and response for the 'deviceservice/all' endpoint.
+func (c Service) ListAllDeviceServicesJSON(offset, limit int, labels string) (json string, urlString string, err error) {
+	return c.getList(offset, limit, labels, common.ApiAllDeviceServiceRoute)
+}
+
+// ListAllProvisionWatchersJSON returns the request URL and response for the 'provisionwatcher/all' endpoint.
+func (c Service) ListAllProvisionWatchersJSON(offset, limit int, labels string) (json string, urlString string, err error) {
+	return c.getList(offset, limit, labels, common.ApiAllProvisionWatcherRoute)
+}
+
 //GetVersionJSON returns the request URL and response for the 'version' endpoint.
 func (c Service) GetVersionJSON() (json string, url string, err error) {
 	return c.callEndpoint(common.ApiVersionRoute)
@@ -62,7 +106,6 @@ func (c Service) CountEventsJSON() (json string, url string, err error) {
 func (c Service) CountReadingsByDeviceJSON(device string) (json string, url string, err error) {
 
 	endpoint := strings.Replace(common.ApiReadingCountByDeviceNameRoute, "{name}", device, 1)
-
 	return c.callEndpoint(endpoint)
 }
 
