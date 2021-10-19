@@ -39,6 +39,18 @@ func (c Service) IssueWriteCommand(deviceName string, commandName string, settin
 	return
 }
 
+func (c Service) ListAllCommands(offset int, limit int) (response responses.MultiDeviceCoreCommandsResponse, err error) {
+	client := c.getCommandClient()
+	response, err = client.AllDeviceCoreCommands(context.Background(), offset, limit)
+	return
+}
+
+func (c Service) ListCommandsByDeviceName(deviceName string) (response responses.DeviceCoreCommandResponse, err error) {
+	client := c.getCommandClient()
+	response, err = client.DeviceCoreCommandsByDeviceName(context.Background(), deviceName)
+	return
+}
+
 func (c Service) GetReadEndpoint(deviceName string, commandName string, dsPushEvent string, dsReturnEvent string) string {
 	url := c.getEndpointUrl(common.ApiDeviceNameCommandNameRoute)
 	replacer := strings.NewReplacer("{name}", deviceName, "{command}", commandName)
@@ -49,6 +61,16 @@ func (c Service) GetWriteEndpoint(deviceName string, commandName string, request
 	url := c.getEndpointUrl(common.ApiDeviceNameCommandNameRoute)
 	replacer := strings.NewReplacer("{name}", deviceName, "{command}", commandName)
 	return replacer.Replace(url) + " -d '" + requestBody + "'"
+}
+
+func (c Service) GetListAllEndpoint() string {
+	return c.getEndpointUrl(common.ApiAllDeviceRoute)
+}
+
+func (c Service) GetListByDeviceEndpoint(deviceName string) string {
+	url := c.getEndpointUrl(common.ApiDeviceByNameRoute)
+	replacer := strings.NewReplacer("{name}", deviceName)
+	return replacer.Replace(url)
 }
 
 func (c Service) getEndpointUrl(endpoint string) string {

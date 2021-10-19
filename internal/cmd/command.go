@@ -20,6 +20,7 @@ import (
 	jsonpkg "encoding/json"
 	"errors"
 	"fmt"
+	"github.com/edgexfoundry/go-mod-core-contracts/v2/dtos"
 	"github.com/spf13/cobra"
 	"io/ioutil"
 	"os"
@@ -29,11 +30,13 @@ import (
 var deviceName, commandName string
 var pushEvent, noReturnEvent bool
 var requestBody, requestFile string
+var limit, offset int
 
 func init() {
 	commandCmd := initCommandCommand()
 	initReadCommand(commandCmd)
 	initWriteCommand(commandCmd)
+	initListCommand(commandCmd)
 }
 
 func initCommandCommand() *cobra.Command {
@@ -82,6 +85,21 @@ func initWriteCommand(cmd *cobra.Command) {
 	writeCmd.MarkFlagRequired("command")
 	cmd.AddCommand(writeCmd)
 	addFormatFlags(writeCmd)
+}
+
+func initListCommand(cmd *cobra.Command) {
+	listCmd := &cobra.Command{
+		Use:          "list",
+		Short:        "A list of device supported commands",
+		Long:         "Returns a paginated list contains all of the commands in the system associated with their respective device, optionally filtering by device name",
+		RunE:         handleListCommand,
+		SilenceUsage: true,
+	}
+	listCmd.Flags().StringVarP(&deviceName, "device", "d", "", "List commands specified by device name")
+	listCmd.Flags().IntVarP(&limit, "limit", "l", 50, "The number of items to return. Specifying -1 will return all remaining items")
+	listCmd.Flags().IntVarP(&offset, "offset", "o", 0, "The number of items to skip")
+	cmd.AddCommand(listCmd)
+	addFormatFlags(listCmd)
 }
 
 func handleReadCommand(cmd *cobra.Command, args []string) error {
@@ -166,6 +184,85 @@ func handleWriteCommand(cmd *cobra.Command, args []string) error {
 		fmt.Printf("apiVersion: %s,statusCode: %d\n", response.ApiVersion, response.StatusCode)
 	}
 	return nil
+}
+
+func handleListCommand(cmd *cobra.Command, args []string) error {
+	//LIST commands with specified device name
+	if deviceName != "" {
+		response, err := getCoreCommandService().ListCommandsByDeviceName(deviceName)
+		if err != nil {
+			return err
+		}
+
+		//print LIST commands with one of these formats: JSON, verbose or table
+		if json || verbose {
+			stringified, err := jsonpkg.Marshal(response)
+			if err != nil {
+				return err
+			}
+
+			if verbose {
+				url := getCoreCommandService().GetListByDeviceEndpoint(deviceName)
+				fmt.Printf("Result:%s\nURL: %s\n", string(stringified), url)
+			} else {
+				fmt.Printf(string(stringified))
+			}
+		} else {
+			w := tabwriter.NewWriter(os.Stdout, 1, 1, 2, ' ', 0)
+			fmt.Fprintln(w, "Name\tDevice Name\tProfile Name\tMethods\tURL")
+			for _, command := range response.DeviceCoreCommand.CoreCommands {
+				methods := methodsToString(command)
+				fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\n",
+					command.Name, response.DeviceCoreCommand.DeviceName, response.DeviceCoreCommand.ProfileName, methods, command.Url+command.Path)
+			}
+			w.Flush()
+		}
+		//LIST all commands, optionally specifying a limit and offset
+	} else {
+		response, err := getCoreCommandService().ListAllCommands(offset, limit)
+		if err != nil {
+			return err
+		}
+
+		//print LIST command's output with one of these formats: JSON, verbose or table
+		if json || verbose {
+			stringified, err := jsonpkg.Marshal(response)
+			if err != nil {
+				return err
+			}
+
+			if verbose {
+				url := getCoreCommandService().GetListAllEndpoint()
+				fmt.Printf("Result:%s\nURL: %s\n", string(stringified), url)
+			} else {
+				fmt.Printf(string(stringified))
+			}
+		} else {
+			w := tabwriter.NewWriter(os.Stdout, 1, 1, 2, ' ', 0)
+			fmt.Fprintln(w, "Name\tDevice Name\tProfile Name\tMethods\tURL")
+			for _, device := range response.DeviceCoreCommands {
+				for _, command := range device.CoreCommands {
+					methods := methodsToString(command)
+					fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\n",
+						command.Name, device.DeviceName, device.ProfileName, methods, command.Url+command.Path)
+				}
+			}
+			w.Flush()
+		}
+	}
+
+	return nil
+}
+
+//using by LIST when it shows in table format
+func methodsToString(command dtos.CoreCommand) string {
+	if command.Get && command.Set {
+		return "Get, Put"
+	} else if command.Get {
+		return "Get"
+	} else {
+		return "Put"
+	}
 }
 
 //using by READ when it specified dsPushEvent or dsReturnEvent
