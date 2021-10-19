@@ -18,18 +18,22 @@ package cmd
 
 import (
 	jsonpkg "encoding/json"
+	"errors"
 	"fmt"
 	"github.com/spf13/cobra"
+	"io/ioutil"
 	"os"
 	"text/tabwriter"
 )
 
 var deviceName, commandName string
 var pushEvent, noReturnEvent bool
+var requestBody, requestFile string
 
 func init() {
 	commandCmd := initCommandCommand()
 	initReadCommand(commandCmd)
+	initWriteCommand(commandCmd)
 }
 
 func initCommandCommand() *cobra.Command {
@@ -60,6 +64,24 @@ func initReadCommand(cmd *cobra.Command) {
 	readCmd.MarkFlagRequired("command")
 	cmd.AddCommand(readCmd)
 	addFormatFlags(readCmd)
+}
+
+func initWriteCommand(cmd *cobra.Command) {
+	var writeCmd = &cobra.Command{
+		Use:          "write",
+		Short:        "write command referenced by the command name and device name",
+		Long:         `Issue the specified write command referenced by the command name to the device/sensor that is also referenced by name`,
+		RunE:         handleWriteCommand,
+		SilenceUsage: true,
+	}
+	writeCmd.Flags().StringVarP(&deviceName, "device", "d", "", "Specify the name of the device")
+	writeCmd.Flags().StringVarP(&commandName, "command", "c", "", "Specify the name of the command to be executed")
+	writeCmd.Flags().StringVarP(&requestBody, "body", "b", "", "Specify PUT requests body/data")
+	writeCmd.Flags().StringVarP(&requestFile, "file", "f", "", "Specify a file containing PUT requests body/data")
+	writeCmd.MarkFlagRequired("device")
+	writeCmd.MarkFlagRequired("command")
+	cmd.AddCommand(writeCmd)
+	addFormatFlags(writeCmd)
 }
 
 func handleReadCommand(cmd *cobra.Command, args []string) error {
@@ -98,6 +120,50 @@ func handleReadCommand(cmd *cobra.Command, args []string) error {
 				commandName, reading.DeviceName, reading.ProfileName, reading.ValueType, reading.Value)
 		}
 		w.Flush()
+	}
+	return nil
+}
+
+func handleWriteCommand(cmd *cobra.Command, args []string) error {
+	//issue WRITE command's request body by one of these options: inline body or using file
+	if (requestBody != "" && requestFile != "") || (requestBody == "" && requestFile == "") {
+		return errors.New("please specify request data using one of the provided ways: --body or --file")
+	}
+
+	if requestFile != "" {
+		content, err := ioutil.ReadFile(requestFile)
+		if err != nil {
+			return err
+		}
+		requestBody = string(content)
+	}
+
+	var settings map[string]string
+	err := jsonpkg.Unmarshal([]byte(requestBody), &settings)
+	if err != nil {
+		return err
+	}
+
+	response, err := getCoreCommandService().IssueWriteCommand(deviceName, commandName, settings)
+	if err != nil {
+		return err
+	}
+
+	//print WRITE command's output with one of these formats: JSON, verbose or string
+	if json || verbose {
+		stringifiedResponse, err := jsonpkg.Marshal(response)
+		if err != nil {
+			return err
+		}
+
+		if verbose {
+			url := getCoreCommandService().GetWriteEndpoint(deviceName, commandName, requestBody)
+			fmt.Printf("Result:%s\nURL: %s\n", string(stringifiedResponse), url)
+		} else {
+			fmt.Printf(string(stringifiedResponse))
+		}
+	} else {
+		fmt.Printf("apiVersion: %s,statusCode: %d\n", response.ApiVersion, response.StatusCode)
 	}
 	return nil
 }

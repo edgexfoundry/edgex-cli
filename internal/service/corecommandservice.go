@@ -22,6 +22,7 @@ import (
 	"github.com/edgexfoundry/go-mod-core-contracts/v2/clients/http"
 	"github.com/edgexfoundry/go-mod-core-contracts/v2/clients/interfaces"
 	"github.com/edgexfoundry/go-mod-core-contracts/v2/common"
+	dtosCommon "github.com/edgexfoundry/go-mod-core-contracts/v2/dtos/common"
 	"github.com/edgexfoundry/go-mod-core-contracts/v2/dtos/responses"
 	"strings"
 )
@@ -32,10 +33,22 @@ func (c Service) IssueReadCommand(deviceName string, commandName string, dsPushE
 	return
 }
 
+func (c Service) IssueWriteCommand(deviceName string, commandName string, settings map[string]string) (response dtosCommon.BaseResponse, err error) {
+	client := c.getCommandClient()
+	response, err = client.IssueSetCommandByName(context.Background(), deviceName, commandName, settings)
+	return
+}
+
 func (c Service) GetReadEndpoint(deviceName string, commandName string, dsPushEvent string, dsReturnEvent string) string {
 	url := c.getEndpointUrl(common.ApiDeviceNameCommandNameRoute)
 	replacer := strings.NewReplacer("{name}", deviceName, "{command}", commandName)
 	return replacer.Replace(url) + "?ds-pushevent=" + dsPushEvent + "&ds-returnevent=" + dsReturnEvent
+}
+
+func (c Service) GetWriteEndpoint(deviceName string, commandName string, requestBody string) string {
+	url := c.getEndpointUrl(common.ApiDeviceNameCommandNameRoute)
+	replacer := strings.NewReplacer("{name}", deviceName, "{command}", commandName)
+	return replacer.Replace(url) + " -d '" + requestBody + "'"
 }
 
 func (c Service) getEndpointUrl(endpoint string) string {
