@@ -41,6 +41,10 @@ func getSelectedServiceKey() string {
 	}
 }
 
+func getCoreDataService() service.Service {
+	return config.GetCoreService(common.CoreDataServiceKey)
+}
+
 func getSelectedServices() map[string]service.Service {
 	key := getSelectedServiceKey()
 	if key == "" {
@@ -54,15 +58,18 @@ func getSelectedServices() map[string]service.Service {
 
 }
 
+func addVerboseFlag(cmd *cobra.Command) {
+	cmd.Flags().BoolVarP(&verbose, "verbose", "v", false, "show verbose/debug output")
+}
+
 func addFormatFlags(cmd *cobra.Command) {
 	cmd.Flags().BoolVarP(&json, "json", "j", false, "show the raw JSON response")
-	cmd.Flags().BoolVarP(&verbose, "debug", "d", false, "show verbose/debug output")
 
 }
 
 func addStandardFlags(cmd *cobra.Command) {
 	addFormatFlags(cmd)
-	cmd.Flags().BoolVarP(&data, "data", "", false, "use core-data service endpoint")
+	cmd.Flags().BoolVarP(&data, "data", "d", false, "use core-data service endpoint")
 	cmd.Flags().BoolVarP(&command, "command", "c", false, "use core-command service endpoint")
 	cmd.Flags().BoolVarP(&metadata, "metadata", "m", false, "use core-metadata service endpoint")
 	cmd.Flags().BoolVarP(&scheduler, "scheduler", "s", false, "use support-scheduler service endpoint")

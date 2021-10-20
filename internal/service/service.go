@@ -19,11 +19,8 @@ package service
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
-	gohttp "net/http"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/v2/clients/http"
-	"github.com/edgexfoundry/go-mod-core-contracts/v2/common"
 	dtoCommon "github.com/edgexfoundry/go-mod-core-contracts/v2/dtos/common"
 )
 
@@ -36,30 +33,6 @@ type Service struct {
 	Port int
 }
 
-//GetVersionJSON returns the request URL and response for the 'version' endpoint.
-func (c Service) GetVersionJSON() (json string, url string, err error) {
-	json, url, err = c.callEndpoint(common.ApiVersionRoute)
-	return
-}
-
-//GetPingJSON returns the request URL and response for the 'ping' endpoint.
-func (c Service) GetPingJSON() (json string, url string, err error) {
-	json, url, err = c.callEndpoint(common.ApiPingRoute)
-	return
-}
-
-//GetConfigJSON returns the request URL and response for the 'config' endpoint.
-func (c Service) GetConfigJSON() (json string, url string, err error) {
-	json, url, err = c.callEndpoint(common.ApiConfigRoute)
-	return
-}
-
-//GetMetricsJSON returns the request URL and response for the 'metrics' endpoint.
-func (c Service) GetMetricsJSON() (json string, url string, err error) {
-	json, url, err = c.callEndpoint(common.ApiMetricsRoute)
-	return
-}
-
 //GetMetrics returns the metrics for this service.
 func (c Service) GetMetrics() (result dtoCommon.Metrics, err error) {
 	url := fmt.Sprintf("http://%s:%v", c.Host, c.Port)
@@ -70,23 +43,5 @@ func (c Service) GetMetrics() (result dtoCommon.Metrics, err error) {
 	}
 
 	return response.Metrics, nil
-
-}
-
-//callEndpoint calls an endpoint on this service and returns the result and the URL used
-func (c Service) callEndpoint(endpoint string) (string, string, error) {
-	url := fmt.Sprintf("http://%s:%v%s", c.Host, c.Port, endpoint)
-
-	resp, err := gohttp.Get(url)
-	if err != nil {
-		return "", "", err
-	}
-	data, err := ioutil.ReadAll(resp.Body)
-	defer resp.Body.Close()
-	if err != nil {
-		return "", "", err
-	}
-
-	return string(data), url, nil
 
 }

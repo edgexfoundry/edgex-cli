@@ -51,9 +51,9 @@ func showMetrics(cmd *cobra.Command) error {
 				return err
 			} else {
 				if json {
-					cmd.Println(jsonValue)
+					fmt.Println(jsonValue)
 				} else {
-					cmd.Printf("%s: %s: %s\n", serviceName, url, jsonValue)
+					fmt.Printf("%s: %s: %s\n", serviceName, url, jsonValue)
 				}
 			}
 		}

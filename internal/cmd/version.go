@@ -18,6 +18,7 @@ package cmd
 
 import (
 	jsonpkg "encoding/json"
+	"fmt"
 
 	"github.com/edgexfoundry/edgex-cli"
 	"github.com/spf13/cobra"
@@ -32,7 +33,7 @@ func init() {
 		SilenceUsage: true,
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			if !json {
-				cmd.Println("EdgeX CLI version: ", edgex.BuildVersion)
+				fmt.Println("EdgeX CLI version: ", edgex.BuildVersion)
 			}
 			err = showVersion(cmd)
 
@@ -53,17 +54,17 @@ func showVersion(cmd *cobra.Command) error {
 			if json {
 				return err
 			} else if verbose {
-				cmd.Printf("%s: %s: %s\n", serviceName, url, err.Error())
+				fmt.Printf("%s: %s: %s\n", serviceName, url, err.Error())
 			}
 		} else {
 			if json {
-				cmd.Println(jsonValue)
+				fmt.Println(jsonValue)
 			} else if verbose {
-				cmd.Printf("%s: %s: %s\n", serviceName, url, jsonValue)
+				fmt.Printf("%s: %s: %s\n", serviceName, url, jsonValue)
 			} else {
 				var result map[string]interface{}
 				jsonpkg.Unmarshal([]byte(jsonValue), &result)
-				cmd.Println(serviceName + ": " + result["version"].(string))
+				fmt.Println(serviceName + ": " + result["version"].(string))
 			}
 		}
 	}
