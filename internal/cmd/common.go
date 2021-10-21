@@ -41,6 +41,10 @@ func getSelectedServiceKey() string {
 	}
 }
 
+func getCoreDataService() service.Service {
+	return config.GetCoreService(common.CoreDataServiceKey)
+}
+
 func getCoreCommandService() service.Service {
 	return config.GetCoreService(common.CoreCommandServiceKey)
 }
@@ -58,9 +62,12 @@ func getSelectedServices() map[string]service.Service {
 
 }
 
+func addVerboseFlag(cmd *cobra.Command) {
+	cmd.Flags().BoolVarP(&verbose, "verbose", "v", false, "show verbose/debug output")
+}
+
 func addFormatFlags(cmd *cobra.Command) {
 	cmd.Flags().BoolVarP(&json, "json", "j", false, "show the raw JSON response")
-	cmd.Flags().BoolVarP(&verbose, "verbose", "v", false, "show verbose/debug output")
 
 }
 

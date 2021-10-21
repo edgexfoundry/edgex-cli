@@ -45,6 +45,7 @@ parts:
       - go/1.16/stable 
     override-build: |
       cd $SNAPCRAFT_PART_SRC
+      make tidy
       make build
       install -DT "./bin/edgex-cli" "$SNAPCRAFT_PART_INSTALL/bin/edgex-cli"
       install -DT "./Attribution.txt" "$SNAPCRAFT_PART_INSTALL/usr/share/doc/edgex-cli/Attribution.txt"
