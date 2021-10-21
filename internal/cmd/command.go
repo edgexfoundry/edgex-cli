@@ -42,27 +42,26 @@ func init() {
 func initCommandCommand() *cobra.Command {
 	var cmd = &cobra.Command{
 		Use:          "command",
-		Short:        "read, write and list commands",
-		Long:         ``,
+		Short:        "Read, write and list commands [Core Command]",
+		Long:         "",
 		SilenceUsage: true,
 	}
 	rootCmd.AddCommand(cmd)
-	addFormatFlags(cmd)
 	return cmd
 }
 
 func initReadCommand(cmd *cobra.Command) {
 	var readCmd = &cobra.Command{
 		Use:          "read",
-		Short:        "read command referenced by the command name and device name",
-		Long:         `Issue the specified read command referenced by the command name to the device/sensor that is also referenced by name`,
+		Short:        "Issue a read command to the specified device",
+		Long:         "Issue a read command to the specified device",
 		RunE:         handleReadCommand,
 		SilenceUsage: true,
 	}
-	readCmd.Flags().StringVarP(&deviceName, "device", "d", "", "Specify the name of device")
-	readCmd.Flags().StringVarP(&commandName, "command", "c", "", "Specify the name of the command to be executed")
-	readCmd.Flags().BoolVarP(&pushEvent, "pushevent", "p", false, "If set, a successful GET will result in an event being pushed to the EdgeX system")
-	readCmd.Flags().BoolVarP(&noReturnEvent, "noreturnevent", "r", false, "If set, there will be no Event returned in the http response")
+	readCmd.Flags().StringVarP(&deviceName, "device", "d", "", "specify the name of device")
+	readCmd.Flags().StringVarP(&commandName, "command", "c", "", "specify the name of the command to be executed")
+	readCmd.Flags().BoolVarP(&pushEvent, "pushevent", "p", false, "if set, a successful read command will result in an event being pushed to the EdgeX system")
+	readCmd.Flags().BoolVarP(&noReturnEvent, "noreturnevent", "r", false, "if set, there will be no event returned in the HTTP response")
 	readCmd.MarkFlagRequired("device")
 	readCmd.MarkFlagRequired("command")
 	cmd.AddCommand(readCmd)
@@ -72,15 +71,15 @@ func initReadCommand(cmd *cobra.Command) {
 func initWriteCommand(cmd *cobra.Command) {
 	var writeCmd = &cobra.Command{
 		Use:          "write",
-		Short:        "write command referenced by the command name and device name",
-		Long:         `Issue the specified write command referenced by the command name to the device/sensor that is also referenced by name`,
+		Short:        "Issue a write command to the specified device",
+		Long:         "Issue a write command to the specified device",
 		RunE:         handleWriteCommand,
 		SilenceUsage: true,
 	}
-	writeCmd.Flags().StringVarP(&deviceName, "device", "d", "", "Specify the name of the device")
-	writeCmd.Flags().StringVarP(&commandName, "command", "c", "", "Specify the name of the command to be executed")
-	writeCmd.Flags().StringVarP(&requestBody, "body", "b", "", "Specify PUT requests body/data")
-	writeCmd.Flags().StringVarP(&requestFile, "file", "f", "", "Specify a file containing PUT requests body/data")
+	writeCmd.Flags().StringVarP(&deviceName, "device", "d", "", "specify the name of the device")
+	writeCmd.Flags().StringVarP(&commandName, "command", "c", "", "specify the name of the command to be executed")
+	writeCmd.Flags().StringVarP(&requestBody, "body", "b", "", "specify the write command's request body, which provides the value(s) being written to the device")
+	writeCmd.Flags().StringVarP(&requestFile, "file", "f", "", "specify a file containing the write command's request body, which provides the value(s) being written to the device")
 	writeCmd.MarkFlagRequired("device")
 	writeCmd.MarkFlagRequired("command")
 	cmd.AddCommand(writeCmd)
@@ -91,45 +90,49 @@ func initListCommand(cmd *cobra.Command) {
 	listCmd := &cobra.Command{
 		Use:          "list",
 		Short:        "A list of device supported commands",
-		Long:         "Returns a paginated list contains all of the commands in the system associated with their respective device, optionally filtering by device name",
+		Long:         "Returns a paginated list of all supported device commands, optionally filtered by device name",
 		RunE:         handleListCommand,
 		SilenceUsage: true,
 	}
-	listCmd.Flags().StringVarP(&deviceName, "device", "d", "", "List commands specified by device name")
-	listCmd.Flags().IntVarP(&limit, "limit", "l", 50, "The number of items to return. Specifying -1 will return all remaining items")
-	listCmd.Flags().IntVarP(&offset, "offset", "o", 0, "The number of items to skip")
+	listCmd.Flags().StringVarP(&deviceName, "device", "d", "", "list commands specified by device name")
+	listCmd.Flags().IntVarP(&limit, "limit", "l", 50, "the number of items to return. specifying -1 will return all remaining items")
+	listCmd.Flags().IntVarP(&offset, "offset", "o", 0, "the number of items to skip")
 	cmd.AddCommand(listCmd)
 	addFormatFlags(listCmd)
 }
 
 func handleReadCommand(cmd *cobra.Command, args []string) error {
+
+	// provide error message when -returnEvent and -pushEvent flag are all set to "no"
+	if !pushEvent && noReturnEvent {
+		fmt.Println("Nothing to do. Please remove -noreturnevent flag or set -pushevent flag.")
+		return nil
+	}
+
+	// parse flags to "yes"/"no" strings
 	dsPushEvent := boolToString(pushEvent)
 	dsReturnEvent := boolToString(!noReturnEvent)
 
-	//issue READ command and handle output if nothing can be displayed
+	// issue READ command
 	response, err := getCoreCommandService().IssueReadCommand(deviceName, commandName, dsPushEvent, dsReturnEvent)
 	if err != nil {
 		return err
 	}
 
+	// return early, if no response received
 	if response == nil {
-		fmt.Println("Read command issued. Nothing to display. Please retry without flag -r.")
+		fmt.Println("Request successful. Pushed results to EdgeX system.")
 		return nil
 	}
 
-	//print READ command's output with one of these formats: JSON, verbose or table
-	if json || verbose {
+	// print READ command's output with one of these formats: JSON or table
+	if json {
 		stringifiedResponse, err := jsonpkg.Marshal(response)
 		if err != nil {
 			return err
 		}
 
-		if verbose {
-			url := getCoreCommandService().GetReadEndpoint(deviceName, commandName, dsPushEvent, dsReturnEvent)
-			fmt.Printf("Result:%s\nURL: %s\n", string(stringifiedResponse), url)
-		} else {
-			fmt.Printf("%s\n", stringifiedResponse)
-		}
+		fmt.Printf("%s\n", stringifiedResponse)
 	} else {
 		w := tabwriter.NewWriter(os.Stdout, 1, 1, 2, ' ', 0)
 		fmt.Fprintln(w, "Command Name\tDevice Name\tProfile Name\tValue Type\tValue")
@@ -143,9 +146,9 @@ func handleReadCommand(cmd *cobra.Command, args []string) error {
 }
 
 func handleWriteCommand(cmd *cobra.Command, args []string) error {
-	//issue WRITE command's request body by one of these options: inline body or using file
+	// issue WRITE command's request body by one of these options: inline body or using file
 	if (requestBody != "" && requestFile != "") || (requestBody == "" && requestFile == "") {
-		return errors.New("please specify request data using one of the provided ways: --body or --file")
+		return errors.New("Please specify request data using one of the provided ways: --body or --file")
 	}
 
 	if requestFile != "" {
@@ -162,24 +165,20 @@ func handleWriteCommand(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
+	// issue write command
 	response, err := getCoreCommandService().IssueWriteCommand(deviceName, commandName, settings)
 	if err != nil {
 		return err
 	}
 
-	//print WRITE command's output with one of these formats: JSON, verbose or string
-	if json || verbose {
+	// print WRITE command's output with one of these formats: JSON or string
+	if json {
 		stringifiedResponse, err := jsonpkg.Marshal(response)
 		if err != nil {
 			return err
 		}
 
-		if verbose {
-			url := getCoreCommandService().GetWriteEndpoint(deviceName, commandName, requestBody)
-			fmt.Printf("Result:%s\nURL: %s\n", string(stringifiedResponse), url)
-		} else {
-			fmt.Printf(string(stringifiedResponse))
-		}
+		fmt.Printf("%s\n", string(stringifiedResponse))
 	} else {
 		fmt.Printf("apiVersion: %s,statusCode: %d\n", response.ApiVersion, response.StatusCode)
 	}
@@ -187,26 +186,21 @@ func handleWriteCommand(cmd *cobra.Command, args []string) error {
 }
 
 func handleListCommand(cmd *cobra.Command, args []string) error {
-	//LIST commands with specified device name
+	// issue list commands with specified device name
 	if deviceName != "" {
 		response, err := getCoreCommandService().ListCommandsByDeviceName(deviceName)
 		if err != nil {
 			return err
 		}
 
-		//print LIST commands with one of these formats: JSON, verbose or table
-		if json || verbose {
+		// print LIST commands with one of these formats: JSON or table
+		if json {
 			stringified, err := jsonpkg.Marshal(response)
 			if err != nil {
 				return err
 			}
 
-			if verbose {
-				url := getCoreCommandService().GetListByDeviceEndpoint(deviceName)
-				fmt.Printf("Result:%s\nURL: %s\n", string(stringified), url)
-			} else {
-				fmt.Printf(string(stringified))
-			}
+			fmt.Printf(string(stringified))
 		} else {
 			w := tabwriter.NewWriter(os.Stdout, 1, 1, 2, ' ', 0)
 			fmt.Fprintln(w, "Name\tDevice Name\tProfile Name\tMethods\tURL")
@@ -217,26 +211,22 @@ func handleListCommand(cmd *cobra.Command, args []string) error {
 			}
 			w.Flush()
 		}
-		//LIST all commands, optionally specifying a limit and offset
+
 	} else {
+		// issue list all commands, optionally specifying a limit and offset
 		response, err := getCoreCommandService().ListAllCommands(offset, limit)
 		if err != nil {
 			return err
 		}
 
-		//print LIST command's output with one of these formats: JSON, verbose or table
-		if json || verbose {
+		// print LIST command's output with one of these formats: JSON or table
+		if json {
 			stringified, err := jsonpkg.Marshal(response)
 			if err != nil {
 				return err
 			}
 
-			if verbose {
-				url := getCoreCommandService().GetListAllEndpoint()
-				fmt.Printf("Result:%s\nURL: %s\n", string(stringified), url)
-			} else {
-				fmt.Printf(string(stringified))
-			}
+			fmt.Printf(string(stringified))
 		} else {
 			w := tabwriter.NewWriter(os.Stdout, 1, 1, 2, ' ', 0)
 			fmt.Fprintln(w, "Name\tDevice Name\tProfile Name\tMethods\tURL")
@@ -254,7 +244,7 @@ func handleListCommand(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-//using by LIST when it shows in table format
+// used by list command when it shows in table format
 func methodsToString(command dtos.CoreCommand) string {
 	if command.Get && command.Set {
 		return "Get, Put"
@@ -265,7 +255,7 @@ func methodsToString(command dtos.CoreCommand) string {
 	}
 }
 
-//using by READ when it specified dsPushEvent or dsReturnEvent
+// used by read command when it specified dsPushEvent or dsReturnEvent
 func boolToString(b bool) string {
 	if b {
 		return "yes"

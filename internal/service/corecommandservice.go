@@ -21,60 +21,44 @@ import (
 	"fmt"
 	"github.com/edgexfoundry/go-mod-core-contracts/v2/clients/http"
 	"github.com/edgexfoundry/go-mod-core-contracts/v2/clients/interfaces"
-	"github.com/edgexfoundry/go-mod-core-contracts/v2/common"
 	dtosCommon "github.com/edgexfoundry/go-mod-core-contracts/v2/dtos/common"
 	"github.com/edgexfoundry/go-mod-core-contracts/v2/dtos/responses"
-	"strings"
 )
 
+// IssueReadCommand issues the specified read command referenced by the device name and command name.
+// commandName: The name of the command to be executed;
+// dsPushEvent: If set to yes, a successful read command will result in an event being pushed to the EdgeX system. Default value is no;
+// dsReturnEvent: If set to no, there will be no event returned in the HTTP response. Default value is yes.
 func (c Service) IssueReadCommand(deviceName string, commandName string, dsPushEvent string, dsReturnEvent string) (response *responses.EventResponse, err error) {
 	client := c.getCommandClient()
 	response, err = client.IssueGetCommandByName(context.Background(), deviceName, commandName, dsPushEvent, dsReturnEvent)
 	return
 }
 
+// IssueWriteCommand issues the specified write command referenced by the device name, command name and settings.
+// commandName: The name of the command to be executed;
+// settings: It specifies the write command's request body, which provides the value(s) being written to the device.
 func (c Service) IssueWriteCommand(deviceName string, commandName string, settings map[string]string) (response dtosCommon.BaseResponse, err error) {
 	client := c.getCommandClient()
 	response, err = client.IssueSetCommandByName(context.Background(), deviceName, commandName, settings)
 	return
 }
 
+// ListAllCommands returns a sorted list of all available commands, optionally limiting the list by
+// specifying the offset and limit parameters.
+// offset: The number of items to skip. Default is 0;
+// limit: The number of items to return (-1 will return all remaining items). Default is 50.
 func (c Service) ListAllCommands(offset int, limit int) (response responses.MultiDeviceCoreCommandsResponse, err error) {
 	client := c.getCommandClient()
 	response, err = client.AllDeviceCoreCommands(context.Background(), offset, limit)
 	return
 }
 
+// ListCommandsByDeviceName returns a sorted list of all available commands, filtered by a device name.
 func (c Service) ListCommandsByDeviceName(deviceName string) (response responses.DeviceCoreCommandResponse, err error) {
 	client := c.getCommandClient()
 	response, err = client.DeviceCoreCommandsByDeviceName(context.Background(), deviceName)
 	return
-}
-
-func (c Service) GetReadEndpoint(deviceName string, commandName string, dsPushEvent string, dsReturnEvent string) string {
-	url := c.getEndpointUrl(common.ApiDeviceNameCommandNameRoute)
-	replacer := strings.NewReplacer("{name}", deviceName, "{command}", commandName)
-	return replacer.Replace(url) + "?ds-pushevent=" + dsPushEvent + "&ds-returnevent=" + dsReturnEvent
-}
-
-func (c Service) GetWriteEndpoint(deviceName string, commandName string, requestBody string) string {
-	url := c.getEndpointUrl(common.ApiDeviceNameCommandNameRoute)
-	replacer := strings.NewReplacer("{name}", deviceName, "{command}", commandName)
-	return replacer.Replace(url) + " -d '" + requestBody + "'"
-}
-
-func (c Service) GetListAllEndpoint() string {
-	return c.getEndpointUrl(common.ApiAllDeviceRoute)
-}
-
-func (c Service) GetListByDeviceEndpoint(deviceName string) string {
-	url := c.getEndpointUrl(common.ApiDeviceByNameRoute)
-	replacer := strings.NewReplacer("{name}", deviceName)
-	return replacer.Replace(url)
-}
-
-func (c Service) getEndpointUrl(endpoint string) string {
-	return fmt.Sprintf("http://%s:%v%s", c.Host, c.Port, endpoint)
 }
 
 func (c Service) getCommandClient() interfaces.CommandClient {
