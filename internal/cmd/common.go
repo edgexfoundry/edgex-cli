@@ -45,6 +45,10 @@ func getCoreDataService() service.Service {
 	return config.GetCoreService(common.CoreDataServiceKey)
 }
 
+func getCoreCommandService() service.Service {
+	return config.GetCoreService(common.CoreCommandServiceKey)
+}
+
 func getSelectedServices() map[string]service.Service {
 	key := getSelectedServiceKey()
 	if key == "" {
