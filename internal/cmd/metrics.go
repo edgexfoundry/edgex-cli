@@ -17,6 +17,8 @@
 package cmd
 
 import (
+	"context"
+	jsonpkg "encoding/json"
 	"fmt"
 	"os"
 	"text/tabwriter"
@@ -27,49 +29,50 @@ import (
 func init() {
 	var cmd = &cobra.Command{
 		Use:          "metrics",
-		Short:        "Outputs the CPU/memory usage stats for all EdgeX core/support microservices",
-		Long:         ``,
+		Short:        "Output the CPU/memory usage stats for all EdgeX core/support microservices",
+		Long:         "Output the CPU/memory usage stats for all EdgeX core/support microservices",
+		RunE:         handleMetrics,
 		SilenceUsage: true,
-		RunE: func(cmd *cobra.Command, args []string) (err error) {
-
-			err = showMetrics(cmd)
-			return err
-		}}
-
+	}
 	rootCmd.AddCommand(cmd)
 	addStandardFlags(cmd)
-
 }
 
-func showMetrics(cmd *cobra.Command) error {
+func handleMetrics(cmd *cobra.Command, args []string) error {
+	var w *tabwriter.Writer
 	services := getSelectedServices()
 
-	if json || verbose {
-		for serviceName, service := range services {
-			jsonValue, url, err := service.GetMetricsJSON()
-			if err != nil {
-				return err
+	if !json {
+		w = tabwriter.NewWriter(os.Stdout, 1, 1, 1, ' ', 0)
+		fmt.Fprintln(w, "Service\tCpuBusyAvg\tMemAlloc\tMemFrees\tMemLiveObjects\tMemMallocs\tMemSys\tMemTotalAlloc")
+		defer w.Flush()
+	}
+
+	for serviceName, service := range services {
+		client := service.GetCommonClient()
+		response, err := client.Metrics(context.Background())
+		if err == nil {
+			if json {
+				result, err := jsonpkg.Marshal(response)
+				if err != nil {
+					return err
+				}
+				fmt.Println(string(result))
 			} else {
-				if json {
-					fmt.Println(jsonValue)
-				} else {
-					fmt.Printf("%s: %s: %s\n", serviceName, url, jsonValue)
+				if err == nil {
+					fmt.Fprintf(w, "%s\t%v\t%v\t%v\t%v\t%v\t%v\t%v\n",
+						serviceName,
+						response.Metrics.CpuBusyAvg,
+						response.Metrics.MemAlloc,
+						response.Metrics.MemFrees,
+						response.Metrics.MemLiveObjects,
+						response.Metrics.MemMallocs,
+						response.Metrics.MemSys,
+						response.Metrics.MemTotalAlloc)
+
 				}
 			}
 		}
-	} else {
-		w := tabwriter.NewWriter(os.Stdout, 1, 1, 1, ' ', 0)
-		fmt.Fprintln(w, "Service\tCpuBusyAvg\tMemAlloc\tMemFrees\tMemLiveObjects\tMemMallocs\tMemSys\tMemTotalAlloc")
-		for serviceName, service := range services {
-			metrics, err := service.GetMetrics()
-			if err == nil {
-				fmt.Fprintf(w, "%s\t%v\t%v\t%v\t%v\t%v\t%v\t%v\n", serviceName, metrics.CpuBusyAvg, metrics.MemAlloc, metrics.MemFrees,
-					metrics.MemLiveObjects, metrics.MemMallocs, metrics.MemSys, metrics.MemTotalAlloc)
-
-			}
-		}
-		w.Flush()
-
 	}
 	return nil
 }

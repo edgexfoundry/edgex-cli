@@ -17,54 +17,43 @@
 package cmd
 
 import (
+	"context"
 	jsonpkg "encoding/json"
 	"fmt"
 
-	"github.com/edgexfoundry/edgex-cli"
 	"github.com/spf13/cobra"
 )
 
 func init() {
 	var cmd = &cobra.Command{
-		Use:   "version",
-		Short: "Outputs the current versions of EdgeX CLI and EdgeX microservices",
-		Long:  ``,
-
+		Use:          "version",
+		Short:        "Output the current version of EdgeX CLI and EdgeX microservices",
+		Long:         "Output the current version of EdgeX CLI and EdgeX microservices",
+		RunE:         handleVersion,
 		SilenceUsage: true,
-		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			if !json {
-				fmt.Println("EdgeX CLI version: ", edgex.BuildVersion)
-			}
-			err = showVersion(cmd)
-
-			return err
-		}}
+	}
 
 	rootCmd.AddCommand(cmd)
 	addStandardFlags(cmd)
 
 }
 
-func showVersion(cmd *cobra.Command) error {
+func handleVersion(cmd *cobra.Command, args []string) error {
 	services := getSelectedServices()
 
 	for serviceName, service := range services {
-		jsonValue, url, err := service.GetVersionJSON()
-		if err != nil {
+		client := service.GetCommonClient()
+		response, err := client.Version(context.Background())
+		if err == nil {
 			if json {
-				return err
-			} else if verbose {
-				fmt.Printf("%s: %s: %s\n", serviceName, url, err.Error())
-			}
-		} else {
-			if json {
-				fmt.Println(jsonValue)
-			} else if verbose {
-				fmt.Printf("%s: %s: %s\n", serviceName, url, jsonValue)
+				result, err := jsonpkg.Marshal(response)
+				if err != nil {
+					return err
+				}
+				fmt.Println(string(result))
 			} else {
-				var result map[string]interface{}
-				jsonpkg.Unmarshal([]byte(jsonValue), &result)
-				fmt.Println(serviceName + ": " + result["version"].(string))
+
+				fmt.Println(serviceName + ": " + response.Version)
 			}
 		}
 	}
