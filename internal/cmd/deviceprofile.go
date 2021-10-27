@@ -17,14 +17,15 @@
 package cmd
 
 import (
+	"context"
 	jsonpkg "encoding/json"
 	"errors"
 	"fmt"
 	"os"
 	"text/tabwriter"
-	"time"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/v2/dtos"
+	"github.com/edgexfoundry/go-mod-core-contracts/v2/dtos/requests"
 	"github.com/spf13/cobra"
 )
 
@@ -44,21 +45,17 @@ func init() {
 	initRmDeviceProfileCommand(cmd)
 	initListDeviceProfileCommand(cmd)
 	initAddDeviceProfileCommand(cmd)
-	initNameDeviceProfileCommand(cmd)
+	initGetDeviceProfileByNameCommand(cmd)
 }
 
+// initRmDeviceProfileCommand implements the DELETE ​/device​profile/name​/{name} endpoint
+// "Delete a device profile by its unique name. This operation will fail if there are devices actively using the profile."
 func initRmDeviceProfileCommand(cmd *cobra.Command) {
 	var rmcmd = &cobra.Command{
-		Use:   "rm",
-		Short: "Remove a device profile",
-		Long:  "Removes a device profile from the core-metadata database",
-		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			response, err := getCoreMetaDataService().RemoveDeviceProfile(deviceProfileName)
-			if err == nil && response != nil {
-				fmt.Println(response)
-			}
-			return err
-		},
+		Use:          "rm",
+		Short:        "Remove a device profile",
+		Long:         "Removes a device profile from the core-metadata database",
+		RunE:         handleRmDeviceProfile,
 		SilenceUsage: true,
 	}
 	rmcmd.Flags().StringVarP(&deviceProfileName, "name", "n", "", "Device Profile name")
@@ -66,6 +63,8 @@ func initRmDeviceProfileCommand(cmd *cobra.Command) {
 	cmd.AddCommand(rmcmd)
 }
 
+// initAddDeviceProfileCommand implements the POST ​/device​profile endpoint
+// "Allows creation of a new device profile"
 func initAddDeviceProfileCommand(cmd *cobra.Command) {
 	var add = &cobra.Command{
 		Use:   "add",
@@ -92,6 +91,9 @@ func initAddDeviceProfileCommand(cmd *cobra.Command) {
 	cmd.AddCommand(add)
 }
 
+// initListDeviceProfileCommand implements the GET ​/device​profile/all endpoint
+// "Given the entire range of device profiles sorted by last modified descending, returns a portion
+// of that range according to the offset and limit parameters. Device profiles may also be filtered by label."
 func initListDeviceProfileCommand(cmd *cobra.Command) {
 	var listCmd = &cobra.Command{
 		Use:          "list",
@@ -108,7 +110,9 @@ func initListDeviceProfileCommand(cmd *cobra.Command) {
 	addLabelsFlag(listCmd)
 }
 
-func initNameDeviceProfileCommand(cmd *cobra.Command) {
+// initGetDeviceProfileByNameCommand implements the GET ​/device​profile/name endpoint
+// "Returns a device profile by its name"
+func initGetDeviceProfileByNameCommand(cmd *cobra.Command) {
 	var nameCmd = &cobra.Command{
 		Use:          "name",
 		Short:        "Returns a device profile by name",
@@ -124,23 +128,38 @@ func initNameDeviceProfileCommand(cmd *cobra.Command) {
 
 }
 
+func handleRmDeviceProfile(cmd *cobra.Command, args []string) error {
+	client := getCoreMetaDataService().GetDeviceProfileClient()
+	response, err := client.DeleteByName(context.Background(), deviceProfileName)
+	if err == nil {
+		fmt.Println(response)
+	}
+	return err
+}
+
 func handleGetDeviceProfileByName(cmd *cobra.Command, args []string) error {
-	if json {
-		json, _, err := getCoreMetaDataService().GetDeviceProfileByNameJSON(deviceProfileName)
-		if err == nil {
-			fmt.Print(json)
-		}
-		return err
-	} else {
-		p, err := getCoreMetaDataService().GetDeviceProfileByName(deviceProfileName)
-		if p != nil {
-			w := tabwriter.NewWriter(os.Stdout, 1, 1, 2, ' ', 0)
-			printProfileTableHeader(w)
-			printProfile(w, p)
-			w.Flush()
-		}
+	client := getCoreMetaDataService().GetDeviceProfileClient()
+
+	response, err := client.DeviceProfileByName(context.Background(), deviceProfileName)
+	if err != nil {
 		return err
 	}
+
+	if json {
+		result, err := jsonpkg.Marshal(response)
+		if err != nil {
+			return err
+		}
+
+		fmt.Println(string(result))
+	} else {
+		w := tabwriter.NewWriter(os.Stdout, 1, 1, 2, ' ', 0)
+		printProfileTableHeader(w)
+		printProfile(w, &response.Profile)
+		w.Flush()
+	}
+	return nil
+
 }
 
 func getDeviceProfileAttributes() (resources []dtos.DeviceResource, commands []dtos.DeviceCommand, labels []string, err error) {
@@ -162,44 +181,55 @@ func getDeviceProfileAttributes() (resources []dtos.DeviceResource, commands []d
 }
 
 func handleAddDeviceProfile(cmd *cobra.Command, args []string) error {
+	client := getCoreMetaDataService().GetDeviceProfileClient()
 
 	resources, commands, labels, err := getDeviceProfileAttributes()
 	if err != nil {
 		return err
 	}
 
-	response, err := getCoreMetaDataService().AddDeviceProfile(deviceProfileName, deviceProfileDescription, deviceProfileManufacturer,
-		deviceProfileModel, labels, resources, commands)
+	var req = requests.NewDeviceProfileRequest(dtos.DeviceProfile{
+		Name:            deviceProfileName,
+		Description:     deviceProfileDescription,
+		Manufacturer:    deviceProfileManufacturer,
+		Model:           deviceProfileModel,
+		Labels:          labels,
+		DeviceResources: resources,
+		DeviceCommands:  commands,
+	})
 
-	if err == nil && response != nil {
-		fmt.Println(response)
+	response, err := client.Add(context.Background(), []requests.DeviceProfileRequest{req})
+
+	if response != nil {
+		fmt.Println(response[0])
 	}
 	return err
+
 }
 
 func handleListDeviceProfile(cmd *cobra.Command, args []string) error {
 
+	client := getCoreMetaDataService().GetDeviceProfileClient()
+	response, err := client.AllDeviceProfiles(context.Background(), getLabels(), offset, limit)
+	if err != nil {
+		return err
+	}
 	if json {
-		json, _, err := getCoreMetaDataService().ListAllDeviceProfilesJSON(offset, limit, labels)
+		result, err := jsonpkg.Marshal(response)
 		if err != nil {
 			return err
 		}
-		fmt.Print(json)
 
+		fmt.Println(string(result))
 	} else {
 
-		deviceProfiles, err := getCoreMetaDataService().ListAllDeviceProfiles(offset, limit, getLabels())
-		if err != nil {
-			return err
-		}
-		if len(deviceProfiles) == 0 {
-			fmt.Println("No device profiles available")
+		if len(response.Profiles) == 0 {
+			fmt.Println("No profiles available")
 			return nil
 		}
-
 		w := tabwriter.NewWriter(os.Stdout, 1, 1, 2, ' ', 0)
 		printProfileTableHeader(w)
-		for _, p := range deviceProfiles {
+		for _, p := range response.Profiles {
 			printProfile(w, &p)
 		}
 		w.Flush()
@@ -222,7 +252,7 @@ func printProfile(w *tabwriter.Writer, p *dtos.DeviceProfile) {
 		fmt.Fprintf(w, "%v\t%v\t%v\t%v\t%v\t%v\t%v\t%v\t%v\n",
 			p.Id,
 			p.Name,
-			time.Unix(0, p.Created).Format(time.RFC822),
+			getRFC822Time(p.Created),
 			p.Description,
 			len(p.DeviceCommands),
 			len(p.DeviceResources),

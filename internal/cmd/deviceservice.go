@@ -17,12 +17,14 @@
 package cmd
 
 import (
+	"context"
+	jsonpkg "encoding/json"
 	"fmt"
 	"os"
 	"text/tabwriter"
-	"time"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/v2/dtos"
+	"github.com/edgexfoundry/go-mod-core-contracts/v2/dtos/requests"
 	"github.com/spf13/cobra"
 )
 
@@ -42,21 +44,17 @@ func init() {
 	initListDeviceServiceCommand(cmd)
 	initAddDeviceServiceCommand(cmd)
 	initUpdateDeviceServiceCommand(cmd)
-	initNameDeviceServiceCommand(cmd)
+	initGetDeviceServiceByNameCommand(cmd)
 }
 
+// initRmDeviceServiceCommand implements the DELETE ​/deviceservice/name​/{name} endpoint
+// "Delete a device service by its unique name"
 func initRmDeviceServiceCommand(cmd *cobra.Command) {
 	var rmcmd = &cobra.Command{
-		Use:   "rm",
-		Short: "Remove a device service",
-		Long:  "Removes a device service from the core-metadata database",
-		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			response, err := getCoreMetaDataService().RemoveDeviceService(deviceServiceName)
-			if response != nil {
-				fmt.Println(response)
-			}
-			return err
-		},
+		Use:          "rm",
+		Short:        "Remove a device service",
+		Long:         "Removes a device service from the core-metadata database",
+		RunE:         handleRmDeviceService,
 		SilenceUsage: true,
 	}
 	rmcmd.Flags().StringVarP(&deviceServiceName, "name", "n", "", "Device name")
@@ -64,29 +62,24 @@ func initRmDeviceServiceCommand(cmd *cobra.Command) {
 	cmd.AddCommand(rmcmd)
 }
 
+// initAddDeviceServiceCommand implements the POST ​/deviceservice/ endpoint
+// "Add a new DeviceService - name must be unique."
 func initAddDeviceServiceCommand(cmd *cobra.Command) {
 	var add = &cobra.Command{
 		Use:   "add",
 		Short: "Add a new device service",
-		Long: `Add a new device service - name must be unique
+		Long: `Add a new device service
 
 Example: 
  edgex-cli deviceservice add -n TestDeviceService -b "http://localhost:51234" -l label-one,label-two,label-three
-		
 		`,
-		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			response, err := getCoreMetaDataService().AddDeviceService(deviceServiceName, deviceServiceDescription, deviceServiceBaseAddress, deviceServiceAdminState, getLabels())
-			if response != nil {
-				fmt.Println(response)
-			}
-			return err
-		},
+		RunE:         handleAddDeviceService,
 		SilenceUsage: true,
 	}
 	add.Flags().StringVarP(&deviceServiceName, "name", "n", "", "Device name")
-	add.Flags().StringVarP(&deviceServiceDescription, "description", "d", "", "Device description")
+	add.Flags().StringVarP(&deviceServiceDescription, "description", "d", "", "Device service description")
 	add.Flags().StringVarP(&deviceServiceAdminState, "admin-state", "a", "UNLOCKED", "Admin state [LOCKED | UNLOCKED]")
-	add.Flags().StringVarP(&deviceServiceBaseAddress, "base-address", "b", "", "Associated device profile")
+	add.Flags().StringVarP(&deviceServiceBaseAddress, "base-address", "b", "", "Base URL for the service")
 	addLabelsFlag(add)
 
 	add.MarkFlagRequired("name")
@@ -94,6 +87,9 @@ Example:
 	cmd.AddCommand(add)
 }
 
+// initListDeviceServiceCommand implements the GET ​/deviceservice/all endpoint
+// "Given the entire range of device services sorted by last modified descending, returns a portion of
+// that range according to the offset and limit parameters. Device services may also be filtered by label."
 func initListDeviceServiceCommand(cmd *cobra.Command) {
 	var listCmd = &cobra.Command{
 		Use:          "list",
@@ -111,6 +107,8 @@ func initListDeviceServiceCommand(cmd *cobra.Command) {
 
 }
 
+// initUpdateDeviceServiceCommand implements the PATCH ​/deviceservice endpoint
+// "Allows updates to an existing device service"
 func initUpdateDeviceServiceCommand(cmd *cobra.Command) {
 	var updateCmd = &cobra.Command{
 		Use:   "update",
@@ -121,39 +119,15 @@ Any other property that is populated in the request will be updated. Empty/blank
 
 Example: 
  edgex-cli deviceservice update -n TestDeviceService -b "http://localhost:51234" -l label-one,label-two,label-three
-		
 		`,
-		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			var name, id, description, address, admin *string
-			if deviceServiceName != "" {
-				name = &deviceServiceName
-			}
-			if deviceServiceID != "" {
-				id = &deviceServiceID
-			}
-			if deviceServiceDescription != "" {
-				description = &deviceServiceDescription
-			}
-			if deviceServiceBaseAddress != "" {
-				address = &deviceServiceBaseAddress
-			}
-			if deviceServiceAdminState != "" {
-				admin = &deviceServiceAdminState
-			}
-
-			response, err := getCoreMetaDataService().UpdateDeviceService(name, id, description, address, admin, getLabels())
-			if response != nil {
-				fmt.Println(response)
-			}
-			return err
-		},
+		RunE:         handleUpdateDeviceService,
 		SilenceUsage: true,
 	}
 	updateCmd.Flags().StringVarP(&deviceServiceName, "name", "n", "", "Device service name")
 	updateCmd.Flags().StringVarP(&deviceServiceID, "id", "i", "", "Device service ID")
-	updateCmd.Flags().StringVarP(&deviceServiceDescription, "description", "d", "", "Device description")
+	updateCmd.Flags().StringVarP(&deviceServiceDescription, "description", "d", "", "Device service description")
 	updateCmd.Flags().StringVarP(&deviceServiceAdminState, "admin-state", "a", "UNLOCKED", "Admin state [LOCKED | UNLOCKED]")
-	updateCmd.Flags().StringVarP(&deviceServiceBaseAddress, "base-address", "b", "", "Associated device profile")
+	updateCmd.Flags().StringVarP(&deviceServiceBaseAddress, "base-address", "b", "", "Base URL for the service")
 	addLabelsFlag(updateCmd)
 
 	updateCmd.MarkFlagRequired("name")
@@ -161,7 +135,9 @@ Example:
 	cmd.AddCommand(updateCmd)
 }
 
-func initNameDeviceServiceCommand(cmd *cobra.Command) {
+// initGetDeviceServiceByNameCommand implements the GET /deviceservice/name/{name} endpoint
+// "Returns a device service by its unique name"
+func initGetDeviceServiceByNameCommand(cmd *cobra.Command) {
 	var nameCmd = &cobra.Command{
 		Use:          "name",
 		Short:        "Returns a device service by its unique name",
@@ -177,23 +153,134 @@ func initNameDeviceServiceCommand(cmd *cobra.Command) {
 
 }
 
-func handleGetDeviceServiceByName(cmd *cobra.Command, args []string) error {
-	if json {
-		json, _, err := getCoreMetaDataService().GetDeviceServiceByNameJSON(deviceServiceName)
-		if err == nil {
-			fmt.Print(json)
-		}
-		return err
-	} else {
-		service, err := getCoreMetaDataService().GetDeviceServiceByName(deviceServiceName)
-		if service != nil {
-			w := tabwriter.NewWriter(os.Stdout, 1, 1, 2, ' ', 0)
-			printServiceTableHeader(w)
-			printService(w, service)
-			w.Flush()
-		}
+func handleAddDeviceService(cmd *cobra.Command, args []string) error {
+	client := getCoreMetaDataService().GetDeviceServiceClient()
+
+	err := validateAdminState(deviceServiceAdminState)
+	if err != nil {
 		return err
 	}
+
+	var req = requests.NewAddDeviceServiceRequest(dtos.DeviceService{
+		Name:        deviceServiceName,
+		Description: deviceServiceDescription,
+		Labels:      getLabels(),
+		BaseAddress: deviceServiceBaseAddress,
+		AdminState:  deviceServiceAdminState,
+	})
+
+	response, err := client.Add(context.Background(), []requests.AddDeviceServiceRequest{req})
+
+	if response != nil {
+		fmt.Println(response[0])
+	}
+	return err
+
+}
+
+func handleRmDeviceService(cmd *cobra.Command, args []string) error {
+	client := getCoreMetaDataService().GetDeviceServiceClient()
+	response, err := client.DeleteByName(context.Background(), deviceServiceName)
+	if err == nil {
+		fmt.Println(response)
+	}
+	return err
+}
+
+func handleGetDeviceServiceByName(cmd *cobra.Command, args []string) error {
+	client := getCoreMetaDataService().GetDeviceServiceClient()
+
+	response, err := client.DeviceServiceByName(context.Background(), deviceServiceName)
+	if err != nil {
+		return err
+	}
+
+	if json {
+		result, err := jsonpkg.Marshal(response)
+		if err != nil {
+			return err
+		}
+
+		fmt.Println(string(result))
+	} else {
+		w := tabwriter.NewWriter(os.Stdout, 1, 1, 2, ' ', 0)
+		printServiceTableHeader(w)
+		printService(w, &response.Service)
+		w.Flush()
+	}
+	return nil
+
+}
+
+func handleListDeviceServices(cmd *cobra.Command, args []string) error {
+
+	client := getCoreMetaDataService().GetDeviceServiceClient()
+	response, err := client.AllDeviceServices(context.Background(), getLabels(), offset, limit)
+	if err != nil {
+		return err
+	}
+	if json {
+		result, err := jsonpkg.Marshal(response)
+		if err != nil {
+			return err
+		}
+
+		fmt.Println(string(result))
+	} else {
+
+		if len(response.Services) == 0 {
+			fmt.Println("No device services available")
+			return nil
+		}
+		w := tabwriter.NewWriter(os.Stdout, 1, 1, 2, ' ', 0)
+		printServiceTableHeader(w)
+		for _, p := range response.Services {
+			printService(w, &p)
+		}
+		w.Flush()
+	}
+	return nil
+}
+
+func handleUpdateDeviceService(cmd *cobra.Command, args []string) (err error) {
+	client := getCoreMetaDataService().GetDeviceServiceClient()
+
+	var name, id, description, baseAddress, adminState *string
+	if deviceServiceName != "" {
+		name = &deviceServiceName
+	}
+	if deviceServiceID != "" {
+		id = &deviceServiceID
+	}
+	if deviceServiceDescription != "" {
+		description = &deviceServiceDescription
+	}
+	if deviceServiceBaseAddress != "" {
+		baseAddress = &deviceServiceBaseAddress
+	}
+	if deviceServiceAdminState != "" {
+		adminState = &deviceServiceAdminState
+		err := validateAdminState(deviceServiceAdminState)
+		if err != nil {
+			return err
+		}
+	}
+
+	var req = requests.NewUpdateDeviceServiceRequest(dtos.UpdateDeviceService{
+		Name:        name,
+		Id:          id,
+		Description: description,
+		Labels:      getLabels(),
+		BaseAddress: baseAddress,
+		AdminState:  adminState,
+	})
+
+	response, err := client.Update(context.Background(), []requests.UpdateDeviceServiceRequest{req})
+
+	if response != nil {
+		fmt.Println(response[0])
+	}
+	return err
 }
 
 func printServiceTableHeader(w *tabwriter.Writer) {
@@ -214,9 +301,9 @@ func printService(w *tabwriter.Writer, deviceService *dtos.DeviceService) {
 			deviceService.AdminState,
 			deviceService.Id,
 			deviceService.Labels,
-			time.Unix(0, deviceService.LastConnected).Format(time.RFC822),
-			time.Unix(0, deviceService.LastReported).Format(time.RFC822),
-			time.Unix(0, deviceService.Modified).Format(time.RFC822))
+			getRFC822Time(deviceService.LastConnected),
+			getRFC822Time(deviceService.LastReported),
+			getRFC822Time(deviceService.Modified))
 	} else {
 		fmt.Fprintf(w, "%s\t%s\t%s\n",
 			deviceService.Name,
@@ -224,37 +311,4 @@ func printService(w *tabwriter.Writer, deviceService *dtos.DeviceService) {
 			deviceService.Description)
 	}
 
-}
-
-func handleListDeviceServices(cmd *cobra.Command, args []string) error {
-
-	if json {
-
-		json, _, err := getCoreMetaDataService().ListAllDeviceServicesJSON(offset, limit, labels)
-
-		if err != nil {
-			return err
-		}
-
-		fmt.Print(json)
-
-	} else {
-		deviceServices, err := getCoreMetaDataService().ListAllDeviceServices(offset, limit, getLabels())
-
-		if err != nil {
-			return err
-		}
-		if len(deviceServices) == 0 {
-			fmt.Println("No device services available")
-			return nil
-		}
-
-		w := tabwriter.NewWriter(os.Stdout, 1, 1, 2, ' ', 0)
-		printServiceTableHeader(w)
-		for _, deviceService := range deviceServices {
-			printService(w, &deviceService)
-		}
-		w.Flush()
-	}
-	return nil
 }

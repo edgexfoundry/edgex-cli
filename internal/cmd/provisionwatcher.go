@@ -17,6 +17,7 @@
 package cmd
 
 import (
+	"context"
 	jsonpkg "encoding/json"
 	"errors"
 	"fmt"
@@ -24,6 +25,7 @@ import (
 	"text/tabwriter"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/v2/dtos"
+	"github.com/edgexfoundry/go-mod-core-contracts/v2/dtos/requests"
 	"github.com/spf13/cobra"
 )
 
@@ -41,26 +43,20 @@ func init() {
 
 	initAddProvisionWatcherCommand(cmd)
 	initListProvisionWatcherCommand(cmd)
-	initNameProvisionWatcherCommand(cmd)
+	initGetProvisionWatcherByNameCommand(cmd)
 	initRmProvisionWatcherCommand(cmd)
 	initUpdateProvisionWatcherCommand(cmd)
 
 }
 
-// initRmProvisionWatcherCommand implements the DELETE ​/provisionWatcher​/name​/{name} endpoint
-// "Delete a ProvisionWatcher by name"
+// initRmProvisionWatcherCommand implements the DELETE ​/provisionwatcher​/name​/{name} endpoint
+// "Delete a provision watcher by its unique name"
 func initRmProvisionWatcherCommand(cmd *cobra.Command) {
 	var rmcmd = &cobra.Command{
-		Use:   "rm",
-		Short: "Remove a provision watcher",
-		Long:  "Remove a provision watcher from the core-metadata database",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			response, err := getCoreMetaDataService().RemoveProvisionWatcher(provisionWatcherName)
-			if err == nil && response != nil {
-				fmt.Println(response)
-			}
-			return err
-		},
+		Use:          "rm",
+		Short:        "Remove a provision watcher",
+		Long:         "Remove a provision watcher from the core-metadata database",
+		RunE:         handleRmProvisionWatcher,
 		SilenceUsage: true,
 	}
 	rmcmd.Flags().StringVarP(&provisionWatcherName, "name", "n", "", "Provision watcher name")
@@ -68,10 +64,9 @@ func initRmProvisionWatcherCommand(cmd *cobra.Command) {
 	cmd.AddCommand(rmcmd)
 }
 
-// initListProvisionWatcherCommand implements the GET ​/provisionWatcher​/all endpoint:
-// "Given the entire range of ProvisionWatchers sorted by last modified descending,
-// returns a portion of that range according to the offset and limit parameters.
-// ProvisionWatchers may also be filtered by label."
+// initListProvisionWatcherCommand implements the GET ​/provisionwatcher​/all endpoint:
+// "Given the entire range of provision watchers sorted by last modified descending,
+// returns a portion of that range according to the offset and limit parameters. Provision watchers may also be filtered by label."
 func initListProvisionWatcherCommand(cmd *cobra.Command) {
 	var listCmd = &cobra.Command{
 		Use:          "list",
@@ -89,8 +84,8 @@ func initListProvisionWatcherCommand(cmd *cobra.Command) {
 
 }
 
-// initUpdateProvisionWatcherCommand implements the PATCH ​/ProvisionWatcher endpoint
-// "Allows updates to an existing ProvisionWatcher"
+// initUpdateProvisionWatcherCommand implements the PATCH ​/provisionwatcher endpoint
+// "Allows updates to an existing provision watcher"
 func initUpdateProvisionWatcherCommand(cmd *cobra.Command) {
 	var add = &cobra.Command{
 		Use:   "update",
@@ -115,8 +110,8 @@ edgex-cli provisionwatcher add -n watcher -i "e69ec9b4-f164-4e09-8b1b-988fc545f9
 	cmd.AddCommand(add)
 }
 
-// initAddProvisionWatcherCommand implements the POST ​/ProvisionWatcher endpoint
-// "Allows provisioning of a new ProvisionWatcher"
+// initAddProvisionWatcherCommand implements the POST ​/provisionwatcher endpoint
+// "Add a new ProvisionWatcher - name must be unique."
 func initAddProvisionWatcherCommand(cmd *cobra.Command) {
 	var add = &cobra.Command{
 		Use:   "add",
@@ -142,7 +137,9 @@ Example:
 	cmd.AddCommand(add)
 }
 
-func initNameProvisionWatcherCommand(cmd *cobra.Command) {
+// initGetProvisionWatcherByNameCommand implements the GET ​/provisionwatcher/name/{name}
+// "Returns a provision watcher by its unique name endpoint"
+func initGetProvisionWatcherByNameCommand(cmd *cobra.Command) {
 	var nameCmd = &cobra.Command{
 		Use:          "name",
 		Short:        "Returns a provision watcher by name",
@@ -158,28 +155,72 @@ func initNameProvisionWatcherCommand(cmd *cobra.Command) {
 
 }
 
+func handleRmProvisionWatcher(cmd *cobra.Command, args []string) error {
+	client := getCoreMetaDataService().GetProvisionWatcherClient()
+	response, err := client.DeleteProvisionWatcherByName(context.Background(), provisionWatcherName)
+	if err == nil {
+		fmt.Println(response)
+	}
+	return err
+}
+
 func handleGetProvisionWatcherByName(cmd *cobra.Command, args []string) error {
-	if json {
-		json, _, err := getCoreMetaDataService().GetProvisionWatcherByNameJSON(provisionWatcherName)
-		if err == nil {
-			fmt.Print(json)
-		}
-		return err
-	} else {
-		d, err := getCoreMetaDataService().GetProvisionWatcherByName(provisionWatcherName)
-		if d != nil {
-			w := tabwriter.NewWriter(os.Stdout, 1, 1, 2, ' ', 0)
-			printProvisionWatcherTableHeader(w)
-			printProvisionWatcher(w, d)
-			w.Flush()
-		}
+	client := getCoreMetaDataService().GetProvisionWatcherClient()
+
+	response, err := client.ProvisionWatcherByName(context.Background(), provisionWatcherName)
+	if err != nil {
 		return err
 	}
+
+	if json {
+		result, err := jsonpkg.Marshal(response)
+		if err != nil {
+			return err
+		}
+
+		fmt.Println(string(result))
+	} else {
+		w := tabwriter.NewWriter(os.Stdout, 1, 1, 2, ' ', 0)
+		printProvisionWatcherTableHeader(w)
+		printProvisionWatcher(w, &response.ProvisionWatcher)
+		w.Flush()
+	}
+	return nil
+}
+
+func handleListProvisionWatchers(cmd *cobra.Command, args []string) error {
+	client := getCoreMetaDataService().GetProvisionWatcherClient()
+	response, err := client.AllProvisionWatchers(context.Background(), getLabels(), offset, limit)
+	if err != nil {
+		return err
+	}
+	if json {
+		result, err := jsonpkg.Marshal(response)
+		if err != nil {
+			return err
+		}
+
+		fmt.Println(string(result))
+	} else {
+
+		if len(response.ProvisionWatchers) == 0 {
+			fmt.Println("No provision watchers available")
+			return nil
+		}
+		w := tabwriter.NewWriter(os.Stdout, 1, 1, 2, ' ', 0)
+		printProvisionWatcherTableHeader(w)
+		for _, p := range response.ProvisionWatchers {
+			printProvisionWatcher(w, &p)
+		}
+		w.Flush()
+	}
+	return nil
 }
 
 func handleUpdateProvisionWatcher(cmd *cobra.Command, args []string) error {
+	client := getCoreMetaDataService().GetProvisionWatcherClient()
 
-	var name, id, service, profile, admin *string
+	var name, id, service, profile, adminState *string
 
 	if provisionWatcherName != "" {
 		name = &provisionWatcherName
@@ -197,7 +238,11 @@ func handleUpdateProvisionWatcher(cmd *cobra.Command, args []string) error {
 	}
 
 	if provisionWatcherAdminState != "" {
-		admin = &provisionWatcherAdminState
+		adminState = &provisionWatcherAdminState
+		err := validateAdminState(provisionWatcherAdminState)
+		if err != nil {
+			return err
+		}
 	}
 
 	identifiers, labels, err := getProvisonWatcherAttributes()
@@ -205,29 +250,54 @@ func handleUpdateProvisionWatcher(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	response, err := getCoreMetaDataService().UpdateProvisionWatcher(name, id, service, profile, admin, labels, identifiers)
+	var req = requests.NewUpdateProvisionWatcherRequest(dtos.UpdateProvisionWatcher{
+		Name:        name,
+		Id:          id,
+		ServiceName: service,
+		ProfileName: profile,
+		AdminState:  adminState,
+		Labels:      labels,
+		Identifiers: identifiers,
+	})
+
+	response, err := client.Update(context.Background(), []requests.UpdateProvisionWatcherRequest{req})
+
 	if response != nil {
-		fmt.Println(response)
+		fmt.Println(response[0])
 	}
 	return err
 
 }
 
 func handleAddProvisionWatcher(cmd *cobra.Command, args []string) error {
+	client := getCoreMetaDataService().GetProvisionWatcherClient()
+
+	err := validateAdminState(provisionWatcherAdminState)
+	if err != nil {
+		return err
+	}
 
 	identifiers, labels, err := getProvisonWatcherAttributes()
 	if err != nil {
 		return err
 	}
 
-	msg, err := getCoreMetaDataService().AddProvisionWatcher(
-		provisionWatcherName, provisionWatcherServiceName, provisionWatcherProfileName,
-		provisionWatcherAdminState, labels, identifiers)
+	var req = requests.NewAddProvisionWatcherRequest(dtos.ProvisionWatcher{
+		Name:                provisionWatcherName,
+		ServiceName:         provisionWatcherServiceName,
+		ProfileName:         provisionWatcherProfileName,
+		AdminState:          provisionWatcherAdminState,
+		Labels:              labels,
+		Identifiers:         identifiers,
+		BlockingIdentifiers: nil,
+	})
+	response, err := client.Add(context.Background(), []requests.AddProvisionWatcherRequest{req})
 
-	if msg != nil {
-		fmt.Println(msg)
+	if response != nil {
+		fmt.Println(response[0])
 	}
 	return err
+
 }
 
 func getProvisonWatcherAttributes() (identifiers map[string]string, labels []string, err error) {
@@ -271,30 +341,4 @@ func printProvisionWatcher(w *tabwriter.Writer, d *dtos.ProvisionWatcher) {
 			d.Labels,
 			d.Identifiers)
 	}
-}
-
-func handleListProvisionWatchers(cmd *cobra.Command, args []string) error {
-	if json {
-		json, _, err := getCoreMetaDataService().ListAllProvisionWatchersJSON(offset, limit, labels)
-		if err != nil {
-			return err
-		}
-		fmt.Print(json)
-	} else {
-		ProvisionWatchers, err := getCoreMetaDataService().ListAllProvisionWatchers(offset, limit, getLabels())
-		if err != nil {
-			return err
-		}
-		if len(ProvisionWatchers) == 0 {
-			fmt.Println("No provision watchers available")
-			return nil
-		}
-		w := tabwriter.NewWriter(os.Stdout, 1, 1, 2, ' ', 0)
-		printProvisionWatcherTableHeader(w)
-		for _, ProvisionWatcher := range ProvisionWatchers {
-			printProvisionWatcher(w, &ProvisionWatcher)
-		}
-		w.Flush()
-	}
-	return nil
 }

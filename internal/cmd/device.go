@@ -17,14 +17,15 @@
 package cmd
 
 import (
+	"context"
 	jsonpkg "encoding/json"
 	"errors"
 	"fmt"
 	"os"
 	"text/tabwriter"
-	"time"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/v2/dtos"
+	"github.com/edgexfoundry/go-mod-core-contracts/v2/dtos/requests"
 	"github.com/spf13/cobra"
 )
 
@@ -38,7 +39,7 @@ func init() {
 	rootCmd.AddCommand(cmd)
 	initAddDeviceCommand(cmd)
 	initListDeviceCommand(cmd)
-	initNameDeviceCommand(cmd)
+	initGetDeviceByNameCommand(cmd)
 	initRmDeviceCommand(cmd)
 	initUpdateDeviceCommand(cmd)
 
@@ -51,16 +52,10 @@ var deviceLocation, deviceProtocols string
 // "Delete a device by name"
 func initRmDeviceCommand(cmd *cobra.Command) {
 	var rmcmd = &cobra.Command{
-		Use:   "rm",
-		Short: "Remove a device",
-		Long:  "Removes a device from the core-metadata database",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			response, err := getCoreMetaDataService().RemoveDevice(deviceName)
-			if err == nil && response != nil {
-				fmt.Println(response)
-			}
-			return err
-		},
+		Use:          "rm",
+		Short:        "Remove a device",
+		Long:         "Removes a device from the core-metadata database",
+		RunE:         handleRmDevice,
 		SilenceUsage: true,
 	}
 	rmcmd.Flags().StringVarP(&deviceName, "name", "n", "", "Device name")
@@ -151,7 +146,9 @@ Example:
 	cmd.AddCommand(add)
 }
 
-func initNameDeviceCommand(cmd *cobra.Command) {
+// initGetDeviceByNameCommand implements the GET ​/device/name endpoint
+// "Returns a device by name"
+func initGetDeviceByNameCommand(cmd *cobra.Command) {
 	var nameCmd = &cobra.Command{
 		Use:          "name",
 		Short:        "Returns a device by name",
@@ -167,8 +164,19 @@ func initNameDeviceCommand(cmd *cobra.Command) {
 
 }
 
+func handleRmDevice(cmd *cobra.Command, args []string) error {
+	client := getCoreMetaDataService().GetDeviceClient()
+	response, err := client.DeleteDeviceByName(context.Background(), deviceName)
+	if err == nil {
+		fmt.Println(response)
+	}
+	return err
+}
+
 func handleUpdateDevice(cmd *cobra.Command, args []string) error {
-	var name, id, description, service, profile, admin, oper, location *string
+	client := getCoreMetaDataService().GetDeviceClient()
+
+	var name, id, description, service, profile, adminState, operState, location *string
 	if deviceName != "" {
 		name = &deviceName
 	}
@@ -188,11 +196,15 @@ func handleUpdateDevice(cmd *cobra.Command, args []string) error {
 	}
 
 	if deviceAdminState != "" {
-		admin = &deviceAdminState
+		adminState = &deviceAdminState
+		err := validateAdminState(deviceAdminState)
+		if err != nil {
+			return err
+		}
 	}
 
 	if deviceOperState != "" {
-		oper = &deviceOperState
+		operState = &deviceOperState
 	}
 
 	if deviceLocation != "" {
@@ -204,67 +216,114 @@ func handleUpdateDevice(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	response, err := getCoreMetaDataService().UpdateDevice(name, id, description, service, profile, admin, oper, location, labels, protocols)
+	var req = requests.NewUpdateDeviceRequest(dtos.UpdateDevice{
+		Name:           name,
+		Id:             id,
+		Description:    description,
+		ProfileName:    profile,
+		ServiceName:    service,
+		AdminState:     adminState,
+		OperatingState: operState,
+		Location:       location,
+		Labels:         labels,
+		Protocols:      protocols,
+	})
+
+	response, err := client.Update(context.Background(), []requests.UpdateDeviceRequest{req})
+
 	if response != nil {
-		fmt.Println(response)
+		fmt.Println(response[0])
 	}
 	return err
 
 }
 
 func handleGetDeviceByName(cmd *cobra.Command, args []string) error {
-	if json {
-		json, _, err := getCoreMetaDataService().GetDeviceByNameJSON(deviceName)
-		if err == nil {
-			fmt.Print(json)
-		}
-		return err
-	} else {
-		d, err := getCoreMetaDataService().GetDeviceByName(deviceName)
-		if d != nil {
-			w := tabwriter.NewWriter(os.Stdout, 1, 1, 2, ' ', 0)
-			printDeviceTableHeader(w)
-			printDevice(w, d)
-			w.Flush()
-		}
+	client := getCoreMetaDataService().GetDeviceClient()
+
+	response, err := client.DeviceByName(context.Background(), deviceName)
+	if err != nil {
 		return err
 	}
+
+	if json {
+		result, err := jsonpkg.Marshal(response)
+		if err != nil {
+			return err
+		}
+
+		fmt.Println(string(result))
+	} else {
+		w := tabwriter.NewWriter(os.Stdout, 1, 1, 2, ' ', 0)
+		printDeviceTableHeader(w)
+		printDevice(w, &response.Device)
+		w.Flush()
+	}
+	return nil
 }
 
 func handleAddDevice(cmd *cobra.Command, args []string) error {
+	client := getCoreMetaDataService().GetDeviceClient()
+
+	err := validateAdminState(deviceAdminState)
+	if err != nil {
+		return err
+	}
+
+	err = validateOperatingState(deviceOperState)
+	if err != nil {
+		return err
+	}
 
 	protocols, labels, err := getDeviceAttributes()
 	if err != nil {
 		return err
 	}
 
-	msg, err := getCoreMetaDataService().AddDevice(deviceName, deviceDescription, deviceService, deviceProfile,
-		deviceAdminState, deviceOperState, labels, deviceLocation, protocols)
-	if msg != nil {
-		fmt.Println(msg)
+	var req = requests.NewAddDeviceRequest(dtos.Device{
+		Name:           deviceName,
+		Description:    deviceDescription,
+		ServiceName:    deviceService,
+		ProfileName:    deviceProfile,
+		AdminState:     deviceAdminState,
+		OperatingState: deviceOperState,
+		Labels:         labels,
+		Location:       deviceLocation,
+		AutoEvents:     nil,
+		Protocols:      protocols,
+	})
+	response, err := client.Add(context.Background(), []requests.AddDeviceRequest{req})
+
+	if response != nil {
+		fmt.Println(response[0])
 	}
 	return err
+
 }
 
 func handleListDevices(cmd *cobra.Command, args []string) error {
+
+	client := getCoreMetaDataService().GetDeviceClient()
+	response, err := client.AllDevices(context.Background(), getLabels(), offset, limit)
+	if err != nil {
+		return err
+	}
 	if json {
-		json, _, err := getCoreMetaDataService().ListAllDevicesJSON(offset, limit, labels)
+		result, err := jsonpkg.Marshal(response)
 		if err != nil {
 			return err
 		}
-		fmt.Print(json)
+
+		fmt.Println(string(result))
 	} else {
-		devices, err := getCoreMetaDataService().ListAllDevices(offset, limit, getLabels())
-		if err != nil {
-			return err
-		}
-		if len(devices) == 0 {
+
+		if len(response.Devices) == 0 {
 			fmt.Println("No devices available")
 			return nil
 		}
 		w := tabwriter.NewWriter(os.Stdout, 1, 1, 2, ' ', 0)
 		printDeviceTableHeader(w)
-		for _, device := range devices {
+		for _, device := range response.Devices {
 			printDevice(w, &device)
 		}
 		w.Flush()
@@ -303,8 +362,8 @@ func printDevice(w *tabwriter.Writer, d *dtos.Device) {
 			d.ProfileName,
 			d.AdminState,
 			d.OperatingState,
-			time.Unix(0, d.LastReported).Format(time.RFC822),
-			time.Unix(0, d.LastConnected).Format(time.RFC822),
+			getRFC822Time(d.LastReported),
+			getRFC822Time(d.LastConnected),
 			d.Labels,
 			d.Location,
 			d.AutoEvents,

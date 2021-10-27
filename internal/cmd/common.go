@@ -17,11 +17,14 @@
 package cmd
 
 import (
+	"fmt"
 	"strings"
+	"time"
 
 	"github.com/edgexfoundry/edgex-cli/internal/config"
 	"github.com/edgexfoundry/edgex-cli/internal/service"
 	"github.com/edgexfoundry/go-mod-core-contracts/v2/common"
+	"github.com/edgexfoundry/go-mod-core-contracts/v2/models"
 	"github.com/spf13/cobra"
 )
 
@@ -43,6 +46,10 @@ func getSelectedServiceKey() string {
 	} else {
 		return ""
 	}
+}
+
+func getSupportNotificationsService() service.Service {
+	return config.GetCoreService(common.SupportNotificationsServiceKey)
 }
 
 func getCoreMetaDataService() service.Service {
@@ -96,6 +103,20 @@ func getLabels() []string {
 	return aLabels
 }
 
+func validateAdminState(adminState string) error {
+	if !(adminState == models.Locked || adminState == models.Unlocked) {
+		return fmt.Errorf("admin state should be %s or %s", models.Locked, models.Unlocked)
+	}
+	return nil
+}
+
+func validateOperatingState(operState string) error {
+	if !(operState == models.Up || operState == models.Down || operState == models.Unknown) {
+		return fmt.Errorf("operating state should be one of %s,%s or %s", models.Up, models.Down, models.Unknown)
+	}
+	return nil
+}
+
 func addStandardFlags(cmd *cobra.Command) {
 	addFormatFlags(cmd)
 	cmd.Flags().BoolVarP(&data, "data", "d", false, "use core-data service endpoint")
@@ -104,4 +125,12 @@ func addStandardFlags(cmd *cobra.Command) {
 	cmd.Flags().BoolVarP(&scheduler, "scheduler", "s", false, "use support-scheduler service endpoint")
 	cmd.Flags().BoolVarP(&notifications, "notifications", "n", false, "use support-notifications service endpoint")
 
+}
+
+func getRFC822Time(t int64) string {
+	if t == 0 {
+		return "0"
+	} else {
+		return time.Unix(0, t*int64(time.Millisecond)).Format(time.RFC822)
+	}
 }

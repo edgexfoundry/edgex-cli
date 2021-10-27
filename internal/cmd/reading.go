@@ -17,11 +17,14 @@
 package cmd
 
 import (
+	"context"
+	jsonpkg "encoding/json"
 	"fmt"
 	"os"
 	"text/tabwriter"
 	"time"
 
+	"github.com/edgexfoundry/go-mod-core-contracts/v2/dtos/common"
 	"github.com/spf13/cobra"
 )
 
@@ -76,30 +79,33 @@ func initCountReadingCommand(cmd *cobra.Command) {
 }
 
 func handleCountReadings(cmd *cobra.Command, args []string) error {
-	if json {
-		var json string
-		var err error
+	client := getCoreDataService().GetReadingClient()
 
-		if readingDevice != "" {
-			json, _, err = getCoreDataService().CountReadingsByDeviceJSON(readingDevice)
-		} else {
-			json, _, err = getCoreDataService().CountReadingsJSON()
-		}
+	var response common.CountResponse
+	var err error
 
-		if err != nil {
-			return err
-		}
-		fmt.Print(json)
-
+	if readingDevice != "" {
+		response, err = client.ReadingCountByDeviceName(context.Background(), readingDevice)
 	} else {
-		count, err := getCoreDataService().CountEvents(readingDevice)
+		response, err = client.ReadingCount(context.Background())
+	}
+
+	if err != nil {
+		return err
+	}
+
+	if json {
+		result, err := jsonpkg.Marshal(response)
 		if err != nil {
 			return err
 		}
-		if readingDevice != "" {
-			fmt.Printf("Total %s readings: %v\n", readingDevice, count.Count)
+
+		fmt.Println(string(result))
+	} else {
+		if eventDevice != "" {
+			fmt.Printf("Total %s readings: %v\n", readingDevice, response.Count)
 		} else {
-			fmt.Printf("Total readings: %v\n", count.Count)
+			fmt.Printf("Total readings: %v\n", response.Count)
 		}
 	}
 	return nil
@@ -108,23 +114,22 @@ func handleCountReadings(cmd *cobra.Command, args []string) error {
 func handleListReadings(cmd *cobra.Command, args []string) error {
 	var err error
 
+	client := getCoreDataService().GetReadingClient()
+	response, err := client.AllReadings(context.Background(), offset, limit)
+	if err != nil {
+		return err
+	}
+
 	if json {
-		var json string
-
-		json, _, err = getCoreDataService().ListAllReadingsJSON(readingOffset, readingLimit)
-
+		result, err := jsonpkg.Marshal(response)
 		if err != nil {
 			return err
 		}
 
-		fmt.Print(json)
-
+		fmt.Println(string(result))
 	} else {
-		readings, err := getCoreDataService().ListAllReadings(readingOffset, readingLimit)
-		if err != nil {
-			return err
-		}
-		if len(readings) == 0 {
+
+		if response.Readings == nil || len(response.Readings) == 0 {
 			fmt.Println("No readings available")
 			return nil
 		}
@@ -132,7 +137,7 @@ func handleListReadings(cmd *cobra.Command, args []string) error {
 		w := tabwriter.NewWriter(os.Stdout, 1, 1, 2, ' ', 0)
 		if verbose {
 			fmt.Fprintln(w, "Origin\tDeviceName\tProfileName\tValue\tValueType\tId\tMediaType\tBinaryValue")
-			for _, reading := range readings {
+			for _, reading := range response.Readings {
 
 				fmt.Fprintf(w, "%v\t%v\t%v\t%v\t%v\t%v\t%v\t%v\n",
 					time.Unix(0, reading.Origin).Format(time.RFC822),
@@ -146,7 +151,7 @@ func handleListReadings(cmd *cobra.Command, args []string) error {
 			}
 		} else {
 			fmt.Fprintln(w, "Origin\tDevice\tProfileName\tValue\tValueType")
-			for _, reading := range readings {
+			for _, reading := range response.Readings {
 				tm := time.Unix(0, reading.Origin)
 				sTime := tm.Format(time.RFC822)
 				fmt.Fprintf(w, "%s\t%s\t%s\t%v\t%v\n",

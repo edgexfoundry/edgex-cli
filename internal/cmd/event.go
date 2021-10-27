@@ -17,11 +17,21 @@
 package cmd
 
 import (
+	"context"
+	jsonpkg "encoding/json"
+	"errors"
 	"fmt"
+	"math/rand"
 	"os"
+	"strconv"
+	"strings"
 	"text/tabwriter"
 	"time"
 
+	"github.com/edgexfoundry/go-mod-core-contracts/v2/common"
+	"github.com/edgexfoundry/go-mod-core-contracts/v2/dtos"
+	dtosCommon "github.com/edgexfoundry/go-mod-core-contracts/v2/dtos/common"
+	"github.com/edgexfoundry/go-mod-core-contracts/v2/dtos/requests"
 	"github.com/spf13/cobra"
 )
 
@@ -117,45 +127,106 @@ func initAddEventCommand(cmd *cobra.Command) {
 }
 
 func handleAddEvents(cmd *cobra.Command, args []string) error {
-	id, err := getCoreDataService().CreateEvent(eventDevice, eventProfile, eventSource, readingsValueType, numberOfReadings)
+	client := getCoreDataService().GetEventClient()
+
+	if numberOfReadings < 1 {
+		return errors.New("the number of readings must be at least 1")
+	}
+
+	event := dtos.NewEvent(eventProfile, eventDevice, eventSource)
+	readingsValueType = strings.Title(strings.ToLower(readingsValueType))
+
+	event.Readings = make([]dtos.BaseReading, numberOfReadings)
+	for i := 0; i < numberOfReadings; i++ {
+		var err error
+		r64 := uint64(rand.Uint32())<<32 + uint64(rand.Uint32())
+		var value interface{}
+		switch readingsValueType {
+
+		case common.ValueTypeBool:
+			value = (r64&1 == 0)
+		case common.ValueTypeString:
+			value = "Reading " + strconv.Itoa(i)
+		case common.ValueTypeUint8:
+			value = uint8(r64)
+		case common.ValueTypeUint16:
+			value = uint16(r64)
+		case common.ValueTypeUint32:
+			value = uint32(r64)
+		case common.ValueTypeUint64:
+			value = r64
+		case common.ValueTypeInt8:
+			value = int8(r64)
+		case common.ValueTypeInt16:
+			value = int16(r64)
+		case common.ValueTypeInt32:
+			value = int32(r64)
+		case common.ValueTypeInt64:
+			value = int64(r64)
+		case common.ValueTypeFloat32:
+			value = float32(r64) / 100
+		case common.ValueTypeFloat64:
+			value = float64(r64) / 100
+		default:
+			return errors.New("type must be one of [bool | string | uint8 | uint16 | uint32 | uint64 | int8 | int16 | int32 | int64 | float32 | float64 ]")
+		}
+		event.Readings[i], err = dtos.NewSimpleReading(eventProfile, eventDevice, eventSource, readingsValueType, value)
+		if err != nil {
+			return err
+		}
+	}
+
+	response, err := client.Add(context.Background(), requests.NewAddEventRequest(event))
+	if err == nil {
+		fmt.Printf("Added event %v\n", response.Id)
+	}
+	return err
+}
+
+func handleRmEvents(cmd *cobra.Command, args []string) error {
+	client := getCoreDataService().GetEventClient()
+
+	if eventDevice != "" && eventAge != 0 {
+		return errors.New("either specify device name or event age, but not both")
+	} else if eventDevice != "" {
+		client.DeleteByDeviceName(context.Background(), eventDevice)
+	} else if eventAge != 0 {
+		client.DeleteByAge(context.Background(), eventAge)
+	} else {
+		return errors.New("event ID, device name or event age must be specified")
+	}
+
+	return nil
+}
+
+func handleCountEvents(cmd *cobra.Command, args []string) error {
+	client := getCoreDataService().GetEventClient()
+
+	var response dtosCommon.CountResponse
+	var err error
+
+	if eventDevice != "" {
+		response, err = client.EventCountByDeviceName(context.Background(), eventDevice)
+	} else {
+		response, err = client.EventCount(context.Background())
+	}
+
 	if err != nil {
 		return err
 	}
 
-	fmt.Println("Event " + id + " created")
-	return nil
-}
-
-func handleRmEvents(cmd *cobra.Command, args []string) error {
-	err := getCoreDataService().RemoveEvents(eventDevice, eventAge)
-	return err
-}
-
-func handleCountEvents(cmd *cobra.Command, args []string) error {
 	if json {
-		var json string
-		var err error
-
-		if eventDevice != "" {
-			json, _, err = getCoreDataService().CountEventsByDeviceJSON(eventDevice)
-		} else {
-			json, _, err = getCoreDataService().CountEventsJSON()
-		}
-
+		result, err := jsonpkg.Marshal(response)
 		if err != nil {
 			return err
 		}
-		fmt.Print(json)
 
+		fmt.Println(string(result))
 	} else {
-		count, err := getCoreDataService().CountEvents(eventDevice)
-		if err != nil {
-			return err
-		}
 		if eventDevice != "" {
-			fmt.Printf("Total %s events: %v\n", eventDevice, count.Count)
+			fmt.Printf("Total %s events: %v\n", eventDevice, response.Count)
 		} else {
-			fmt.Printf("Total events: %v\n", count.Count)
+			fmt.Printf("Total events: %v\n", response.Count)
 		}
 	}
 	return nil
@@ -164,23 +235,22 @@ func handleCountEvents(cmd *cobra.Command, args []string) error {
 func handleListEvents(cmd *cobra.Command, args []string) error {
 	var err error
 
+	client := getCoreDataService().GetEventClient()
+	response, err := client.AllEvents(context.Background(), offset, limit)
+	if err != nil {
+		return err
+	}
+
 	if json {
-		var json string
-
-		json, _, err = getCoreDataService().ListAllEventsJSON(eventOffset, eventLimit)
-
+		result, err := jsonpkg.Marshal(response)
 		if err != nil {
 			return err
 		}
 
-		fmt.Print(json)
-
+		fmt.Println(string(result))
 	} else {
-		events, err := getCoreDataService().ListAllEvents(eventOffset, eventLimit)
-		if err != nil {
-			return err
-		}
-		if len(events) == 0 {
+
+		if response.Events == nil || len(response.Events) == 0 {
 			fmt.Println("No events available")
 			return nil
 		}
@@ -188,7 +258,7 @@ func handleListEvents(cmd *cobra.Command, args []string) error {
 		w := tabwriter.NewWriter(os.Stdout, 1, 1, 2, ' ', 0)
 		if verbose {
 			fmt.Fprintln(w, "Origin\tDevice\tProfile\tSource\tId\tVersionable\tReadings")
-			for _, event := range events {
+			for _, event := range response.Events {
 				fmt.Fprintf(w, "%v\t%v\t%v\t%v\t%v\t%v\t%v\n",
 					time.Unix(0, event.Origin).Format(time.RFC822),
 					event.DeviceName,
@@ -201,7 +271,7 @@ func handleListEvents(cmd *cobra.Command, args []string) error {
 
 		} else {
 			fmt.Fprintln(w, "Origin\tDevice\tProfile\tSource\tNumber of readings")
-			for _, event := range events {
+			for _, event := range response.Events {
 				tm := time.Unix(0, event.Origin)
 				sTime := tm.Format(time.RFC822)
 				nReadings := 0

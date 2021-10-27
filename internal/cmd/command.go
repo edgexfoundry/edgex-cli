@@ -17,6 +17,7 @@
 package cmd
 
 import (
+	"context"
 	jsonpkg "encoding/json"
 	"errors"
 	"fmt"
@@ -112,8 +113,7 @@ func handleReadCommand(cmd *cobra.Command, args []string) error {
 	dsPushEvent := boolToString(pushEvent)
 	dsReturnEvent := boolToString(!noReturnEvent)
 
-	// issue READ command
-	response, err := getCoreCommandService().IssueReadCommand(commandDeviceName, commandName, dsPushEvent, dsReturnEvent)
+	response, err := getCoreCommandService().GetCommandClient().IssueGetCommandByName(context.Background(), commandDeviceName, commandName, dsPushEvent, dsReturnEvent)
 	if err != nil {
 		return err
 	}
@@ -165,7 +165,8 @@ func handleWriteCommand(cmd *cobra.Command, args []string) error {
 	}
 
 	// issue write command
-	response, err := getCoreCommandService().IssueWriteCommand(commandDeviceName, commandName, settings)
+
+	response, err := getCoreCommandService().GetCommandClient().IssueSetCommandByName(context.Background(), commandDeviceName, commandName, settings)
 	if err != nil {
 		return err
 	}
@@ -187,7 +188,7 @@ func handleWriteCommand(cmd *cobra.Command, args []string) error {
 func handleListCommand(cmd *cobra.Command, args []string) error {
 	// issue list commands with specified device name
 	if deviceName != "" {
-		response, err := getCoreCommandService().ListCommandsByDeviceName(commandDeviceName)
+		response, err := getCoreCommandService().GetCommandClient().DeviceCoreCommandsByDeviceName(context.Background(), commandDeviceName)
 		if err != nil {
 			return err
 		}
@@ -212,7 +213,8 @@ func handleListCommand(cmd *cobra.Command, args []string) error {
 
 	} else {
 		// issue list all commands, optionally specifying a limit and offset
-		response, err := getCoreCommandService().ListAllCommands(offset, limit)
+
+		response, err := getCoreCommandService().GetCommandClient().AllDeviceCoreCommands(context.Background(), offset, limit)
 		if err != nil {
 			return err
 		}
