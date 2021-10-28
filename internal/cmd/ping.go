@@ -17,6 +17,7 @@
 package cmd
 
 import (
+	"context"
 	jsonpkg "encoding/json"
 	"fmt"
 
@@ -25,46 +26,37 @@ import (
 
 func init() {
 	var cmd = &cobra.Command{
-		Use:   "ping",
-		Short: "The ping (health check) response for all EdgeX core/support microservices",
-		Long:  ``,
-
+		Use:          "ping",
+		Short:        "Ping (health check) all EdgeX core/support microservices",
+		Long:         "Ping (health check) all EdgeX core/support microservices",
+		RunE:         handlePing,
 		SilenceUsage: true,
-		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			err = showPing(cmd)
-
-			return err
-		}}
+	}
 
 	rootCmd.AddCommand(cmd)
 	addStandardFlags(cmd)
 
 }
 
-func showPing(cmd *cobra.Command) error {
+func handlePing(cmd *cobra.Command, args []string) error {
 	services := getSelectedServices()
 
 	for serviceName, service := range services {
-		jsonValue, url, err := service.GetPingJSON()
-		if err != nil {
-			if json {
-				return err
-			} else if verbose {
-				fmt.Printf("%s: %s: %s\n", serviceName, url, err.Error())
-			}
-		} else {
-			if json {
-				fmt.Println(jsonValue)
-			} else if verbose {
-				fmt.Printf("%s: %s: %s\n", serviceName, url, jsonValue)
-			} else {
-				var result map[string]interface{}
-				jsonpkg.Unmarshal([]byte(jsonValue), &result)
-				fmt.Println(serviceName + ": " + result["timestamp"].(string))
+		client := service.GetCommonClient()
+		response, err := client.Ping(context.Background())
+		if err == nil {
 
+			if json {
+				result, err := jsonpkg.Marshal(response)
+				if err != nil {
+					return err
+				}
+				fmt.Println(string(result))
+			} else {
+
+				fmt.Println(serviceName + ": " + response.Timestamp)
 			}
 		}
 	}
-
 	return nil
 }

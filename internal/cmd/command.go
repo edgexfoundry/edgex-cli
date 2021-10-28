@@ -17,20 +17,21 @@
 package cmd
 
 import (
+	"context"
 	jsonpkg "encoding/json"
 	"errors"
 	"fmt"
-	"github.com/edgexfoundry/go-mod-core-contracts/v2/dtos"
-	"github.com/spf13/cobra"
 	"io/ioutil"
 	"os"
 	"text/tabwriter"
+
+	"github.com/edgexfoundry/go-mod-core-contracts/v2/dtos"
+	"github.com/spf13/cobra"
 )
 
-var deviceName, commandName string
+var commandDeviceName, commandName string
 var pushEvent, noReturnEvent bool
 var requestBody, requestFile string
-var limit, offset int
 
 func init() {
 	commandCmd := initCommandCommand()
@@ -58,7 +59,7 @@ func initReadCommand(cmd *cobra.Command) {
 		RunE:         handleReadCommand,
 		SilenceUsage: true,
 	}
-	readCmd.Flags().StringVarP(&deviceName, "device", "d", "", "specify the name of device")
+	readCmd.Flags().StringVarP(&commandDeviceName, "device", "d", "", "specify the name of device")
 	readCmd.Flags().StringVarP(&commandName, "command", "c", "", "specify the name of the command to be executed")
 	readCmd.Flags().BoolVarP(&pushEvent, "pushevent", "p", false, "if set, a successful read command will result in an event being pushed to the EdgeX system")
 	readCmd.Flags().BoolVarP(&noReturnEvent, "noreturnevent", "r", false, "if set, there will be no event returned in the HTTP response")
@@ -76,7 +77,7 @@ func initWriteCommand(cmd *cobra.Command) {
 		RunE:         handleWriteCommand,
 		SilenceUsage: true,
 	}
-	writeCmd.Flags().StringVarP(&deviceName, "device", "d", "", "specify the name of the device")
+	writeCmd.Flags().StringVarP(&commandDeviceName, "device", "d", "", "specify the name of the device")
 	writeCmd.Flags().StringVarP(&commandName, "command", "c", "", "specify the name of the command to be executed")
 	writeCmd.Flags().StringVarP(&requestBody, "body", "b", "", "specify the write command's request body, which provides the value(s) being written to the device")
 	writeCmd.Flags().StringVarP(&requestFile, "file", "f", "", "specify a file containing the write command's request body, which provides the value(s) being written to the device")
@@ -94,9 +95,8 @@ func initListCommand(cmd *cobra.Command) {
 		RunE:         handleListCommand,
 		SilenceUsage: true,
 	}
-	listCmd.Flags().StringVarP(&deviceName, "device", "d", "", "list commands specified by device name")
-	listCmd.Flags().IntVarP(&limit, "limit", "l", 50, "the number of items to return. specifying -1 will return all remaining items")
-	listCmd.Flags().IntVarP(&offset, "offset", "o", 0, "the number of items to skip")
+	listCmd.Flags().StringVarP(&commandDeviceName, "device", "d", "", "list commands specified by device name")
+	addLimitOffsetFlags(listCmd)
 	cmd.AddCommand(listCmd)
 	addFormatFlags(listCmd)
 }
@@ -113,8 +113,7 @@ func handleReadCommand(cmd *cobra.Command, args []string) error {
 	dsPushEvent := boolToString(pushEvent)
 	dsReturnEvent := boolToString(!noReturnEvent)
 
-	// issue READ command
-	response, err := getCoreCommandService().IssueReadCommand(deviceName, commandName, dsPushEvent, dsReturnEvent)
+	response, err := getCoreCommandService().GetCommandClient().IssueGetCommandByName(context.Background(), commandDeviceName, commandName, dsPushEvent, dsReturnEvent)
 	if err != nil {
 		return err
 	}
@@ -148,7 +147,7 @@ func handleReadCommand(cmd *cobra.Command, args []string) error {
 func handleWriteCommand(cmd *cobra.Command, args []string) error {
 	// issue WRITE command's request body by one of these options: inline body or using file
 	if (requestBody != "" && requestFile != "") || (requestBody == "" && requestFile == "") {
-		return errors.New("Please specify request data using one of the provided ways: --body or --file")
+		return errors.New("please specify request data using one of the provided ways: --body or --file")
 	}
 
 	if requestFile != "" {
@@ -166,7 +165,8 @@ func handleWriteCommand(cmd *cobra.Command, args []string) error {
 	}
 
 	// issue write command
-	response, err := getCoreCommandService().IssueWriteCommand(deviceName, commandName, settings)
+
+	response, err := getCoreCommandService().GetCommandClient().IssueSetCommandByName(context.Background(), commandDeviceName, commandName, settings)
 	if err != nil {
 		return err
 	}
@@ -188,7 +188,7 @@ func handleWriteCommand(cmd *cobra.Command, args []string) error {
 func handleListCommand(cmd *cobra.Command, args []string) error {
 	// issue list commands with specified device name
 	if deviceName != "" {
-		response, err := getCoreCommandService().ListCommandsByDeviceName(deviceName)
+		response, err := getCoreCommandService().GetCommandClient().DeviceCoreCommandsByDeviceName(context.Background(), commandDeviceName)
 		if err != nil {
 			return err
 		}
@@ -199,8 +199,7 @@ func handleListCommand(cmd *cobra.Command, args []string) error {
 			if err != nil {
 				return err
 			}
-
-			fmt.Printf(string(stringified))
+			fmt.Println(string(stringified))
 		} else {
 			w := tabwriter.NewWriter(os.Stdout, 1, 1, 2, ' ', 0)
 			fmt.Fprintln(w, "Name\tDevice Name\tProfile Name\tMethods\tURL")
@@ -214,7 +213,8 @@ func handleListCommand(cmd *cobra.Command, args []string) error {
 
 	} else {
 		// issue list all commands, optionally specifying a limit and offset
-		response, err := getCoreCommandService().ListAllCommands(offset, limit)
+
+		response, err := getCoreCommandService().GetCommandClient().AllDeviceCoreCommands(context.Background(), offset, limit)
 		if err != nil {
 			return err
 		}
@@ -226,7 +226,7 @@ func handleListCommand(cmd *cobra.Command, args []string) error {
 				return err
 			}
 
-			fmt.Printf(string(stringified))
+			fmt.Println(string(stringified))
 		} else {
 			w := tabwriter.NewWriter(os.Stdout, 1, 1, 2, ' ', 0)
 			fmt.Fprintln(w, "Name\tDevice Name\tProfile Name\tMethods\tURL")

@@ -17,6 +17,7 @@
 package cmd
 
 import (
+	"context"
 	jsonpkg "encoding/json"
 	"fmt"
 
@@ -25,41 +26,36 @@ import (
 
 func init() {
 	var cmd = &cobra.Command{
-		Use:   "config",
-		Short: "Returns the current configuration of all EdgeX core/support microservices",
-		Long:  ``,
-
+		Use:          "config",
+		Short:        "Return the current configuration of all EdgeX core/support microservices",
+		Long:         "Return the current configuration of all EdgeX core/support microservices",
+		RunE:         handleConfig,
 		SilenceUsage: true,
-		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			err = showConfig(cmd)
-			return err
-		}}
+	}
 
 	rootCmd.AddCommand(cmd)
 	addStandardFlags(cmd)
 
 }
 
-func showConfig(cmd *cobra.Command) error {
+func handleConfig(cmd *cobra.Command, args []string) error {
 	services := getSelectedServices()
 
 	for serviceName, service := range services {
-		jsonValue, url, err := service.GetConfigJSON()
-		if err != nil {
-			if json {
-				return err
-			} else if verbose {
-				fmt.Printf("%s: %s: %s\n", serviceName, url, err.Error())
+		client := service.GetCommonClient()
+		response, err := client.Configuration(context.Background())
+		if err == nil {
+			jsonresult, xerr := jsonpkg.Marshal(response)
+			if xerr != nil {
+				return xerr
 			}
-		} else {
+
 			if json {
-				fmt.Println(jsonValue)
-			} else if verbose {
-				fmt.Printf("%s: %s: %s\n", serviceName, url, jsonValue)
+				fmt.Println(string(jsonresult))
 			} else {
 				fmt.Println(serviceName + ":")
 				var result map[string]interface{}
-				jsonpkg.Unmarshal([]byte(jsonValue), &result)
+				jsonpkg.Unmarshal([]byte(jsonresult), &result)
 				b, err := jsonpkg.MarshalIndent(result["config"], "", "    ")
 				if err != nil {
 					return err
@@ -68,6 +64,5 @@ func showConfig(cmd *cobra.Command) error {
 			}
 		}
 	}
-
 	return nil
 }
