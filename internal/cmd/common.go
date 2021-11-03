@@ -134,3 +134,11 @@ func getRFC822Time(t int64) string {
 		return time.Unix(0, t*int64(time.Millisecond)).Format(time.RFC822)
 	}
 }
+
+func getMillisTimestampFromRFC822Time(t string) (int64, error) {
+	result, err := time.Parse(time.RFC822, t)
+	if err != nil {
+		return 0, err
+	}
+	return result.UnixNano() / int64(time.Millisecond), nil
+}

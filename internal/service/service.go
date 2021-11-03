@@ -76,3 +76,13 @@ func (c Service) GetNotificationClient() interfaces.NotificationClient {
 	url := fmt.Sprintf("http://%s:%v", c.Host, c.Port)
 	return http.NewNotificationClient(url)
 }
+
+func (c Service) GetSubscriptionClient() interfaces.SubscriptionClient {
+	url := fmt.Sprintf("http://%s:%v", c.Host, c.Port)
+	return http.NewSubscriptionClient(url)
+}
+
+func (c Service) GetTransmissionClient() interfaces.TransmissionClient {
+	url := fmt.Sprintf("http://%s:%v", c.Host, c.Port)
+	return http.NewTransmissionClient(url)
+}
