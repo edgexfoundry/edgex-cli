@@ -48,6 +48,10 @@ func getSelectedServiceKey() string {
 	}
 }
 
+func getSupportSchedulerService() service.Service {
+	return config.GetCoreService(common.SupportSchedulerServiceKey)
+}
+
 func getSupportNotificationsService() service.Service {
 	return config.GetCoreService(common.SupportNotificationsServiceKey)
 }

@@ -86,3 +86,13 @@ func (c Service) GetTransmissionClient() interfaces.TransmissionClient {
 	url := fmt.Sprintf("http://%s:%v", c.Host, c.Port)
 	return http.NewTransmissionClient(url)
 }
+
+func (c Service) GetIntervalClient() interfaces.IntervalClient {
+	url := fmt.Sprintf("http://%s:%v", c.Host, c.Port)
+	return http.NewIntervalClient(url)
+}
+
+func (c Service) GetIntervalActionClient() interfaces.IntervalActionClient {
+	url := fmt.Sprintf("http://%s:%v", c.Host, c.Port)
+	return http.NewIntervalActionClient(url)
+}
