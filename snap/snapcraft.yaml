@@ -1,5 +1,5 @@
 name: edgex-cli
-base: core18
+base: core20
 type: app
 adopt-info: version
 summary: A command-line client for EdgeX Foundry
