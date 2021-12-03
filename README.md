@@ -3,6 +3,30 @@
 
 ## Introduction
 
-A command line interface to interact with EdgeX microservices. Replaces the need to manually construct complex CURL commands and/or maintain developer scripts.
+EdgeX-CLI is a command line interface tool meant for developers to interact with EdgeX microservices. It replaces the need to manually construct complex cURL commands and/or maintain developer scripts.
 
-`edgex-cli` is being updated to support the V2 API and the documentation will be updated in due course. See the [EdgeXFoundry CLI documentation](https://docs.edgexfoundry.org/1.3/getting-started/tools/Ch-CommandLineInterface/) for more information about the V1.3 (Hanoi) client.
+See the [CLI Getting started documentation](https://docs.edgexfoundry.org/2.2/getting-started/tools/Ch-CommandLineInterface/) for more information about the client. 
+
+## Installing EdgeX-CLI
+
+The client can be installed using a [snap](https://github.com/edgexfoundry/edgex-cli/tree/main/snap):
+
+```
+sudo snap install edgex-cli
+```
+
+To build, install and run `edgex-cli` natively, do the following:
+```
+git clone http://github.com/edgexfoundry/edgex-cli.git
+cd edgex-cli
+make tidy
+make build
+./bin/edgex-cli
+```
+
+## Community
+- [EdgeXFoundry Slack](https://slack.edgexfoundry.org/)
+- [Mailing lists](https://lists.edgexfoundry.org/g/main)
+
+## License
+[Apache-2.0](LICENSE)
