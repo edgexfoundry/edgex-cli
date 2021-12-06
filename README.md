@@ -3,6 +3,36 @@
 
 ## Introduction
 
-A command line interface to interact with EdgeX microservices. Replaces the need to manually construct complex CURL commands and/or maintain developer scripts.
+EdgeX CLI is a command-line interface tool for developers, used for interacting with the EdgeX microservices.
 
-`edgex-cli` is being updated to support the V2 API and the documentation will be updated in due course. See the [EdgeXFoundry CLI documentation](https://docs.edgexfoundry.org/1.3/getting-started/tools/Ch-CommandLineInterface/) for more information about the V1.3 (Hanoi) client.
+See the [CLI Getting started documentation](https://docs.edgexfoundry.org/2.2/getting-started/tools/Ch-CommandLineInterface/) and the [EdgeX-CLI V2 Design ADR](https://github.com/edgexfoundry/edgex-docs/blob/main/docs_src/design/adr/core/0019-EdgeX-CLI-V2.md) for more information about the client.
+
+
+## Installing EdgeX CLI
+
+The client can be installed using a [snap](https://github.com/edgexfoundry/edgex-cli/tree/main/snap):
+
+```
+sudo snap install edgex-cli
+```
+
+To build, install and run `edgex-cli` natively, do the following:
+```
+git clone http://github.com/edgexfoundry/edgex-cli.git
+cd edgex-cli
+make tidy
+make build
+./bin/edgex-cli
+```
+
+## Limitations
+- The client requires all services to run on the local host. It does not support a distributed configuration or using the API gateway ([#427](https://github.com/edgexfoundry/edgex-cli/issues/427))
+- The `db` command from the v1 client is not supported ([#383](https://github.com/edgexfoundry/edgex-cli/issues/383))
+- See this list of [all current enhancement issues](https://github.com/edgexfoundry/edgex-cli/issues?q=is%3Aissue+is%3Aopen+label%3Aenhancement) 
+
+## Community
+- [EdgeXFoundry Slack](https://slack.edgexfoundry.org/)
+- [Mailing lists](https://lists.edgexfoundry.org/g/main)
+
+## License
+[Apache-2.0](LICENSE)
