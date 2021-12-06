@@ -3,12 +3,12 @@
 
 ## Introduction
 
-EdgeX-CLI is a command line interface tool for developers, used for interacting with the EdgeX microservices.
+EdgeX CLI is a command-line interface tool for developers, used for interacting with the EdgeX microservices.
 
 See the [CLI Getting started documentation](https://docs.edgexfoundry.org/2.2/getting-started/tools/Ch-CommandLineInterface/) and the [EdgeX-CLI V2 Design ADR](https://github.com/edgexfoundry/edgex-docs/blob/main/docs_src/design/adr/core/0019-EdgeX-CLI-V2.md) for more information about the client.
 
 
-## Installing EdgeX-CLI
+## Installing EdgeX CLI
 
 The client can be installed using a [snap](https://github.com/edgexfoundry/edgex-cli/tree/main/snap):
 
