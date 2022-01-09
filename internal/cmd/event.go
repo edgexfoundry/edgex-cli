@@ -236,7 +236,7 @@ func handleListEvents(cmd *cobra.Command, args []string) error {
 	var err error
 
 	client := getCoreDataService().GetEventClient()
-	response, err := client.AllEvents(context.Background(), offset, limit)
+	response, err := client.AllEvents(context.Background(), eventOffset, eventLimit)
 	if err != nil {
 		return err
 	}

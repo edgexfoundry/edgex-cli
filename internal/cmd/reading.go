@@ -115,7 +115,7 @@ func handleListReadings(cmd *cobra.Command, args []string) error {
 	var err error
 
 	client := getCoreDataService().GetReadingClient()
-	response, err := client.AllReadings(context.Background(), offset, limit)
+	response, err := client.AllReadings(context.Background(), readingOffset, readingLimit)
 	if err != nil {
 		return err
 	}
