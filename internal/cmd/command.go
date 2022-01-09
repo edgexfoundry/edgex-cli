@@ -187,7 +187,7 @@ func handleWriteCommand(cmd *cobra.Command, args []string) error {
 
 func handleListCommand(cmd *cobra.Command, args []string) error {
 	// issue list commands with specified device name
-	if deviceName != "" {
+	if commandDeviceName != "" {
 		response, err := getCoreCommandService().GetCommandClient().DeviceCoreCommandsByDeviceName(context.Background(), commandDeviceName)
 		if err != nil {
 			return err
