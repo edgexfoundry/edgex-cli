@@ -42,7 +42,7 @@ parts:
     source: .
     plugin: make 
     build-snaps:
-      - go/1.16/stable 
+      - go/1.17/stable 
     override-build: |
       cd $SNAPCRAFT_PART_SRC
       make tidy
