@@ -31,7 +31,7 @@ make build
 - See this list of [all current enhancement issues](https://github.com/edgexfoundry/edgex-cli/issues?q=is%3Aissue+is%3Aopen+label%3Aenhancement) 
 
 ## Community
-- [EdgeXFoundry Slack](https://slack.edgexfoundry.org/)
+- [EdgeXFoundry Slack](https://edgexfoundry.slack.com/)
 - [Mailing lists](https://lists.edgexfoundry.org/g/main)
 
 ## License
