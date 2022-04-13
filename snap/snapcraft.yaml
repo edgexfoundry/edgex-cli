@@ -1,10 +1,7 @@
 name: edgex-cli
 base: core20
 type: app
-adopt-info: version
-summary: A command-line client for EdgeX Foundry
-description: |
-  A command-line client for EdgeX Foundry.
+adopt-info: metadata
 
 grade: stable
 confinement: strict
@@ -18,36 +15,48 @@ apps:
     plugs: [home, network]
 
 parts:
-  version:
-    plugin: nil
-    # we need to include git, in case we are building the minimal-snap-build
-    build-packages:
-      - git
-    # as with static-packages part, the source dir is unrelated to this part and is used
-    # since it changes rarely and therefore will not trigger a new pull
-    source: snap/local/runtime-helpers
-    override-pull: |
-      cd $SNAPCRAFT_PROJECT_DIR
-      GIT_VERSION=$(git describe --tags --abbrev=0 | sed 's/v//')
-      if [ -z "$GIT_VERSION" ]; then
-        GIT_VERSION="0.0.0"
-      fi
-      snapcraftctl set-version ${GIT_VERSION}
-
   config-common:
     plugin: dump
     source: snap/local/runtime-helpers
 
   edgex-cli:
+    after: [metadata]
     source: .
     plugin: make 
     build-snaps:
       - go/1.17/stable 
     override-build: |
       cd $SNAPCRAFT_PART_SRC
+
+      # the version is needed for the build
+      cat ./VERSION
+
       make tidy
       make build
       install -DT "./bin/edgex-cli" "$SNAPCRAFT_PART_INSTALL/bin/edgex-cli"
       install -DT "./Attribution.txt" "$SNAPCRAFT_PART_INSTALL/usr/share/doc/edgex-cli/Attribution.txt"
       install -DT "./LICENSE" "$SNAPCRAFT_PART_INSTALL/usr/share/doc/edgex-cli/LICENSE" 
+
+  metadata:
+    plugin: nil
+    source: https://github.com/canonical/edgex-snap-metadata.git
+    source-branch: appstream
+    source-depth: 1
+    override-build: |
+      # install the icon at the default internal path
+      install -DT edgex-snap-icon.png \
+        $SNAPCRAFT_PART_INSTALL/meta/gui/icon.png
+      # change to this project's repo to get the version
+      cd $SNAPCRAFT_PROJECT_DIR
+      if git describe ; then
+        VERSION=$(git describe --tags --abbrev=0 | sed 's/v//')
+      else
+        VERSION="0.0.0"
+      fi
+      
+      # write version to file for the build
+      echo $VERSION > ./VERSION
+      # set the version of this snap
+      snapcraftctl set-version $VERSION
+    parse-info: [edgex-cli.metainfo.xml] 
 
