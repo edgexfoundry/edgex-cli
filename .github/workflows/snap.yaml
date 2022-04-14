@@ -25,8 +25,10 @@ jobs:
     steps:
       - name: Download and test snap
         # uses: canonical/edgex-snap-testing/test@v2
-        uses: MonicaisHer/edgex-snap-testing/build@EDGEX-416-create-edgex-cli-testing-suite
+        uses: MonicaisHer/edgex-snap-testing/test@EDGEX-416-create-edgex-cli-testing-suite
         with:
           name: cli
           snap: ${{needs.build.outputs.snap}}
+          print_logs: false
+          
 
