@@ -1,47 +1,24 @@
 # EdgeX CLI Snap
-[![snap store badge](https://raw.githubusercontent.com/snapcore/snap-store-badges/master/EN/%5BEN%5D-snap-store-black-uneditable.png)](https://snapcraft.io/edgex-cli)
+[![edgex-cli](https://snapcraft.io/edgex-cli/badge.svg)][edgex-cli]
 
-This folder contains snap packaging for the EdgeX-CLI Snap
+This directory contains the snap packaging of the EdgeX CLI.
 
-The snap currently supports both `amd64` and `arm64` platforms.
+The snap is built automatically and published on the Snap Store as [edgex-cli].
 
-## Installation
+For usage instructions, please refer to EdgeX CLI section in [Getting Started using Snaps][docs].
 
-### Installing snapd
-The snap can be installed on any system that supports snaps. You can see how to install 
-snaps on your system [here](https://snapcraft.io/docs/installing-snapd/6735).
-
-However for full security confinement, the snap should be installed on an 
-Ubuntu 18.04 LTS or later (Desktop or Server), or a system running Ubuntu Core 18 or later.
-
-### Installing EdgeX CLI as a snap
-The snap is published in the snap store at https://snapcraft.io/edgex-cli.
-You can see the current revisions available for your machine's architecture by running the command:
-
-```bash
-$ snap info edgex-cli
+## Build from source
+Execute the following command from the top-level directory of this repo:
+```
+snapcraft
 ```
 
-The latest stable version of the snap can be installed using:
-
+This will create a snap package file with `.snap` extension. It can be installed locally by setting the `--dangerous` flag:
 ```bash
-$ sudo snap install edgex-cli
+sudo snap install --dangerous <snap-file>
 ```
 
-The latest development version of the snap can be installed using:
+The [snapcraft overview](https://snapcraft.io/docs/snapcraft-overview) provides additional details.
 
-```bash
-$ sudo snap install edgex-cli --edge
-```
-
-A specific version of the snap can be installed by setting the channel, for instance for 2.1 (Jakarta):
-
-```bash
-$ sudo snap install edgex-cli --channel=2.1
-```
-
-For the older CLI version compatible with 1.x of EdgeX, use `--channel=1.0`
-
-
-
-**Note** - the snap has only been tested on Ubuntu Core, Desktop, and Server.
+[edgex-cli]: https://snapcraft.io/edgex-cli
+[docs]: https://docs.edgexfoundry.org/2.2/getting-started/Ch-GettingStartedSnapUsers/#edgex-cli
