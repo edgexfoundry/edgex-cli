@@ -10,14 +10,14 @@ See the [CLI Getting started documentation](https://docs.edgexfoundry.org/2.2/ge
 
 ## Installing EdgeX CLI
 
-The client can be installed using a [snap](https://github.com/edgexfoundry/edgex-cli/tree/main/snap):
-
-```
+The client can be installed using a Snap:
+```bash
 sudo snap install edgex-cli
 ```
+Please refer to the [snap directory](./snap) for details.
 
 To build, install and run `edgex-cli` natively, do the following:
-```
+```bash
 git clone http://github.com/edgexfoundry/edgex-cli.git
 cd edgex-cli
 make tidy
@@ -26,7 +26,7 @@ make build
 ```
 
 ## Limitations
-- The client requires all services to run on the local host. It does not support a distributed configuration or using the API gateway ([#427](https://github.com/edgexfoundry/edgex-cli/issues/427))
+- The client requires all services to run on the localhost. It does not support a distributed configuration or using the API gateway ([#427](https://github.com/edgexfoundry/edgex-cli/issues/427))
 - The `db` command from the v1 client is not supported ([#383](https://github.com/edgexfoundry/edgex-cli/issues/383))
 - See this list of [all current enhancement issues](https://github.com/edgexfoundry/edgex-cli/issues?q=is%3Aissue+is%3Aopen+label%3Aenhancement) 
 
