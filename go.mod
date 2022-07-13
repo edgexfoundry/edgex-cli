@@ -1,5 +1,7 @@
 module github.com/edgexfoundry/edgex-cli
 
+go 1.18
+
 require (
 	github.com/edgexfoundry/go-mod-core-contracts/v2 v2.0.0
 	github.com/spf13/cobra v1.3.0
@@ -19,5 +21,3 @@ require (
 	golang.org/x/sys v0.0.0-20211205182925-97ca703d548d // indirect
 	golang.org/x/text v0.3.7 // indirect
 )
-
-go 1.17
