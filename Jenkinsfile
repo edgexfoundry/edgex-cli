@@ -14,6 +14,8 @@
 // limitations under the License.
 //
 
+@Library("edgex-global-pipelines@291c4df366b1211a453f8ba03165bbcbbf48c1ef") _
+
 edgeXBuildGoApp (
     project: 'edgex-cli',
     arch: ['amd64'],
