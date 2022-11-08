@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/edgexfoundry/go-mod-core-contracts/v2 v2.3.0
-	github.com/spf13/cobra v1.3.0
+	github.com/spf13/cobra v1.6.1
 )
 
 require (
@@ -13,7 +13,7 @@ require (
 	github.com/go-playground/universal-translator v0.18.0 // indirect
 	github.com/go-playground/validator/v10 v10.11.1 // indirect
 	github.com/google/uuid v1.3.0 // indirect
-	github.com/inconshreveable/mousetrap v1.0.0 // indirect
+	github.com/inconshreveable/mousetrap v1.0.1 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
