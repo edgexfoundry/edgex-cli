@@ -6,7 +6,17 @@
 ### Change Logs for EdgeX Dependencies
 - [go-mod-core-contracts](https://github.com/edgexfoundry/go-mod-core-contracts/blob/main/CHANGELOG.md)
 
-## [v2.2.0] Kamakura - 2022-05-11  (Not Compatible with 1.x releases)
+## [v2.3.0] Levski - 2022-11-09  (Only compatible with the 2.x release)
+
+### Code Refactoring ♻
+
+- Use DeviceProfileBasicInfo when creating DeviceProfile ([#450](https://github.com/edgexfoundry/edgex-cli/issues/450)) ([#b8614dc](https://github.com/edgexfoundry/edgex-cli/commits/b8614dc))
+
+### Build 👷
+
+- Upgrade to Go 1.18 and optimize attribution script ([#445](https://github.com/edgexfoundry/edgex-cli/issues/445)) ([#b285fb7](https://github.com/edgexfoundry/edgex-cli/commits/b285fb7))
+
+## [v2.2.0] Kamakura - 2022-05-11  (Only compatible with the 2.x release)
 
 ### Bug Fixes 🐛
 - Replace slack.edgexfoundry.org with edgexfoundry.slack.com ([#b653c32](https://github.com/edgexfoundry/edgex-cli/commits/b653c32))
@@ -26,7 +36,7 @@
 - gomod changes related for Go 1.17 ([#433](https://github.com/edgexfoundry/edgex-cli/issues/433)) ([#cb94420](https://github.com/edgexfoundry/edgex-cli/commits/cb94420))
 - Go 1.17 related changes ([#432](https://github.com/edgexfoundry/edgex-cli/issues/432)) ([#10c2baf](https://github.com/edgexfoundry/edgex-cli/commits/10c2baf))
 
-## [v2.1.0] Jakarta - 2021-11-18  (Not Compatible with 1.x releases)
+## [v2.1.0] Jakarta - 2021-11-18  (Only compatible with the 2.x release)
 ### Features ✨
 - Add V2 support-scheduler ([#6d2939f](https://github.com/edgexfoundry/edgex-cli/commits/6d2939f))
 - Add V2 support-notifications ([#c21b0cc](https://github.com/edgexfoundry/edgex-cli/commits/c21b0cc))
