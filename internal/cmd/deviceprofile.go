@@ -189,11 +189,13 @@ func handleAddDeviceProfile(cmd *cobra.Command, args []string) error {
 	}
 
 	var req = requests.NewDeviceProfileRequest(dtos.DeviceProfile{
-		Name:            deviceProfileName,
-		Description:     deviceProfileDescription,
-		Manufacturer:    deviceProfileManufacturer,
-		Model:           deviceProfileModel,
-		Labels:          labels,
+		DeviceProfileBasicInfo: dtos.DeviceProfileBasicInfo{
+			Name:         deviceProfileName,
+			Description:  deviceProfileDescription,
+			Manufacturer: deviceProfileManufacturer,
+			Model:        deviceProfileModel,
+			Labels:       labels,
+		},
 		DeviceResources: resources,
 		DeviceCommands:  commands,
 	})
